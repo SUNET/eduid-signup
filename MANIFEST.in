@@ -1,0 +1,2 @@
+include *.rst *.cfg *.txt
+recursive-include eduid_signup *.ini
