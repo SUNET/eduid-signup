@@ -18,7 +18,7 @@ requires = [
 
 
 test_requires = [
-    'WebTest==2.0.4',
+    'WebTest==1.4.3',
 ]
 
 
