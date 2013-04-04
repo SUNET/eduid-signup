@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: lgs@yaco.es\n"
-"POT-Creation-Date: 2013-04-04 12:45+0200\n"
+"POT-Creation-Date: 2013-04-04 18:11+0200\n"
 "PO-Revision-Date: 2013-04-04 12:45+0200\n"
 "Last-Translator: Lorenzo Gil <lgs@yaco.es>\n"
 "Language-Team: es <ES@li.org>\n"
@@ -45,4 +45,20 @@ msgstr "Crea una cuenta que te dará acceso a todas las universidades Suecas."
 #: eduid_signup/templates/home.jinja2:7
 msgid "Sign up today"
 msgstr "Date de alta hoy"
+
+#: eduid_signup/templates/home.jinja2:11
+msgid "Sign up with your email"
+msgstr "Regístrate con tu correo electrónico"
+
+#: eduid_signup/templates/home.jinja2:20
+msgid "Signup with your social network id"
+msgstr "Regístrate con tus redes sociales"
+
+#: eduid_signup/templates/home.jinja2:21
+msgid "Facebook"
+msgstr ""
+
+#: eduid_signup/templates/home.jinja2:22
+msgid "Google"
+msgstr ""
 
