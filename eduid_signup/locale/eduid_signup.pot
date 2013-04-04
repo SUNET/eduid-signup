@@ -1,0 +1,47 @@
+# Translations template for eduid_signup.
+# Copyright (C) 2013 ORGANIZATION
+# This file is distributed under the same license as the eduid_signup project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: eduid_signup 0.1dev\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-04-04 12:52+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: eduid_signup/templates/base.jinja2:6
+msgid "eduID Sign Up"
+msgstr ""
+
+#: eduid_signup/templates/base.jinja2:20
+msgid "Home"
+msgstr ""
+
+#: eduid_signup/templates/base.jinja2:21
+msgid "About"
+msgstr ""
+
+#: eduid_signup/templates/base.jinja2:22
+msgid "Contact"
+msgstr ""
+
+#: eduid_signup/templates/home.jinja2:5
+msgid "Welcome to eduID!"
+msgstr ""
+
+#: eduid_signup/templates/home.jinja2:6
+msgid "Create an account that will allow you access to all Sweedish Universities."
+msgstr ""
+
+#: eduid_signup/templates/home.jinja2:7
+msgid "Sign up today"
+msgstr ""
+

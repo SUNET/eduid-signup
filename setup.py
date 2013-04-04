@@ -1,4 +1,5 @@
 import os
+import sys
 
 from setuptools import setup, find_packages
 
@@ -16,6 +17,10 @@ requires = [
     'pyramid_jinja2==1.6',
     'waitress==0.8.2',
 ]
+
+if sys.version_info[0] < 3:
+    # Babel does not work with Python 3
+    requires.append('Babel==0.9.6')
 
 
 test_requires = [

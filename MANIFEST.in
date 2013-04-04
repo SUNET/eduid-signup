@@ -1,2 +1,3 @@
-include *.rst *.cfg *.txt
-recursive-include eduid_signup *.ini
+include *.rst *.cfg *.txt *.ini
+recursive-include config-templates *.ini
+recursive-include eduid_signup *.jinja2 *.ico *.png *.gif *.jpg *.css *.js

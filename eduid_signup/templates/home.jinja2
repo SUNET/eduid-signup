@@ -1,9 +1,10 @@
 {% extends "templates/base.jinja2" %}
+
 {% block contents %}
 <div class="jumbotron">
-  <h1>Welcome to eduID!</h1>
-  <p class="lead">Create an account that will allow you access to all Sweedish Universities.</p>
-  <a class="btn btn-large btn-success" href="#">Sign up today</a>
+  <h1>{{ _("Welcome to eduID!") }}</h1>
+  <p class="lead">{{ _("Create an account that will allow you access to all Sweedish Universities.") }}</p>
+  <a class="btn btn-large btn-success" href="#">{{ _("Sign up today") }}</a>
 </div>
 
 <div class="row">

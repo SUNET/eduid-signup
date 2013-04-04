@@ -1,0 +1,48 @@
+# Spanish translations for eduid_signup.
+# Copyright (C) 2013 ORGANIZATION
+# This file is distributed under the same license as the eduid_signup
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: eduid_signup 0.1dev\n"
+"Report-Msgid-Bugs-To: lgs@yaco.es\n"
+"POT-Creation-Date: 2013-04-04 12:45+0200\n"
+"PO-Revision-Date: 2013-04-04 12:45+0200\n"
+"Last-Translator: Lorenzo Gil <lgs@yaco.es>\n"
+"Language-Team: es <ES@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: eduid_signup/templates/base.jinja2:6
+msgid "eduID Sign Up"
+msgstr "Altas de eduID"
+
+#: eduid_signup/templates/base.jinja2:20
+msgid "Home"
+msgstr "Inicio"
+
+#: eduid_signup/templates/base.jinja2:21
+msgid "About"
+msgstr "Acerca de"
+
+#: eduid_signup/templates/base.jinja2:22
+msgid "Contact"
+msgstr "Contacto"
+
+#: eduid_signup/templates/home.jinja2:5
+msgid "Welcome to eduID!"
+msgstr "¡Bienvenido a eduID!"
+
+#: eduid_signup/templates/home.jinja2:6
+msgid "Create an account that will allow you access to all Sweedish Universities."
+msgstr "Crea una cuenta que te dará acceso a todas las universidades Suecas."
+
+#: eduid_signup/templates/home.jinja2:7
+msgid "Sign up today"
+msgstr "Date de alta hoy"
+
