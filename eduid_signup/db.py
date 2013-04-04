@@ -1,11 +1,6 @@
 import pymongo
-import six
 
-if six.PY3:  # pragma: no cover
-    import urllib as urlparse
-else:  # pragma: no cover
-    import urlparse
-
+from eduid_signup.compat import urlparse
 
 DEFAULT_MONGODB_HOST = 'localhost'
 DEFAULT_MONGODB_PORT = 27017
