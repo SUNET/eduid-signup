@@ -15,6 +15,7 @@ requires = [
     'pyramid_beaker==0.7',
     'pyramid_debugtoolbar==1.0.4',
     'pyramid_jinja2==1.6',
+    'six==1.3.0',
     'waitress==0.8.2',
 ]
 
