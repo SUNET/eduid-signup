@@ -8,6 +8,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
+version = '0.1dev'
 
 requires = [
     'pymongo==2.5',
@@ -41,10 +42,14 @@ testing_extras = test_requires + [
 
 setup(
     name='eduid_signup',
-    version='0.1dev',
-    description='eduId Sign Up application',
-    long_description = README + '\n\n' + CHANGES,
+    version=version,
+    description='eduID Sign Up application',
+    long_description=README + '\n\n' + CHANGES,
     # TODO: add classifiers
+    classifiers=[
+        # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+    ],
+    keywords='identity federation saml',
     author='NORDUnet A/S',
     url='https://github.com/SUNET/eduid-signup',
     packages=find_packages(),
