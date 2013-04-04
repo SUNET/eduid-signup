@@ -10,6 +10,8 @@ def includeme(config):
 def main(global_config, **settings):
     config = Configurator(settings=settings)
 
+    config.include('pyramid_jinja2')
+
     includeme(config)
 
     config.scan(ignore=[re.compile('.*tests.*').search, '.testing'])
