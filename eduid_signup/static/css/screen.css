@@ -11,3 +11,7 @@
     font-size: 21px;
     padding: 14px 24px;
 }
+
+.input-append .help-block {
+    font-size: 14px;
+}

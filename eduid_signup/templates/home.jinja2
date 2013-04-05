@@ -6,14 +6,20 @@
   <p class="lead">{{ _("Create an account that will allow you access to all Sweedish Universities.") }}</p>
   <a class="btn btn-large btn-success" href="#">{{ _("Sign up today") }}</a>
 </div>
-<div id="sign-up-block" class="row hide">
+<div id="sign-up-block" class="row {% if email_error is not defined %}hide{% endif %}">
   <div id="email-register" class="span6">
     <h3>{{ _("Sign up with your email") }}</h3>
     <div>
       <form class="form-inline" method="POST">
         <div class="input-append">
-          <input type="email" name="email" placeholder="you@example.com"/>
-          <input type="submit" class="btn"/>
+            <span class="control-group {% if email_error is defined %}error{% endif %}">
+              <input type="email" name="email" placeholder="you@example.com"
+                {% if email is defined %}value="{{ email }}"{% endif %}/>
+            </span>
+            <input type="submit" class="btn"/>
+            {% if email_error is defined %}
+              <span class="help-block error">{{ email_error }}</span>
+            {% endif %}
         </div>
       </form>
     </div>
