@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-04 18:11+0200\n"
+"POT-Creation-Date: 2013-04-05 14:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: eduid_signup/views.py:22
+msgid "Email is not valid"
+msgstr ""
 
 #: eduid_signup/templates/base.jinja2:6
 msgid "eduID Sign Up"
@@ -49,15 +53,15 @@ msgstr ""
 msgid "Sign up with your email"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:20
+#: eduid_signup/templates/home.jinja2:28
 msgid "Signup with your social network id"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:21
+#: eduid_signup/templates/home.jinja2:29
 msgid "Facebook"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:22
+#: eduid_signup/templates/home.jinja2:30
 msgid "Google"
 msgstr ""
 
