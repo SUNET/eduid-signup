@@ -1,0 +1,21 @@
+{% extends "templates/base.jinja2" %}
+
+{% block contents %}
+<div class="jumbotron">
+  <h1>{{ _("Welcome to eduID!") }}</h1>
+  <p class="lead">{{ _("Now, you are successfully registered.") }}</p>
+</div>
+<div class="row">
+
+  <div class="span6">
+    <h4>{{ _("Complete your profile") }}</h4>
+    <p> {{ _("Now, you can complete your profile clicking in this <a href='%(profile_link)s'>link</a>")|format(profile_link=profile_link)|safe }}</p>
+  </div>
+  <div>
+    <h4>{{ _("Remember! You must confirm your email") }}</h4>
+    <p>{{ _("An email with a confirmation link was sent to your inbox, remember
+       that you need to confirm your email address by clicking on that link.") }}</p>
+  </div>
+
+</div>
+{% endblock %}

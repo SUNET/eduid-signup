@@ -26,6 +26,7 @@ def includeme(config):
 
     # root views
     config.add_route('home', '/')
+    config.add_route('success', '/success/')
 
 
 def main(global_config, **settings):
@@ -34,11 +35,18 @@ def main(global_config, **settings):
     available_languages = read_setting_from_env(settings, 'available_languages', 'en es')
     settings['available_languages'] = [
         lang for lang in available_languages.split(' ') if lang
-        ]
+    ]
 
     settings['mongo_uri'] = read_setting_from_env(settings, 'mongo_uri', None)
     if settings['mongo_uri'] is None:
         raise ConfigurationError('The mongo_uri configuration option is required')
+
+    settings['profile_link'] = read_setting_from_env(settings,
+                                                     'profile_link',
+                                                     None)
+    if settings['profile_link'] is None:
+        raise ConfigurationError('The profile_link configuration option is '
+                                 'required')
 
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)

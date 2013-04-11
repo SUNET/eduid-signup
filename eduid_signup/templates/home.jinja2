@@ -14,7 +14,8 @@
         <div class="input-append">
             <span class="control-group {% if email_error is defined %}error{% endif %}">
               <input type="email" name="email" placeholder="you@example.com"
-                {% if email is defined %}value="{{ email }}"{% endif %}/>
+                {% if email is defined %}value="{{ email }}"{% endif %}
+                required/>
             </span>
             <input type="submit" class="btn"/>
             {% if email_error is defined %}
