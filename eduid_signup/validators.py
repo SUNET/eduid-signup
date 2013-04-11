@@ -16,5 +16,5 @@ def email_format_validator(email):
 
 
 def required_validator(post, fieldname, message):
-    if not fieldname.get(fieldname, None):
+    if not post.get(fieldname, None):
         return {"{0}_error".format(fieldname): message}
