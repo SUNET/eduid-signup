@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: lgs@yaco.es\n"
-"POT-Creation-Date: 2013-04-05 14:28+0200\n"
+"POT-Creation-Date: 2013-04-11 16:53+0200\n"
 "PO-Revision-Date: 2013-04-04 12:45+0200\n"
 "Last-Translator: Lorenzo Gil <lgs@yaco.es>\n"
 "Language-Team: es <ES@li.org>\n"
@@ -18,9 +18,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: eduid_signup/views.py:22
+#: eduid_signup/validators.py:14
 msgid "Email is not valid"
 msgstr "Email no válido"
+
+#: eduid_signup/views.py:16
+msgid "Email is required"
+msgstr "Email es requerido"
+
+#: eduid_signup/views.py:28
+msgid "This email is already registered"
+msgstr "Este email ya estaba registrado"
 
 #: eduid_signup/templates/base.jinja2:6
 msgid "eduID Sign Up"
@@ -38,7 +46,7 @@ msgstr "Acerca de"
 msgid "Contact"
 msgstr "Contacto"
 
-#: eduid_signup/templates/home.jinja2:5
+#: eduid_signup/templates/home.jinja2:5 eduid_signup/templates/success.jinja2:5
 msgid "Welcome to eduID!"
 msgstr "¡Bienvenido a eduID!"
 
@@ -54,15 +62,45 @@ msgstr "Date de alta hoy"
 msgid "Sign up with your email"
 msgstr "Regístrate con tu correo electrónico"
 
-#: eduid_signup/templates/home.jinja2:28
+#: eduid_signup/templates/home.jinja2:29
 msgid "Signup with your social network id"
 msgstr "Regístrate con tus redes sociales"
 
-#: eduid_signup/templates/home.jinja2:29
+#: eduid_signup/templates/home.jinja2:30
 msgid "Facebook"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:30
+#: eduid_signup/templates/home.jinja2:31
 msgid "Google"
 msgstr ""
+
+#: eduid_signup/templates/success.jinja2:6
+msgid "You are successfully registered now"
+msgstr ""
+
+#: eduid_signup/templates/success.jinja2:11
+msgid "Complete your profile"
+msgstr "Completa tu perfil"
+
+#: eduid_signup/templates/success.jinja2:12
+msgid "Now, you can complete your profile clicking in the next button"
+msgstr "Ahora puedes completar tu perfil pulsando en el siguiente botón"
+
+#: eduid_signup/templates/success.jinja2:14
+msgid "Fill your profile"
+msgstr "Completa tu perfil"
+
+#: eduid_signup/templates/success.jinja2:18
+msgid "Remember! You must confirm your email"
+msgstr "Recuerda! Debes confirmar tu correo"
+
+#: eduid_signup/templates/success.jinja2:19
+msgid ""
+"An email with a confirmation link was sent to your inbox, remember\n"
+"       that you need to confirm your email address by clicking on that "
+"link."
+msgstr ""
+"Un email con enlace de confirmación te ha sido enviado, recuerda\n"
+"       que necesitas confirmar tu dirección de email haciendo click en "
+"ese enlace."
 
