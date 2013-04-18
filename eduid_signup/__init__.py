@@ -3,6 +3,7 @@ import re
 
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
+from pyramid.settings import asbool
 
 from eduid_signup.db import MongoDB, get_db
 from eduid_signup.i18n import locale_negotiator
@@ -27,9 +28,22 @@ def includeme(config):
     # root views
     config.add_route('home', '/')
     config.add_route('success', '/success/')
+    config.add_route('email_verification_link', '/email_verification/{code}/')
 
 
 def main(global_config, **settings):
+
+    # read pyramid_mailer options
+    for key, default in (
+        ('host', 'localhost'),
+        ('port', '25'),
+        ('username', None),
+        ('password', None),
+        ('default_sender', 'no-reply@example.com')
+    ):
+        option = 'mail_' + key
+
+    settings[option] = read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
     available_languages = read_setting_from_env(settings, 'available_languages', 'en es')
@@ -53,6 +67,13 @@ def main(global_config, **settings):
 
     # include other packages
     config.include('pyramid_jinja2')
+
+    if 'testing' in settings and asbool(settings['testing']):
+        config.include('pyramid_mailer.testing')
+    else:
+        config.include('pyramid_mailer')
+
+    config.include('pyramid_tm')
 
     # global directives
     config.add_static_view('static', 'static', cache_max_age=3600)

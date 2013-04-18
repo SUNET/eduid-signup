@@ -3,8 +3,10 @@ from datetime import datetime
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 
+from eduid_signup.emails import send_verification_mail
 from eduid_signup.i18n import TranslationString as _
 from eduid_signup.validators import email_format_validator, required_validator
+from eduid_signup.utils import generate_verification_link
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
@@ -13,7 +15,11 @@ def home(request):
     if request.method == 'POST':
         email = request.POST.get("email", None)
 
-        response = required_validator(request.POST, "email", _("Email is required"))
+        response = required_validator(
+            request.POST,
+            "email",
+            _("Email is required")
+        )
 
         if not response:
             response = email_format_validator(email)
@@ -28,12 +34,8 @@ def home(request):
                 return {"email_error": _("This email is already registered"),
                         "email": email}
 
-            # Do the registration staff
-            now = datetime.utcnow()
-            request.db.registered.insert({
-                "email": email,
-                "date": now
-            })
+            send_verification_mail(request, email)
+
             success_url = request.route_url("success")
             return HTTPFound(location=success_url)
 
@@ -42,6 +44,15 @@ def home(request):
 
 @view_config(route_name='success', renderer="templates/success.jinja2")
 def success(request):
+    return {
+        "profile_link": request.registry.settings.get("profile_link", "#")
+    }
+
+
+@view_config(route_name='email_verification_link',
+             renderer="templates/email_verified.jinja2")
+def email_verification_link(request, code):
+    # TODO
     return {
         "profile_link": request.registry.settings.get("profile_link", "#")
     }
