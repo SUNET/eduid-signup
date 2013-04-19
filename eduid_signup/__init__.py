@@ -41,7 +41,7 @@ def main(global_config, **settings):
         ('password', None),
         ('default_sender', 'no-reply@example.com')
     ):
-        option = 'mail_' + key
+        option = 'mail.' + key
 
     settings[option] = read_setting_from_env(settings, option, default)
 
@@ -59,6 +59,13 @@ def main(global_config, **settings):
                                                      'profile_link',
                                                      None)
     if settings['profile_link'] is None:
+        raise ConfigurationError('The profile_link configuration option is '
+                                 'required')
+
+    settings['site.name'] = read_setting_from_env(settings,
+                                                  'site.name',
+                                                  None)
+    if settings['site.name'] is None:
         raise ConfigurationError('The profile_link configuration option is '
                                  'required')
 

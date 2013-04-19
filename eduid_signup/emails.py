@@ -13,20 +13,27 @@ def send_verification_mail(request, email):
     mailer = get_mailer(request)
     (verification_link, code) = generate_verification_link(request)
 
+    context = {
+        "email": email,
+        "verification_link": verification_link,
+        "site_url": request.route_url("home"),
+        "site_name": request.registry.settings.get("site.name", "eduid_signup")
+    }
+
     message = Message(
         subject=_("eduid-signup verification email"),
-        sender=request.registry.settings.get("mail_default_sender"),
+        sender=request.registry.settings.get("mail.default_sender"),
         recipients=[email],
         body=render(
             "templates/verification_email.txt.jinja2",
-            {
-                "email": email,
-                "verification_link": verification_link,
-                "site_url": "http://example.com/",
-                "site_name": "Site Name"
-            },
-            request
-        )
+            context,
+            request,
+        ),
+        html=render(
+            "templates/verification_email.html.jinja2",
+            context,
+            request,
+        ),
     )
 
     mailer.send(message)
@@ -35,4 +42,5 @@ def send_verification_mail(request, email):
         "email": email,
         "date": datetime.utcnow(),
         "code": code,
-    })
+        "verified": False,
+    }, safe=True)
