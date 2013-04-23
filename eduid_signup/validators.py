@@ -10,7 +10,7 @@ RFC2822_email = re.compile("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
 
 
 def email_format_validator(email):
-    if not RFC2822_email.match(email):
+    if not RFC2822_email.match(email.lower()):
         return {"email_error": _("Email is not valid"),
                 "email": email}
 
