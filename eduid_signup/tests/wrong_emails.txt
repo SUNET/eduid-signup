@@ -4,6 +4,8 @@ userâ@more.domains.example.com
 user'more@.domains.example.com
 us·er@more.domains.example.com
 user@example@example.com
+us er@example.com
+user@exa mple.com
 a@com
 com
 userlocalhost
