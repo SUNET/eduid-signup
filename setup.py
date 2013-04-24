@@ -18,6 +18,7 @@ requires = [
     'pyramid_jinja2==1.6',
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
+    'pyramid_sna==0.1.2',
     'waitress==0.8.2',
 ]
 
