@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from pyramid.httpexceptions import HTTPNotFound, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPInternalServerError
 
 
 def generate_verification_link(request):
