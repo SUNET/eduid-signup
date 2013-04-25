@@ -3,9 +3,12 @@ from os import path
 import unittest
 
 from eduid_signup.validators import validate_email_format
+from eduid_signup.validators import validate_email_is_unique
+from eduid_signup.validators import validate_email, ValidationError
+from eduid_signup.testing import DBTests
 
 
-class EmailValidatorTests(unittest.TestCase):
+class EmailFormatTests(unittest.TestCase):
 
     def read_emails(self, filename):
         basepath = path.abspath(path.dirname(__file__))
@@ -23,3 +26,38 @@ class EmailValidatorTests(unittest.TestCase):
     def test_wrong_emails(self):
         for email in self.read_emails("wrong_emails.txt"):
             self.assertFalse(validate_email_format(email))
+
+
+class EmailUniqueTests(DBTests):
+
+    clean_collections = ('registered', )
+
+    def test_email_unique(self):
+        self.assertTrue(validate_email_is_unique(self.db, 'foo@example.com'))
+
+    def test_email_duplicate(self):
+        self.db.registered.insert({'email': 'foo@example.com'}, safe=True)
+
+        self.assertFalse(validate_email_is_unique(self.db, 'foo@example.com'))
+
+
+class ValidateEmailTests(DBTests):
+
+    clean_collections = ('registered', )
+
+    def test_no_email(self):
+        self.assertRaises(ValidationError, validate_email,
+                          self.db, {})
+
+    def test_bad_format(self):
+        self.assertRaises(ValidationError, validate_email,
+                          self.db, {'email': 'a@com'})
+
+    def test_already_exist(self):
+        self.db.registered.insert({'email': 'foo@example.com'}, safe=True)
+        self.assertRaises(ValidationError, validate_email,
+                          self.db, {'email': 'foo@example.com'})
+
+    def test_good_email(self):
+        self.assertEqual('bar@example.com',
+                         validate_email(self.db, {'email': 'bar@example.com'}))

@@ -27,7 +27,7 @@ def validate_email(db, data):
     """Validate that a valid email address exist in the data dictionary"""
     try:
         email = data['email']
-    except AttributeError:
+    except KeyError:
         raise ValidationError(_("Email is required"))
 
     if not validate_email_format(email):
