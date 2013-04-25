@@ -2,7 +2,7 @@ from os import path
 
 import unittest
 
-from eduid_signup.validators import email_format_validator
+from eduid_signup.validators import validate_email_format
 
 
 class EmailValidatorTests(unittest.TestCase):
@@ -17,16 +17,9 @@ class EmailValidatorTests(unittest.TestCase):
         return emails
 
     def test_verified_emails(self):
-        verified_emails = self.read_emails("verified_emails.txt")
-
-        for email in verified_emails:
-            self.assertEqual(None, email_format_validator(email))
+        for email in self.read_emails("verified_emails.txt"):
+            self.assertTrue(validate_email_format(email))
 
     def test_wrong_emails(self):
-        wrong_emails = self.read_emails("wrong_emails.txt")
-
-        for email in wrong_emails:
-            self.assertEqual({
-                "email_error": "Email is not valid",
-                "email": email
-            }, email_format_validator(email))
+        for email in self.read_emails("wrong_emails.txt"):
+            self.assertFalse(validate_email_format(email))
