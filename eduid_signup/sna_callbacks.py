@@ -4,12 +4,13 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
 
-def google_callback(request, user_id, attributes):
-    """pyramid_sna calls this function aftera successfull authentication flow"""
+def create_or_update(request, provider, provider_user_id, attributes):
+    provider_key = '%s_id' % provider
     # Create or update the user
-    user = request.db.users.find_one({'google_id': user_id})
+    user = request.db.users.find_one({provider_key: provider_user_id})
     if user is None:  # first time
         user_id = request.db.registered.insert({
+            provider_key: provider_user_id,
             "email": attributes["email"],
             "date": datetime.datetime.utcnow(),
             "verified": True,
@@ -26,5 +27,9 @@ def google_callback(request, user_id, attributes):
     return HTTPFound(request.route_url('success'), headers=remember_headers)
 
 
+def google_callback(request, user_id, attributes):
+    return create_or_update(request, 'google', user_id, attributes)
+
+
 def facebook_callback(request, user_id, attributes):
-    pass
+    return create_or_update(request, 'facebook', user_id, attributes)
