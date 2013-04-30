@@ -69,6 +69,10 @@ def main(global_config, **settings):
         raise ConfigurationError('The profile_link configuration option is '
                                  'required')
 
+
+    settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
+    settings['facebook_callback'] =  'eduid_signup.sna_callbacks.facebook_callback'
+
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
 
