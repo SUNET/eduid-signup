@@ -27,8 +27,14 @@
   </div>
   <div id="social-register" class="span6">
     <h3>{{ _("Signup with your social network id") }}</h3>
-    <a class="btn" href="{{ request.route_path('facebook_login') }}">{{ _("Facebook") }}</a>
-    <a class="btn" href="{{ request.route_path('google_login') }}">{{ _("Google") }}</a>
+    <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
+      <span class="btn-icon"></span>
+      <span class="btn-text">{{ _("Sign up with Facebook") }}</span>
+    </a>
+    <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">
+      <span class="btn-icon"></span>
+      <span class="btn-text">{{ _("Sign up with Google") }}</span>
+    </a>
   </div>
 </div>
 <div class="row">
