@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: lgs@yaco.es\n"
-"POT-Creation-Date: 2013-04-11 16:53+0200\n"
-"PO-Revision-Date: 2013-04-04 12:45+0200\n"
+"POT-Creation-Date: 2013-04-30 18:41+0200\n"
+"PO-Revision-Date: 2013-04-30 18:47+0200\n"
 "Last-Translator: Lorenzo Gil <lgs@yaco.es>\n"
 "Language-Team: es <ES@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -18,15 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: eduid_signup/validators.py:14
-msgid "Email is not valid"
-msgstr "Email no válido"
+#: eduid_signup/emails.py:24
+msgid "eduid-signup verification email"
+msgstr ""
 
-#: eduid_signup/views.py:16
+#: eduid_signup/validators.py:32
 msgid "Email is required"
 msgstr "Email es requerido"
 
-#: eduid_signup/views.py:28
+#: eduid_signup/validators.py:35
+msgid "Email is not valid"
+msgstr "Email no válido"
+
+#: eduid_signup/validators.py:38
 msgid "This email is already registered"
 msgstr "Este email ya estaba registrado"
 
@@ -46,49 +50,52 @@ msgstr "Acerca de"
 msgid "Contact"
 msgstr "Contacto"
 
+#: eduid_signup/templates/email_verified.jinja2:5
 #: eduid_signup/templates/home.jinja2:5 eduid_signup/templates/success.jinja2:5
 msgid "Welcome to eduID!"
 msgstr "¡Bienvenido a eduID!"
 
-#: eduid_signup/templates/home.jinja2:6
-msgid "Create an account that will allow you access to all Sweedish Universities."
-msgstr "Crea una cuenta que te dará acceso a todas las universidades Suecas."
+#: eduid_signup/templates/email_verified.jinja2:6
+msgid "Your email has been verified now"
+msgstr "Tu email acaba de ser verificado"
 
-#: eduid_signup/templates/home.jinja2:7
-msgid "Sign up today"
-msgstr "Date de alta hoy"
-
-#: eduid_signup/templates/home.jinja2:11
-msgid "Sign up with your email"
-msgstr "Regístrate con tu correo electrónico"
-
-#: eduid_signup/templates/home.jinja2:29
-msgid "Signup with your social network id"
-msgstr "Regístrate con tus redes sociales"
-
-#: eduid_signup/templates/home.jinja2:30
-msgid "Facebook"
-msgstr ""
-
-#: eduid_signup/templates/home.jinja2:31
-msgid "Google"
-msgstr ""
-
-#: eduid_signup/templates/success.jinja2:6
-msgid "You are successfully registered now"
-msgstr ""
-
+#: eduid_signup/templates/email_verified.jinja2:9
 #: eduid_signup/templates/success.jinja2:11
 msgid "Complete your profile"
 msgstr "Completa tu perfil"
 
-#: eduid_signup/templates/success.jinja2:12
-msgid "Now, you can complete your profile clicking in the next button"
+#: eduid_signup/templates/email_verified.jinja2:10
+msgid "Now, you can complete your profile clicking in the follow button"
 msgstr "Ahora puedes completar tu perfil pulsando en el siguiente botón"
 
+#: eduid_signup/templates/email_verified.jinja2:12
 #: eduid_signup/templates/success.jinja2:14
 msgid "Fill your profile"
 msgstr "Completa tu perfil"
+
+#: eduid_signup/templates/home.jinja2:7
+msgid "Create an account that will allow you access to all Sweedish Universities."
+msgstr "Crea una cuenta que te dará acceso a todas las universidades Suecas."
+
+#: eduid_signup/templates/home.jinja2:15
+msgid "Sign up with your email"
+msgstr "Regístrate con tu email"
+
+#: eduid_signup/templates/home.jinja2:26
+msgid "Sign up with Facebook"
+msgstr "Regístrate con Facebook"
+
+#: eduid_signup/templates/home.jinja2:30
+msgid "Sign up with Google"
+msgstr "Regístrate con Google"
+
+#: eduid_signup/templates/success.jinja2:6
+msgid "You are successfully registered now"
+msgstr "Acabas de registrarte correctamente"
+
+#: eduid_signup/templates/success.jinja2:12
+msgid "Now, you can complete your profile clicking in the next button"
+msgstr "Ahora puedes completar tu perfil pulsando en el siguiente botón"
 
 #: eduid_signup/templates/success.jinja2:18
 msgid "Remember! You must confirm your email"
@@ -103,4 +110,33 @@ msgstr ""
 "Un email con enlace de confirmación te ha sido enviado, recuerda\n"
 "       que necesitas confirmar tu dirección de email haciendo click en "
 "ese enlace."
+
+#: eduid_signup/templates/verification_email.html.jinja2:1
+#, python-format
+msgid ""
+"\n"
+"<h2>Welcome to %(site_name)s,</h2>\n"
+"\n"
+"<p>We send you an email with a verification link because you has\n"
+"registered at <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+"\n"
+"<p>Please, click on the follow link to verificate your email account.</p>"
+"\n"
+"\n"
+"<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
+msgstr ""
+
+#: eduid_signup/templates/verification_email.txt.jinja2:1
+#, python-format
+msgid ""
+"\n"
+"Welcome to %(site_name)s,\n"
+"\n"
+"We send you an email with a verification link because you has\n"
+"registered at %(site_name)s %(site_url)s.\n"
+"\n"
+"Please, click on the follow link to verificate your email account.\n"
+"\n"
+"%(verification_link)s\n"
+msgstr ""
 

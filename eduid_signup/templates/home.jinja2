@@ -12,7 +12,7 @@
       	<div class="control-group{% if email_error is defined %} error{% endif %}">
         <div class="input-append">
           <input type="email" name="email" placeholder="you@example.com" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
-          <button class="btn btn-success" type="submit">Sign up with your email</button>
+          <button class="btn btn-success" type="submit">{{ _("Sign up with your email") }}</button>
 	  {% if email_error is defined %}
 	    <p class="help-block">{{ email_error }}</p>
 	  {% endif %}

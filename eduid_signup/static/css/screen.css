@@ -47,8 +47,8 @@
 .btn-text {
     display: inline-block;
     vertical-align: middle;
-    padding: 0 15px 0 10px;
-    margin: 0 0 0 10px;
+    padding: 0 14px 0 10px;
+    margin: 0 0 0 4px;
     border-left: 1px solid #ccc;
 }
 
