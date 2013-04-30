@@ -9,7 +9,9 @@ class HomeViewTests(FunctionalTests):
         res.mustcontain(
             'Welcome to eduID!',
             'Create an account that will allow you access to all Sweedish Universities.',
-            'Sign up today'
+            'Sign up with your email',
+            'Sign up with Facebook',
+            'Sign up with Google',
         )
 
     def test_sign_up_with_bad_email(self):
