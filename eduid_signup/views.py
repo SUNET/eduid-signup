@@ -12,7 +12,7 @@ def home(request):
         try:
             email = validate_email(request.db, request.POST)
         except ValidationError as error:
-            return {'email_error': error.msg}
+            return {'email_error': error.msg, 'email': error.email}
 
         send_verification_mail(request, email)
 

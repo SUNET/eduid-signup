@@ -11,8 +11,9 @@ RFC2822_email = re.compile("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
 
 class ValidationError(Exception):
 
-    def __init__(self, msg):
+    def __init__(self, msg, email=None):
         self.msg = msg
+        self.email = email
 
 
 def validate_email_format(email):
@@ -31,9 +32,9 @@ def validate_email(db, data):
         raise ValidationError(_("Email is required"))
 
     if not validate_email_format(email):
-        raise ValidationError(_("Email is not valid"))
+        raise ValidationError(_("Email is not valid"), email)
 
     if not validate_email_is_unique(db, email):
-        raise ValidationError(_("This email is already registered"))
+        raise ValidationError(_("This email is already registered"), email)
 
     return email

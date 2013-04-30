@@ -3,40 +3,36 @@
 {% block contents %}
 <div class="jumbotron">
   <h1>{{ _("Welcome to eduID!") }}</h1>
+
   <p class="lead">{{ _("Create an account that will allow you access to all Sweedish Universities.") }}</p>
-  <a class="btn btn-large btn-success" href="#">{{ _("Sign up today") }}</a>
-</div>
-<div id="sign-up-block" class="row {% if email_error is not defined %}hide{% endif %}">
-  <div id="email-register" class="span6">
-    <h3>{{ _("Sign up with your email") }}</h3>
-    <div>
+
+  <div class="row">
+    <div id="email-register" class="span6">
       <form class="form-inline" method="POST">
+      	<div class="control-group{% if email_error is defined %} error{% endif %}">
         <div class="input-append">
-            <span class="control-group {% if email_error is defined %}error{% endif %}">
-              <input type="email" name="email" placeholder="you@example.com"
-                {% if email is defined %}value="{{ email }}"{% endif %}
-                required/>
-            </span>
-            <input type="submit" class="btn"/>
-            {% if email_error is defined %}
-              <span class="help-block error">{{ email_error }}</span>
-            {% endif %}
+          <input type="email" name="email" placeholder="you@example.com" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
+          <button class="btn btn-success" type="submit">Sign up with your email</button>
+	  {% if email_error is defined %}
+	    <p class="help-block">{{ email_error }}</p>
+	  {% endif %}
         </div>
+	</div>
       </form>
     </div>
-  </div>
-  <div id="social-register" class="span6">
-    <h3>{{ _("Signup with your social network id") }}</h3>
-    <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
-      <span class="btn-icon"></span>
-      <span class="btn-text">{{ _("Sign up with Facebook") }}</span>
-    </a>
-    <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">
-      <span class="btn-icon"></span>
-      <span class="btn-text">{{ _("Sign up with Google") }}</span>
-    </a>
+    <div id="social-register" class="span6">
+      <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
+        <span class="btn-icon"></span>
+        <span class="btn-text">{{ _("Sign up with Facebook") }}</span>
+      </a>
+      <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">
+        <span class="btn-icon"></span>
+        <span class="btn-text">{{ _("Sign up with Google") }}</span>
+      </a>
+    </div>
   </div>
 </div>
+
 <div class="row">
 
   <div class="span6">
@@ -63,8 +59,4 @@
 
 </div>
 
-{% endblock %}
-
-{% block extrajs %}
-<script src="{{'eduid_signup:static/js/home.js'|static_url}}"></script>
 {% endblock %}

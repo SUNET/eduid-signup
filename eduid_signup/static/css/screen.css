@@ -7,9 +7,18 @@
     font-size: 72px;
     line-height: 1;
 }
+
+.jumbotron .lead {
+    margin: 1em 0 2em 0;
+}
+
+.jumbotron input {
+    height: 30px;
+}
+
 .jumbotron .btn {
-    font-size: 21px;
-    padding: 14px 24px;
+    height: 40px;
+    border-radius: 0 5px 5px 0;    
 }
 
 .input-append .help-block {
@@ -52,7 +61,6 @@
 }
 
 .btn-google {
-    font-family: serif;
     background-color: rgb(204, 55, 50);
 }
 
@@ -61,7 +69,6 @@
 }
 
 .btn-facebook {
-    font-family: serif;
     background-color: rgb(79, 106, 163);
 }
 
