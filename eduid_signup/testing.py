@@ -40,7 +40,11 @@ class FunctionalTests(DBTests):
             'jinja2.filters': """
     route_url = pyramid_jinja2.filters:route_url_filter
     static_url = pyramid_jinja2.filters:static_url_filter
-"""
+""",
+            'google_client_id': '123',
+            'google_client_secret': 'abc',
+            'facebook_app_id': '456',
+            'facebook_app_secret': 'def',
         }
         app = main({}, **settings)
         self.testapp = TestApp(app)
