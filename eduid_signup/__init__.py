@@ -73,6 +73,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
 
     # include other packages
+    config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
 
     if 'testing' in settings and asbool(settings['testing']):
