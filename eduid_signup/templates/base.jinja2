@@ -17,11 +17,11 @@
     <div class="container">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
-          <li class="active"><a href="#">{{ _("Home") }}</a></li>
+          <li class="active"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
           <li><a href="#">{{ _("About") }}</a></li>
           <li><a href="#">{{ _("Contact") }}</a></li>
         </ul>
-        <h3 class="muted">eduID</h3>
+        <h3 class="muted"><a href="{{ request.route_path('home') }}">eduID</a></h3>
       </div>
       {% block contents %}
 
