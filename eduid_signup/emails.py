@@ -5,6 +5,8 @@ from pyramid.renderers import render
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 
+from eduid_am.tasks import update_attributes
+
 from eduid_signup.i18n import TranslationString as _
 from eduid_signup.utils import generate_verification_link
 
@@ -38,9 +40,13 @@ def send_verification_mail(request, email):
 
     mailer.send(message)
 
-    request.db.registered.insert({
+    user_id = request.db.registered.insert({
         "email": email,
         "date": datetime.utcnow(),
         "code": code,
         "verified": False,
     }, safe=True)
+
+    # Send the signal to the attribute manager so it can update
+    # this user's attributes in the IdP
+    update_attributes.delay('eduid_signup', str(user_id))

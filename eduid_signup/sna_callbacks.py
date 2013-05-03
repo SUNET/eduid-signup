@@ -3,6 +3,8 @@ import datetime
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
+from eduid_am.tasks import update_attributes
+
 
 def create_or_update(request, provider, provider_user_id, attributes):
     provider_key = '%s_id' % provider
@@ -21,9 +23,15 @@ def create_or_update(request, provider, provider_user_id, attributes):
     else:
         user_id = user['_id']
 
+    user_id = str(user_id)
+
+    # Send the signal to the attribute manager so it can update
+    # this user's attributes in the IdP
+    update_attributes.delay('eduid_signup', user_id)
+
     # Create an authenticated session and send the user to the
     # success screeen
-    remember_headers = remember(request, str(user_id))
+    remember_headers = remember(request, user_id)
     return HTTPFound(request.route_url('success'), headers=remember_headers)
 
 

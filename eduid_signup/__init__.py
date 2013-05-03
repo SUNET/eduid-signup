@@ -5,6 +5,7 @@ from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.settings import asbool
 
+from eduid_am.celery import celery
 from eduid_signup.db import MongoDB, get_db
 from eduid_signup.i18n import locale_negotiator
 
@@ -69,6 +70,12 @@ def main(global_config, **settings):
         raise ConfigurationError('The profile_link configuration option is '
                                  'required')
 
+
+    # configure Celery broker
+    broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
+    celery.conf.update(BROKER_URL=broker_url)
+    settings['celery'] = celery
+    settings['broker_url'] = broker_url
 
     settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
     settings['facebook_callback'] =  'eduid_signup.sna_callbacks.facebook_callback'

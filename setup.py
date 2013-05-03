@@ -11,6 +11,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 version = '0.1dev'
 
 requires = [
+    'eduid_am',
     'pymongo==2.5',
     'pyramid==1.4',
     'pyramid_beaker==0.7',
@@ -55,6 +56,7 @@ setup(
     keywords='identity federation saml',
     author='NORDUnet A/S',
     url='https://github.com/SUNET/eduid-signup',
+    license='BSD',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
