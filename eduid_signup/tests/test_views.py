@@ -30,3 +30,32 @@ class SuccessViewTests(FunctionalTests):
     def test_success(self):
         res = self.testapp.get('/success/')
         self.assertEqual(res.status, '200 OK')
+
+
+class HelpViewTests(FunctionalTests):
+
+    def test_default_language(self):
+        res = self.testapp.get('/help/')
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Help')
+
+    def test_help_in_english(self):
+        res = self.testapp.get('/help/', headers={
+            'Accept-Language': 'en',
+        })
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Help')
+        
+    def test_help_in_spanish(self):
+        res = self.testapp.get('/help/', headers={
+            'Accept-Language': 'es',
+        })
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Ayuda')
+
+    def test_help_in_unknown_language(self):
+        res = self.testapp.get('/help/', headers={
+            'Accept-Language': 'xx',
+        })
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Help')
