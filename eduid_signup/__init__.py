@@ -28,6 +28,7 @@ def includeme(config):
 
     # root views
     config.add_route('home', '/')
+    config.add_route('help', '/help')
     config.add_route('success', '/success/')
     config.add_route('email_verification_link', '/email_verification/{code}/')
 
