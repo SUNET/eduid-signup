@@ -91,3 +91,69 @@ its dependencies in the virtualenv:
 
    (eduid-signup)$ cd /opt/eduid-signup/eduid-signup
    (eduid-signup)$ python setup.py develop
+
+Database setup
+^^^^^^^^^^^^^^
+eduID Sign Up stores the information about registered users in a MongoDB
+database so you need it installed in the same machine or in other box that
+is accesible from the one you installed eduID Sign Up in.
+
+Deb based example:
+
+.. code-block:: text
+
+   $ sudo apt-get install mongodb mongodb-server
+
+Rpm based example:
+
+.. code-block:: text
+
+   $ sudo yum install mongodb mongodb-server
+
+Now it is time to start the database server and configure it to start at boot
+time.
+
+Deb based example:
+
+.. code-block:: text
+
+   $ sudo service mongodb start
+   $ sudo update-rc.d mongodb defaults
+
+Rpm based example:
+
+.. code-block:: text
+
+   $ sudo systemctl start mongod.service
+   $ sudo systemctl enable mongod.service
+
+
+Testing the application
+^^^^^^^^^^^^^^^^^^^^^^^
+Once everything is installed, the application can be started but first
+you need to write a configuration file. Luckily, there are several
+example configuration files in the `config-templates` directory ready
+to be used. For example, the `development.ini` is a good starting point
+if you want to test or develop the application:
+
+.. code-block:: text
+
+   $ cp config-templates/development.ini myconfig.ini
+
+It is important to activate the virtualenv before running the server:
+
+.. code-block:: text
+
+   $ source /opt/eduid-signup/bin/activate
+   (eduid-signup)$ pserver myconfig.ini
+   Starting server in PID 16756.
+   serving on http://0.0.0.0:6543
+
+Now you can open the link http://0.0.0.0:6543 in your browser and test
+the application.
+
+The `pserve` command will use the `Waitress` WSGI server which is a very
+capable server and also very handy for development.
+
+The next thing you should do is learn about all the configuration options
+and other WSGI server choices for production.

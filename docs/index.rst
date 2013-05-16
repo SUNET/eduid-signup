@@ -17,7 +17,7 @@ Contents:
 
    installation
    configuration
-
+   deployment
 
 Indices and tables
 ==================
