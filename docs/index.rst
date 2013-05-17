@@ -18,6 +18,7 @@ Contents:
    installation
    configuration
    deployment
+   development
 
 Indices and tables
 ==================

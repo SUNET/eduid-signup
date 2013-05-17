@@ -108,22 +108,95 @@ The default value for this option is ``mongodb://localhost:27017/eduid_signup``
 
 Email
 ^^^^^
+The application uses an SMTP server to send verification emails when users
+register in the system.
 
-TODO
+eduID Sign Up uses the library
+`pyramid_mailer <https://pypi.python.org/pypi/pyramid_mailer>`_ so you can
+check the available options at
+`pyramid_mailer documentation <http://docs.pylonsproject.org/projects/pyramid_mailer/en/latest/#configuration>`_
 
+Some of the most common used are:
+
+.. code-block:: ini
+
+   mail.host = localhost
+   mail.port = 25
+   mail_default_sender = no-reply@localhost.localdomain
 
 Facebook authentication
 ^^^^^^^^^^^^^^^^^^^^^^^
+eduID Sign Up allows the user to easily register clicking on a Facebook
+button that will fetch their Facebook account information with their
+consent.
 
-TODO
+This is implemented using the
+library `pyramid_sna <https://pypi.python.org/pypi/pyramid_sna/>`_
+
+At the very minimum you need to add the public and private Facebook
+API keys but you can configure other things. To learn how to get
+this information check the
+`pyramid_sna documentation <https://pyramid_sna.readthedocs.org/en/latest/>`_
+
+.. code-block:: ini
+
+   facebook_app_id = 123
+   facebook_app_secret = s3cr3t
+
+You can also set these options with environment variables:
+
+.. code-block:: bash
+
+   $ export FACEBOOK_APP_ID=123
+   $ export FACEBOOK_APP_SECRET=s3cr3t
+
+These two options are required and there are no default values for them.
 
 Google authentication
 ^^^^^^^^^^^^^^^^^^^^^
+eduID Sign Up allows the user to easily register clicking on a Google
+button that will fetch their Google account information with their
+consent.
 
-TODO
+This is implemented using the
+library `pyramid_sna <https://pypi.python.org/pypi/pyramid_sna/>`_
 
+At the very minimum you need to add the public and private Google
+API keys but you can configure other things. To learn how to get
+this information check the
+`pyramid_sna documentation <https://pyramid_sna.readthedocs.org/en/latest/>`_
+
+.. code-block:: ini
+
+   google_client_id = 123
+   google_client_secret = s3cr3t
+
+You can also set these options with environment variables:
+
+.. code-block:: bash
+
+   $ export GOOGLE_CLIENT_ID=123
+   $ export GOOGLE_CLIENT_SECRET=s3cr3t
+
+These two options are required and there are no default values for them.
 
 Profile link
 ^^^^^^^^^^^^
+When a user succesfully register in this application he gets a message
+telling him to go to his profile and fill up other information about
+him. This profile site is an external application and eduID Sign Up
+needs to know the location for such application.
 
-TODO
+Using this option you can configure the URL for the profile application:
+
+.. code-block:: ini
+
+   profile_link = http://profiles.example.com/edit
+
+You can also set this option with an environment variable:
+
+.. code-block:: bash
+
+   $ export PROFILE_LINK=http://profiles.example.com/edit
+
+This option is required and does not have a default value.
