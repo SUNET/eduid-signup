@@ -3,6 +3,8 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
 
+from wsgi_ratelimit import is_ratelimit_reached
+
 from eduid_signup.emails import send_verification_mail
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.utils import verificate_code
@@ -10,18 +12,28 @@ from eduid_signup.utils import verificate_code
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
+    context = {}
     if request.method == 'POST':
+        context["use_captcha"] = is_ratelimit_reached(request.environ)
+
         try:
             email = validate_email(request.db, request.POST)
         except ValidationError as error:
-            return {'email_error': error.msg, 'email': error.email}
+            context.update({
+                'email_error': error.msg,
+                'email': error.email
+            })
+            return context
+
+        if context.get("use_captcha", False):
+            return context
 
         send_verification_mail(request, email)
 
         success_url = request.route_url("success")
         return HTTPFound(location=success_url)
 
-    return {}
+    return context
 
 
 @view_config(route_name='success', renderer="templates/success.jinja2")

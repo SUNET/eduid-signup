@@ -8,18 +8,23 @@
 
   <p class="lead">{{ _("Create an account that will allow you access to all Sweedish Universities.") }}</p>
 
+
+
   <div class="row">
     <div id="email-register" class="span6">
       <form class="form-inline" method="POST">
-      	<div class="control-group{% if email_error is defined %} error{% endif %}">
+        <div class="control-group{% if email_error is defined %} error{% endif %}">
         <div class="input-append">
           <input type="email" name="email" placeholder="you@example.com" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email") }}</button>
-	  {% if email_error is defined %}
-	    <p class="help-block">{{ email_error }}</p>
-	  {% endif %}
+    {% if email_error is defined %}
+      <p class="help-block">{{ email_error }}</p>
+    {% endif %}
         </div>
-	</div>
+  </div>
+  {% if use_captcha is defined and use_captcha %}
+     <h1>Implement captcha system </h1>
+  {% endif %}
       </form>
     </div>
     <div id="social-register" class="span6">
