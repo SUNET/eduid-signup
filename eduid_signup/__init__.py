@@ -31,6 +31,7 @@ def includeme(config):
     config.add_route('help', '/help/')
     config.add_route('success', '/success/')
     config.add_route('email_verification_link', '/email_verification/{code}/')
+    config.add_route('trycaptcha', '/trycaptcha')
 
 
 def main(global_config, **settings):
@@ -71,6 +72,14 @@ def main(global_config, **settings):
         raise ConfigurationError('The profile_link configuration option is '
                                  'required')
 
+    # reCaptcha
+    settings['recaptcha_public_key'] = read_setting_from_env(settings,
+                                                             'recaptcha_public_key',
+                                                             None)
+
+    settings['recaptcha_private_key'] = read_setting_from_env(settings,
+                                                              'recaptcha_private_key',
+                                                              None)
 
     # configure Celery broker
     broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
@@ -79,7 +88,7 @@ def main(global_config, **settings):
     settings['broker_url'] = broker_url
 
     settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
-    settings['facebook_callback'] =  'eduid_signup.sna_callbacks.facebook_callback'
+    settings['facebook_callback'] = 'eduid_signup.sna_callbacks.facebook_callback'
 
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)

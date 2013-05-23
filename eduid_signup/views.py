@@ -1,5 +1,7 @@
+from recaptcha.client import captcha
+
 from pyramid.i18n import get_locale_name
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPMethodNotAllowed
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
 
@@ -14,8 +16,6 @@ from eduid_signup.utils import verificate_code
 def home(request):
     context = {}
     if request.method == 'POST':
-        context["use_captcha"] = is_ratelimit_reached(request.environ)
-
         try:
             email = validate_email(request.db, request.POST)
         except ValidationError as error:
@@ -25,8 +25,10 @@ def home(request):
             })
             return context
 
-        if context.get("use_captcha", False):
-            return context
+        if is_ratelimit_reached(request.environ):
+            request.session['email'] = email
+            trycaptcha_url = request.route_url("trycaptcha")
+            return HTTPFound(location=trycaptcha_url)
 
         send_verification_mail(request, email)
 
@@ -34,6 +36,47 @@ def home(request):
         return HTTPFound(location=success_url)
 
     return context
+
+
+@view_config(route_name='trycaptcha', renderer='templates/trycaptcha.jinja2')
+def trycaptcha(request):
+
+    if 'email' not in request.session:
+        home_url = request.route_url("home")
+        return HTTPFound(location=home_url)
+
+    settings = request.registry.settings
+
+    recaptcha_public_key = settings.get("recaptcha_public_key", ''),
+    if request.method == 'GET':
+        return {
+            'recaptcha_public_key': recaptcha_public_key
+        }
+
+    elif request.method == 'POST':
+        challenge_field = request.POST.get('recaptcha_challenge_field', '')
+        response_field = request.POST.get('recaptcha_response_field', '')
+
+        response = captcha.submit(
+            challenge_field,
+            response_field,
+            settings.get("recaptcha_private_key", ''),
+            request.environ.get("REMOTE_ADDRESS", ''),
+        )
+
+        if response.is_valid:
+            email = request.session['email']
+            send_verification_mail(request, email)
+            success_url = request.route_url("success")
+            del request.session['email']
+            return HTTPFound(location=success_url)
+        else:
+            return {
+                "error": True,
+                "recaptcha_public_key": recaptcha_public_key
+            }
+
+    return HTTPMethodNotAllowed()
 
 
 @view_config(route_name='success', renderer="templates/success.jinja2")
