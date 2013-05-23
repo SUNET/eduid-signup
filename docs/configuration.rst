@@ -200,3 +200,19 @@ You can also set this option with an environment variable:
    $ export PROFILE_LINK=http://profiles.example.com/edit
 
 This option is required and does not have a default value.
+
+Google Recaptcha
+^^^^^^^^^^^^^^^^
+When many application registration process from the same IP are detected, the
+system show a captcha system to the user to confirm that he is not a bot.
+
+You can need a private a public key from Google Recaptcha. Please, go to
+`Google Recaptcha website <https://www.google.com/recaptcha>`_ and ask for
+these keys.
+
+You need to set this options in your application settings with the keys you
+have got.
+
+.. code::
+   recaptcha_public_key = YOURKEY-yourkeyyourkey
+   recaptcha_private_key = YOURKEY-yourkeyyourkey
