@@ -213,6 +213,7 @@ these keys.
 You need to set this options in your application settings with the keys you
 have got.
 
-.. code::
+.. code-block:: ini
+
    recaptcha_public_key = YOURKEY-yourkeyyourkey
    recaptcha_private_key = YOURKEY-yourkeyyourkey
