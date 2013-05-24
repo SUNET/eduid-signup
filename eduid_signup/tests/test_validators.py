@@ -33,9 +33,13 @@ class EmailUniqueTests(DBTests):
     clean_collections = ('registered', )
 
     def test_email_unique(self):
+        if not self.db:
+            raise unittest.SkipTest("requires accessible MongoDB server")
         self.assertTrue(validate_email_is_unique(self.db, 'foo@example.com'))
 
     def test_email_duplicate(self):
+        if not self.db:
+            raise unittest.SkipTest("requires accessible MongoDB server")
         self.db.registered.insert({'email': 'foo@example.com'}, safe=True)
 
         self.assertFalse(validate_email_is_unique(self.db, 'foo@example.com'))
@@ -54,10 +58,14 @@ class ValidateEmailTests(DBTests):
                           self.db, {'email': 'a@com'})
 
     def test_already_exist(self):
+        if not self.db:
+            raise unittest.SkipTest("requires accessible MongoDB server")
         self.db.registered.insert({'email': 'foo@example.com'}, safe=True)
         self.assertRaises(ValidationError, validate_email,
                           self.db, {'email': 'foo@example.com'})
 
     def test_good_email(self):
+        if not self.db:
+            raise unittest.SkipTest("requires accessible MongoDB server")
         self.assertEqual('bar@example.com',
                          validate_email(self.db, {'email': 'bar@example.com'}))

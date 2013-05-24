@@ -5,6 +5,8 @@ from webtest import TestApp
 from eduid_signup import main
 from eduid_signup.db import MongoDB
 
+import pymongo
+
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
 
 
@@ -14,10 +16,15 @@ class DBTests(unittest.TestCase):
     clean_collections = tuple()
 
     def setUp(self):
-        mongodb = MongoDB(MONGO_URI_TEST)
-        self.db = mongodb.get_database()
+        try:
+            mongodb = MongoDB(MONGO_URI_TEST)
+            self.db = mongodb.get_database()
+        except pymongo.errors.ConnectionFailure:
+            self.db = None
 
     def tearDown(self):
+        if not self.db:
+            return None
         for collection in self.clean_collections:
             self.db.drop_collection(collection)
 
@@ -46,9 +53,12 @@ class FunctionalTests(DBTests):
             'facebook_app_id': '456',
             'facebook_app_secret': 'def',
         }
-        app = main({}, **settings)
-        self.testapp = TestApp(app)
-        self.db = app.registry.settings['mongodb'].get_database()
+        try:
+            app = main({}, **settings)
+            self.testapp = TestApp(app)
+            self.db = app.registry.settings['mongodb'].get_database()
+        except pymongo.errors.ConnectionFailure:
+            raise unittest.SkipTest("requires accessible MongoDB server")
 
     def tearDown(self):
         super(FunctionalTests, self).tearDown()
