@@ -3,7 +3,7 @@ Installation
 
 Minimum requirements
 ^^^^^^^^^^^^^^^^^^^^
-eduID Sign Up is a Python web application so you will ned a Python
+eduID Sign Up is a Python web application so you will need a Python
 interpreter for running it. It has been tested with Python 2.7 and
 Python 3.3 so either one should work fine. However we recommend
 sticking with Python 2.7 since not all the Python dependencies for
@@ -15,7 +15,7 @@ authors do not have a Windows box available to test and document its
 installation.
 
 In all Linux modern distributions Python 2.7 is installed by default
-so you will not need to do anything especial at this point.
+so you will not need to do anything special at this point.
 
 Installing virtualenv
 ^^^^^^^^^^^^^^^^^^^^^
@@ -61,7 +61,7 @@ You can choose between installing a development version or a stable version.
 Stable version
 """"""""""""""
 Installing a stable version is really easy, all you have to do is execute the
-following command and have a coffe while it downloads the application and all
+following command and have a coffee while it downloads the application and all
 its dependencies:
 
 .. code-block:: text
@@ -96,7 +96,7 @@ Database setup
 ^^^^^^^^^^^^^^
 eduID Sign Up stores the information about registered users in a MongoDB
 database so you need it installed in the same machine or in other box that
-is accesible from the one you installed eduID Sign Up in.
+is accessible from the one you installed eduID Sign Up in.
 
 Deb based example:
 
