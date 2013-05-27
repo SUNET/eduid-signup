@@ -11,15 +11,33 @@ def create_or_update(request, provider, provider_user_id, attributes):
     # Create or update the user
     user = request.db.users.find_one({provider_key: provider_user_id})
     if user is None:  # first time
-        user_id = request.db.registered.insert({
-            provider_key: provider_user_id,
-            "email": attributes["email"],
-            "date": datetime.datetime.utcnow(),
-            "verified": True,
-            "screen_name": attributes["screen_name"],
-            "first_name": attributes["first_name"],
-            "last_name": attributes["last_name"],
-        }, safe=True)
+        register = request.db.registered.find_one({"email": attributes["email"]})
+        if register is None:
+            user_id = request.db.registered.insert({
+                provider_key: provider_user_id,
+                "email": attributes["email"],
+                "date": datetime.datetime.utcnow(),
+                "verified": True,
+                "screen_name": attributes["screen_name"],
+                "first_name": attributes["first_name"],
+                "last_name": attributes["last_name"],
+            }, safe=True)
+        elif not register['verified']:
+            request.db.registered.find_and_modify({
+                "email": attributes['email'],
+                "verified": False
+            }, {
+                "$set": {
+                    "verified": True
+                }
+            })
+            user_id = register['_id']
+        else:
+            # TODO
+            # The user is already registered and his email was verified.
+            # Maybe, we want to warm him and send to a view to change his password
+            # or edit his profile
+            user_id = register['_id']
     else:
         user_id = user['_id']
 
