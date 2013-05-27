@@ -39,13 +39,6 @@ class ValidateEmailTests(DBTests):
         self.assertRaises(ValidationError, validate_email,
                           self.db, {'email': 'a@com'})
 
-    def test_already_exist(self):
-        if not self.db:
-            raise unittest.SkipTest("requires accessible MongoDB server")
-        self.db.registered.insert({'email': 'foo@example.com'}, safe=True)
-        self.assertRaises(ValidationError, validate_email,
-                          self.db, {'email': 'foo@example.com'})
-
     def test_good_email(self):
         if not self.db:
             raise unittest.SkipTest("requires accessible MongoDB server")
