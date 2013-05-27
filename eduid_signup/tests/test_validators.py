@@ -3,7 +3,6 @@ from os import path
 import unittest
 
 from eduid_signup.validators import validate_email_format
-from eduid_signup.validators import validate_email_is_unique
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.testing import DBTests
 
@@ -26,23 +25,6 @@ class EmailFormatTests(unittest.TestCase):
     def test_wrong_emails(self):
         for email in self.read_emails("wrong_emails.txt"):
             self.assertFalse(validate_email_format(email))
-
-
-class EmailUniqueTests(DBTests):
-
-    clean_collections = ('registered', )
-
-    def test_email_unique(self):
-        if not self.db:
-            raise unittest.SkipTest("requires accessible MongoDB server")
-        self.assertTrue(validate_email_is_unique(self.db, 'foo@example.com'))
-
-    def test_email_duplicate(self):
-        if not self.db:
-            raise unittest.SkipTest("requires accessible MongoDB server")
-        self.db.registered.insert({'email': 'foo@example.com'}, safe=True)
-
-        self.assertFalse(validate_email_is_unique(self.db, 'foo@example.com'))
 
 
 class ValidateEmailTests(DBTests):

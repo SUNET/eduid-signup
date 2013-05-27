@@ -1,0 +1,15 @@
+{% extends "templates/base.jinja2" %}
+
+{% block contents %}
+
+<div class="jumbotron">
+  <h1>{{ _("Your email is already registered!") }}</h1>
+  <p class="lead"> {{ _("Do you want a new verification link in your email inbox?") }}</p>
+</div>
+<div class="row">
+    <form method="POST" class="text-center">
+      <button type="submit" class="btn btn-success btn-large">{{ _("Resend verification link") }}</a>
+    </form>
+</div>
+
+{% endblock %}

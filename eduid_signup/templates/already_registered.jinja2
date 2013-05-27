@@ -1,0 +1,17 @@
+{% extends "templates/base.jinja2" %}
+
+{% block contents %}
+
+<div class="jumbotron">
+  <h1>{{ _("Welcome to eduID!") }}</h1>
+  <p class="lead">{{ _("Your email is already registered") }}</p>
+</div>
+<div class="row">
+    <h4>{{ _("This email is already registered") }}</h4>
+    <p> {{ _("Maybe you want to reset your password") }}</p>
+    <p class="text-center">
+      <a class="btn btn-success btn-large profile-link" href="{{ reset_password_link }}">{{ _("Reset your password") }}</a>
+    </p>
+</div>
+
+{% endblock %}

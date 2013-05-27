@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from pyramid.httpexceptions import HTTPInternalServerError
+from pyramid.httpexceptions import HTTPInternalServerError, HTTPFound
 
 from eduid_signup.compat import text_type
 
@@ -29,3 +29,23 @@ def verificate_code(collection, code):
         raise HTTPInternalServerError("Your email can't be verified now, try"
                                       " it later")
     return True
+
+
+def check_email_status(db, email):
+    """
+        Check the email registration status.
+
+        If the email doesn't exist in database, then return 'new'.
+
+        If exists and it hasn't been verified, then return 'not_verified'.
+
+        If exists and it has been verified before, then return 'verified'.
+    """
+
+    email = db.registered.find_one({'email': email})
+    if not email:
+        return 'new'
+    if email.get('verified', False):
+        return 'verified'
+    else:
+        return 'not_verified'

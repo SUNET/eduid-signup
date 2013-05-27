@@ -40,12 +40,16 @@ def send_verification_mail(request, email):
 
     mailer.send(message)
 
-    user_id = request.db.registered.insert({
+    user_id = request.db.registered.update({
         "email": email,
-        "date": datetime.utcnow(),
-        "code": code,
-        "verified": False,
-    }, safe=True)
+    }, {
+        '$set': {
+            "email": email,
+            "date": datetime.utcnow(),
+            "code": code,
+            "verified": False,
+        }
+    }, upsert=True, safe=True)
 
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP

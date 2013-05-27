@@ -20,10 +20,6 @@ def validate_email_format(email):
     return RFC2822_email.match(email.lower())
 
 
-def validate_email_is_unique(db, email):
-    return db.registered.find({'email': email}).count() == 0
-
-
 def validate_email(db, data):
     """Validate that a valid email address exist in the data dictionary"""
     try:
@@ -33,8 +29,5 @@ def validate_email(db, data):
 
     if not validate_email_format(email):
         raise ValidationError(_("Email is not valid"), email)
-
-    if not validate_email_is_unique(db, email):
-        raise ValidationError(_("This email is already registered"), email)
 
     return email

@@ -31,7 +31,9 @@ def includeme(config):
     config.add_route('help', '/help/')
     config.add_route('success', '/success/')
     config.add_route('email_verification_link', '/email_verification/{code}/')
-    config.add_route('trycaptcha', '/trycaptcha')
+    config.add_route('trycaptcha', '/trycaptcha/')
+    config.add_route('resend_email_verification', '/resend_email_verification')
+    config.add_route('email_already_registered', '/email_already_registered/')
 
 
 def main(global_config, **settings):
@@ -45,8 +47,7 @@ def main(global_config, **settings):
         ('default_sender', 'no-reply@example.com')
     ):
         option = 'mail.' + key
-
-    settings[option] = read_setting_from_env(settings, option, default)
+        settings[option] = read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
     available_languages = read_setting_from_env(settings, 'available_languages', 'en es')
@@ -54,23 +55,15 @@ def main(global_config, **settings):
         lang for lang in available_languages.split(' ') if lang
     ]
 
-    settings['mongo_uri'] = read_setting_from_env(settings, 'mongo_uri', None)
-    if settings['mongo_uri'] is None:
-        raise ConfigurationError('The mongo_uri configuration option is required')
-
-    settings['profile_link'] = read_setting_from_env(settings,
-                                                     'profile_link',
-                                                     None)
-    if settings['profile_link'] is None:
-        raise ConfigurationError('The profile_link configuration option is '
-                                 'required')
-
-    settings['site.name'] = read_setting_from_env(settings,
-                                                  'site.name',
-                                                  None)
-    if settings['site.name'] is None:
-        raise ConfigurationError('The profile_link configuration option is '
-                                 'required')
+    for item in (
+        'mongo_uri',
+        'profile_link',
+        'site.name',
+        'reset_password_link'
+    ):
+        settings[item] = read_setting_from_env(settings, item, None)
+        if settings[item] is None:
+            raise ConfigurationError('The {0} configuration option is required'.format(item))
 
     # reCaptcha
     settings['recaptcha_public_key'] = read_setting_from_env(settings,

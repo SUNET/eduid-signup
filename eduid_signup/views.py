@@ -9,7 +9,26 @@ from wsgi_ratelimit import is_ratelimit_reached
 
 from eduid_signup.emails import send_verification_mail
 from eduid_signup.validators import validate_email, ValidationError
-from eduid_signup.utils import verificate_code
+from eduid_signup.utils import verificate_code, check_email_status
+
+
+EMAIL_STATUS_VIEWS = {
+    'new': None,
+    'not_verified': 'resend_email_verification',
+    'verified': 'email_already_registered'
+}
+
+
+def get_url_from_email_status(request, email):
+    status = check_email_status(request.db, email)
+    if status == 'new':
+        send_verification_mail(request, email)
+        namedview = 'success'
+    else:
+        request.session['email'] = email
+        namedview = EMAIL_STATUS_VIEWS[status]
+    url = request.route_url(namedview)
+    return HTTPFound(location=url)
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
@@ -30,10 +49,7 @@ def home(request):
             trycaptcha_url = request.route_url("trycaptcha")
             return HTTPFound(location=trycaptcha_url)
 
-        send_verification_mail(request, email)
-
-        success_url = request.route_url("success")
-        return HTTPFound(location=success_url)
+        return get_url_from_email_status(request, email)
 
     return context
 
@@ -66,10 +82,8 @@ def trycaptcha(request):
 
         if response.is_valid:
             email = request.session['email']
-            send_verification_mail(request, email)
-            success_url = request.route_url("success")
             del request.session['email']
-            return HTTPFound(location=success_url)
+            return get_url_from_email_status(request, email)
         else:
             return {
                 "error": True,
@@ -82,7 +96,29 @@ def trycaptcha(request):
 @view_config(route_name='success', renderer="templates/success.jinja2")
 def success(request):
     return {
-        "profile_link": request.registry.settings.get("profile_link", "#")
+        "profile_link": request.registry.settings.get("profile_link", "#"),
+    }
+
+
+@view_config(route_name='resend_email_verification',
+             renderer='templates/resend_email_verification.jinja2')
+def resend_email_verification(context, request):
+    if request.method == 'POST':
+        email = request.session.get('email', '')
+        if email:
+            send_verification_mail(request, email)
+            url = request.route_url('success')
+            return HTTPFound(location=url)
+
+    return {}
+
+
+@view_config(route_name='email_already_registered',
+             renderer='templates/already_registered.jinja2')
+def already_registered(context, request):
+    return {
+        'reset_password_link': request.registry.settings.get(
+            'reset_password_link', '#'),
     }
 
 
