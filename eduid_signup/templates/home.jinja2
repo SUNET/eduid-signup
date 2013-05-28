@@ -25,14 +25,18 @@
       </form>
     </div>
     <div id="social-register" class="span6">
-      <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
-        <span class="btn-icon"></span>
-        <span class="btn-text">{{ _("Sign up with Facebook") }}</span>
-      </a>
-      <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">
-        <span class="btn-icon"></span>
-        <span class="btn-text">{{ _("Sign up with Google") }}</span>
-      </a>
+      {% if request.registry.settings['facebook_auth_enabled'] %}
+        <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
+          <span class="btn-icon"></span>
+          <span class="btn-text">{{ _("Sign up with Facebook") }}</span>
+        </a>
+      {% endif %}
+      {% if request.registry.settings['google_auth_enabled'] %}
+        <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">
+          <span class="btn-icon"></span>
+          <span class="btn-text">{{ _("Sign up with Google") }}</span>
+        </a>
+      {% endif %}
     </div>
   </div>
 </div>
