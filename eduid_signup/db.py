@@ -33,7 +33,7 @@ class MongoDB(object):
             **kwargs)
 
         if self.parsed_uri.get("database", None):
-            self.database_name = self.parsed_uri.get["database"]
+            self.database_name = self.parsed_uri["database"]
         else:
             self.database_name = DEFAULT_MONGODB_NAME
 
