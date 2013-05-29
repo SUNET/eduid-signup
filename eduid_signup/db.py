@@ -13,7 +13,13 @@ class MongoDB(object):
 
     def __init__(self, db_uri=DEFAULT_MONGODB_URI,
                  connection_factory=None, **kwargs):
+
         self.db_uri = db_uri
+
+        if db_uri == "mongodb://":
+            db_uri = DEFAULT_MONGODB_URI
+
+        self.parsed_uri = pymongo.uri_parser.parse_uri(db_uri)
 
         if 'replicaSet' in kwargs:
             connection_factory = pymongo.MongoReplicaSetClient
@@ -36,9 +42,15 @@ class MongoDB(object):
 
     def get_database(self, database_name=None):
         if database_name is None:
-            return self.connection[self.database_name]
+            db = self.connection[self.database_name]
         else:
-            return self.connection[database_name]
+            db = self.connection[database_name]
+        if self.parsed_uri.get("username", None):
+            db.authenticate(
+                self.parsed_uri.get("username", None),
+                self.parsed_uri.get("password", None)
+            )
+        return db
 
 
 def get_db(request):
