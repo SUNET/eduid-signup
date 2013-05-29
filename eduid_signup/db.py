@@ -32,8 +32,8 @@ class MongoDB(object):
             tz_aware=True,
             **kwargs)
 
-        if self.db_uri.count("/") == 3:
-            self.database_name = self.db_uri.split("/")[-1]
+        if self.parsed_uri.get("database", None):
+            self.database_name = self.parsed_uri.get["database"]
         else:
             self.database_name = DEFAULT_MONGODB_NAME
 
