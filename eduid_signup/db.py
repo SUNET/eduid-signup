@@ -1,7 +1,5 @@
 import pymongo
 
-from eduid_signup.compat import urlparse
-
 DEFAULT_MONGODB_HOST = 'localhost'
 DEFAULT_MONGODB_PORT = 27017
 DEFAULT_MONGODB_NAME = 'eduid'
@@ -14,11 +12,10 @@ class MongoDB(object):
     """Simple wrapper to get pymongo real objects from the settings uri"""
 
     def __init__(self, db_uri=DEFAULT_MONGODB_URI,
-                 connection_factory=pymongo.Connection):
-        self.db_uri = urlparse.urlparse(db_uri)
+                 connection_factory=pymongo.MongoClient):
+        self.db_uri = db_uri
         self.connection = connection_factory(
-            host=self.db_uri.hostname or DEFAULT_MONGODB_HOST,
-            port=self.db_uri.port or DEFAULT_MONGODB_PORT,
+            host=self.db_uri,
             tz_aware=True)
 
         if self.db_uri.path:
