@@ -18,8 +18,8 @@ class MongoDB(object):
             host=self.db_uri,
             tz_aware=True)
 
-        if self.db_uri.path:
-            self.database_name = self.db_uri.path[1:]
+        if self.db_uri.count("/") == 3:
+            self.database_name = self.db_uri.split("/")[-1]
         else:
             self.database_name = DEFAULT_MONGODB_NAME
 
