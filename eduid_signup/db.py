@@ -12,11 +12,19 @@ class MongoDB(object):
     """Simple wrapper to get pymongo real objects from the settings uri"""
 
     def __init__(self, db_uri=DEFAULT_MONGODB_URI,
-                 connection_factory=pymongo.MongoClient):
+                 connection_factory=None, **kwargs):
         self.db_uri = db_uri
+
+        if 'replicaSet' in kwargs:
+            connection_factory = pymongo.MongoReplicaSetClient
+
+        elif connection_factory is None:
+            connection_factory = pymongo.MongoClient
+
         self.connection = connection_factory(
             host=self.db_uri,
-            tz_aware=True)
+            tz_aware=True,
+            **kwargs)
 
         if self.db_uri.count("/") == 3:
             self.database_name = self.db_uri.split("/")[-1]

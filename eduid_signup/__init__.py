@@ -20,7 +20,12 @@ def read_setting_from_env(settings, key, default=None):
 
 def includeme(config):
     # DB setup
-    mongodb = MongoDB(config.registry.settings['mongo_uri'])
+    mongo_replicaset = config.registry.settings.get('mongo_replicaset', None)
+    if mongo_replicaset is not None:
+        mongodb = MongoDB(config.registry.settings['mongo_uri'],
+                          replicaSet=mongo_replicaset)
+    else:
+        mongodb = MongoDB(config.registry.settings['mongo_uri'])
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 
@@ -73,6 +78,10 @@ def main(global_config, **settings):
     settings['recaptcha_private_key'] = read_setting_from_env(settings,
                                                               'recaptcha_private_key',
                                                               None)
+
+    mongo_replicaset = read_setting_from_env(settings, 'mongo_replicaset', None)
+    if mongo_replicaset is not None:
+        settings['mongo_replicaset'] = mongo_replicaset
 
     # configure Celery broker
     broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
