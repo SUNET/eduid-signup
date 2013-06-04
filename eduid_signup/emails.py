@@ -45,16 +45,17 @@ def send_verification_mail(request, email):
         "date": datetime.utcnow(),
         "code": code,
         "verified": False,
-        }
-    request.db.registered.update({'email': email,
-                                  },
-                                 {
+    }
+
+    result = request.db.registered.find_and_modify(
+        query={
+            'email': email,
+        }, update={
             '$set': docu,
-            }, upsert=True, safe=True)
+        }, upsert=True, full_response=True, new=True, safe=True)
 
     # read back to get _id
-    entry = request.db.registered.find_one(docu)
-    user_id = str(entry.get('_id'))
+    user_id = result.get("value", {}).get("_id")
 
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
