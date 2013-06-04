@@ -74,7 +74,7 @@ msgid "Fill your profile"
 msgstr ""
 
 #: eduid_signup/templates/home.jinja2:7
-msgid "Create an account that will allow you access to all Sweedish Universities."
+msgid "Create an account that will allow you access to all Swedish Universities."
 msgstr ""
 
 #: eduid_signup/templates/home.jinja2:15
