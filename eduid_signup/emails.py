@@ -54,7 +54,6 @@ def send_verification_mail(request, email):
             '$set': docu,
         }, upsert=True, full_response=True, new=True, safe=True)
 
-    # read back to get _id
     user_id = result.get("value", {}).get("_id")
 
     # Send the signal to the attribute manager so it can update
