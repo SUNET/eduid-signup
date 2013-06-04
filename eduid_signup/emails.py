@@ -46,15 +46,15 @@ def send_verification_mail(request, email):
         "code": code,
         "verified": False,
         }
-    # Can't do safe=True update and still get _id back. Seems you have to
-    # do find() after update() if both is required.
     request.db.registered.update({'email': email,
                                   },
                                  {
             '$set': docu,
-            }, upsert=True, manipulate=True)
+            }, upsert=True, safe=True)
 
-    user_id = str(docu.get('_id')) # manipulate=True populates docu['_id'] above
+    # read back to get _id
+    entry = request.db.registered.find_one(docu)
+    user_id = str(entry.get('_id'))
 
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
