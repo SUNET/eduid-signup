@@ -13,7 +13,7 @@ version = '0.1dev'
 requires = [
     'eduid_am',
     'wsgi_ratelimit',
-    'pymongo==2.5',
+    'pymongo==2.5.1',
     'pyramid==1.4',
     'pyramid_beaker==0.7',
     'pyramid_debugtoolbar==1.0.4',
