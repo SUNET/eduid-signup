@@ -40,17 +40,19 @@ def send_verification_mail(request, email):
 
     mailer.send(message)
 
-    docu = {'email': email,
-            }
-    request.db.registered.update(docu,
+    docu = {
+        "email": email,
+        "date": datetime.utcnow(),
+        "code": code,
+        "verified": False,
+        }
+    # Can't do safe=True update and still get _id back. Seems you have to
+    # do find() after update() if both is required.
+    request.db.registered.update({'email': email,
+                                  },
                                  {
-            '$set': {
-                "email": email,
-                "date": datetime.utcnow(),
-                "code": code,
-                "verified": False,
-                }
-            }, upsert=True, safe=True, manipulate=True)
+            '$set': docu,
+            }, upsert=True, manipulate=True)
 
     user_id = str(docu.get('_id')) # manipulate=True populates docu['_id'] above
 
