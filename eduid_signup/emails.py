@@ -40,18 +40,16 @@ def send_verification_mail(request, email):
 
     mailer.send(message)
 
-    docu = {
-        "email": email,
-        "date": datetime.utcnow(),
-        "code": code,
-        "verified": False,
-    }
-
     result = request.db.registered.find_and_modify(
         query={
             'email': email,
         }, update={
-            '$set': docu,
+            '$set': {
+                "email": email,
+                "date": datetime.utcnow(),
+                "code": code,
+                "verified": False,
+            },
         }, upsert=True, full_response=True, new=True, safe=True)
 
     user_id = result.get("value", {}).get("_id")
