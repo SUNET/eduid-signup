@@ -49,6 +49,7 @@ class FunctionalTests(DBTests):
     route_url = pyramid_jinja2.filters:route_url_filter
     static_url = pyramid_jinja2.filters:static_url_filter
 """,
+            'vccs_url': 'http://localhost:8550/',
             'google_client_id': '123',
             'google_client_secret': 'abc',
             'facebook_app_id': '456',
