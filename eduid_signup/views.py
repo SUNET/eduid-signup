@@ -1,4 +1,5 @@
 from recaptcha.client import captcha
+from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPMethodNotAllowed
@@ -7,9 +8,12 @@ from pyramid.view import view_config
 
 from wsgi_ratelimit import is_ratelimit_reached
 
+from eduid_am.tasks import update_attributes
+
 from eduid_signup.emails import send_verification_mail
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.utils import verificate_code, check_email_status
+from eduid_signup.vccs import generate_password
 
 
 EMAIL_STATUS_VIEWS = {
@@ -95,6 +99,7 @@ def trycaptcha(request):
 
 @view_config(route_name='success', renderer="templates/success.jinja2")
 def success(request):
+
     return {
         "profile_link": request.registry.settings.get("profile_link", "#"),
     }
@@ -122,13 +127,64 @@ def already_registered(context, request):
     }
 
 
+def registered_completed(request, user, context=None):
+    if context is None:
+        context = {}
+    password_id = str(ObjectId())
+    (password, salt) = generate_password(
+        request.registry.settings.get('vccs_url'),
+        password_id,
+        user.get('email'),
+    )
+
+    request.db.registered.update(
+        {
+            'email': user.get('email'),
+        }, {
+            '$set': {
+                'passwords': {
+                    'id': password_id,
+                    'salt': salt,
+                }
+            },
+        }, safe=True)
+
+    user_id = user.get("_id")
+
+    # Send the signal to the attribute manager so it can update
+    # this user's attributes in the IdP
+    update_attributes.delay('eduid_signup', str(user_id))
+
+    context.update({
+        "profile_link": request.registry.settings.get("profile_link", "#"),
+        "password": password,
+    })
+
+    return context
+
+
 @view_config(route_name='email_verification_link',
-             renderer="templates/email_verified.jinja2")
+             renderer="templates/account_created.jinja2")
 def email_verification_link(context, request):
+
     verificate_code(request.db.registered, context.code)
-    return {
-        "profile_link": request.registry.settings.get("profile_link", "#")
-    }
+
+    user = request.db.registered.find_one({
+        'code': context.code
+    })
+
+    return registered_completed(request, user, {'from_email': True})
+
+
+@view_config(route_name='sna_account_created',
+             renderer="templates/account_created.jinja2")
+def account_created_from_sna(context, request):
+
+    user = request.db.registered.find_one({
+        'email': request.session.get('email')
+    })
+
+    return registered_completed(request, user)
 
 
 @view_config(route_name='help')

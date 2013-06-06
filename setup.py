@@ -24,6 +24,7 @@ requires = [
     'pyramid_sna==0.2',
     'waitress==0.8.2',
     'recaptcha-client==1.0.6',
+    'pwgen==0.4',
 ]
 
 if sys.version_info[0] < 3:

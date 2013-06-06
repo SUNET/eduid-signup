@@ -18,7 +18,7 @@
 
 .jumbotron .btn {
     height: 40px;
-    border-radius: 0 5px 5px 0;    
+    border-radius: 0 5px 5px 0;
 }
 
 .input-append .help-block {
@@ -74,4 +74,8 @@
 
 .btn-facebook:hover {
     background-color: rgb(114, 136, 181);
+}
+
+.pre-big {
+    font-size: 150%;
 }

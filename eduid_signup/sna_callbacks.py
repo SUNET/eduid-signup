@@ -50,7 +50,11 @@ def create_or_update(request, provider, provider_user_id, attributes):
     # Create an authenticated session and send the user to the
     # success screeen
     remember_headers = remember(request, user_id)
-    return HTTPFound(request.route_url('success'), headers=remember_headers)
+
+    request.session["email"] = attributes["email"]
+
+    return HTTPFound(request.route_url('sna_account_created'),
+                     headers=remember_headers)
 
 
 def google_callback(request, user_id, attributes):

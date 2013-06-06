@@ -36,8 +36,9 @@ def includeme(config):
     config.add_route('help', '/help/')
     config.add_route('success', '/success/')
     config.add_route('email_verification_link', '/email_verification/{code}/')
+    config.add_route('sna_account_created', '/sna_account_created/')
     config.add_route('trycaptcha', '/trycaptcha/')
-    config.add_route('resend_email_verification', '/resend_email_verification')
+    config.add_route('resend_email_verification', '/resend_email_verification/')
     config.add_route('email_already_registered', '/email_already_registered/')
 
 

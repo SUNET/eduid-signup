@@ -1,0 +1,25 @@
+{% extends "templates/base.jinja2" %}
+
+{% block contents %}
+<div class="jumbotron">
+  <h1>{{ _("Welcome to eduID!") }}</h1>
+  {% if from_email is defined %}
+    <p class="lead">{{ _("Your email has been verified now") }}</p>
+  {% endif %}
+</div>
+
+<div class='row'>
+  <h4>Your temporary password</h4>
+  <p>{{ _("Please, write down your temporary password. The system will ask you for it, and you must change it after using it once") }}</p>
+  <pre class='text-center pre-big'>{{ password }}</pre>
+</div>
+
+<div class="row">
+  <h4>{{ _("Complete your profile") }}</h4>
+  <p>{{ _("Now, you can complete your profile clicking in the follow button") }}</p>
+  <p class="text-center">
+    <a class="btn btn-success btn-large profile-link" href="{{ profile_link }}">{{ _("Fill your profile") }}</a>
+  </p>
+</div>
+
+{% endblock %}

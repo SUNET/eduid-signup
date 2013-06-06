@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from pyramid.httpexceptions import HTTPInternalServerError, HTTPFound
+from pyramid.httpexceptions import HTTPInternalServerError
 
 from eduid_signup.compat import text_type
 
