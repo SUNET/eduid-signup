@@ -28,6 +28,7 @@ class HomeViewTests(FunctionalTests):
 class SuccessViewTests(FunctionalTests):
 
     def test_success(self):
+        self.add_to_session({'email': 'mail@example.com'})
         res = self.testapp.get('/success/')
         self.assertEqual(res.status, '200 OK')
 

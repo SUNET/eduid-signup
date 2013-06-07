@@ -1,11 +1,15 @@
 import unittest
 
-from webtest import TestApp
+import pymongo
+
+from webtest import TestApp, TestRequest
+from pyramid.interfaces import ISessionFactory
+from pyramid.security import remember
+from pyramid.testing import DummyRequest
 
 from eduid_signup import main
 from eduid_signup.db import MongoDB
 
-import pymongo
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
 
@@ -66,3 +70,20 @@ class FunctionalTests(DBTests):
     def tearDown(self):
         super(FunctionalTests, self).tearDown()
         self.testapp.reset()
+
+    def set_user_cookie(self, user_id):
+        request = TestRequest.blank('', {})
+        request.registry = self.testapp.app.registry
+        remember_headers = remember(request, user_id)
+        cookie_value = remember_headers[0][1].split('"')[1]
+        self.testapp.cookies['auth_tkt'] = cookie_value
+
+    def add_to_session(self, data):
+        queryUtility = self.testapp.app.registry.queryUtility
+        session_factory = queryUtility(ISessionFactory)
+        request = DummyRequest()
+        session = session_factory(request)
+        for key, value in data.items():
+            session[key] = value
+        session.persist()
+        self.testapp.cookies['beaker.session.id'] = session._sess.id
