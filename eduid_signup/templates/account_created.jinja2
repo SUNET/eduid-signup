@@ -17,9 +17,13 @@
 <div class="row">
   <h4>{{ _("Complete your profile") }}</h4>
   <p>{{ _("Now, you can complete your profile clicking in the follow button") }}</p>
-  <p class="text-center">
-    <a class="btn btn-success btn-large profile-link" href="{{ profile_link }}">{{ _("Fill your profile") }}</a>
-  </p>
+    <p class="text-center">
+      <form method="post" action="{{ profile_link }}">
+        <input type="hidden" name="email" value="{{ email }}"/>
+        <input type="hidden" name="token" value="{{ auth_token }}"/>
+        <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Fill your profile") }}</button>
+      </form>
+    </p>
 </div>
 
 {% endblock %}
