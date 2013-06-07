@@ -45,7 +45,7 @@ class HelpViewTests(FunctionalTests):
         })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Help')
-        
+
     def test_help_in_spanish(self):
         res = self.testapp.get('/help/', headers={
             'Accept-Language': 'es',

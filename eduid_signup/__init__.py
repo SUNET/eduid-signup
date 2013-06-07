@@ -67,6 +67,7 @@ def main(global_config, **settings):
         'site.name',
         'reset_password_link',
         'vccs_url',
+        'auth_shared_secret',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:

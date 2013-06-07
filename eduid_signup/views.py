@@ -12,7 +12,8 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.emails import send_verification_mail
 from eduid_signup.validators import validate_email, ValidationError
-from eduid_signup.utils import verificate_code, check_email_status
+from eduid_signup.utils import (verificate_code, check_email_status,
+                                generate_auth_token)
 from eduid_signup.vccs import generate_password
 
 
@@ -48,8 +49,8 @@ def home(request):
             })
             return context
 
+        request.session['email'] = email
         if is_ratelimit_reached(request.environ):
-            request.session['email'] = email
             trycaptcha_url = request.route_url("trycaptcha")
             return HTTPFound(location=trycaptcha_url)
 
@@ -86,7 +87,6 @@ def trycaptcha(request):
 
         if response.is_valid:
             email = request.session['email']
-            del request.session['email']
             return get_url_from_email_status(request, email)
         else:
             return {
@@ -100,8 +100,14 @@ def trycaptcha(request):
 @view_config(route_name='success', renderer="templates/success.jinja2")
 def success(request):
 
+    email = request.session['email']
+    secret = request.registry.settings.get('auth_shared_secret')
+    auth_token = generate_auth_token(secret, email)
+
     return {
         "profile_link": request.registry.settings.get("profile_link", "#"),
+        "email": email,
+        "auth_token": auth_token,
     }
 
 
@@ -155,9 +161,15 @@ def registered_completed(request, user, context=None):
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', str(user_id))
 
+    email = user.get('email')
+    secret = request.registry.settings.get('auth_shared_secret')
+    auth_token = generate_auth_token(secret, email)
+
     context.update({
         "profile_link": request.registry.settings.get("profile_link", "#"),
         "password": password,
+        "email": email,
+        "auth_token": auth_token,
     })
 
     return context
