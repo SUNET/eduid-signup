@@ -58,4 +58,4 @@ def generate_auth_token(share_key, public_word, generator=sha256):
         The public word must must go through form POST or GET
     """
 
-    return generator("{0}{1}".format(share_key, public_word))
+    return generator("{0}{1}".format(share_key, public_word)).hexdigest()
