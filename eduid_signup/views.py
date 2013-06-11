@@ -136,10 +136,10 @@ def already_registered(context, request):
 def registered_completed(request, user, context=None):
     if context is None:
         context = {}
-    password_id = str(ObjectId())
+    password_id = ObjectId()
     (password, salt) = generate_password(
         request.registry.settings.get('vccs_url'),
-        password_id,
+        str(password_id),
         user.get('email'),
     )
 
@@ -147,7 +147,7 @@ def registered_completed(request, user, context=None):
         {
             'email': user.get('email'),
         }, {
-            '$set': {
+            '$push': {
                 'passwords': {
                     'id': password_id,
                     'salt': salt,

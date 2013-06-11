@@ -28,7 +28,10 @@ def create_or_update(request, provider, provider_user_id, attributes):
                 "verified": False
             }, {
                 "$set": {
-                    "verified": True
+                    "verified": True,
+                    "screen_name": attributes["screen_name"],
+                    "first_name": attributes["first_name"],
+                    "last_name": attributes["last_name"],
                 }
             })
             user_id = register['_id']
