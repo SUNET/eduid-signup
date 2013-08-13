@@ -145,7 +145,7 @@ It is important to activate the virtualenv before running the server:
 .. code-block:: text
 
    $ source /opt/eduid-signup/bin/activate
-   (eduid-signup)$ pserver myconfig.ini
+   (eduid-signup)$ pserve myconfig.ini
    Starting server in PID 16756.
    serving on http://0.0.0.0:6543
 
