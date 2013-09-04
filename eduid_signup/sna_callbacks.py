@@ -18,9 +18,9 @@ def create_or_update(request, provider, provider_user_id, attributes):
                 "email": attributes["email"],
                 "date": datetime.datetime.utcnow(),
                 "verified": True,
-                "screen_name": attributes["screen_name"],
-                "first_name": attributes["first_name"],
-                "last_name": attributes["last_name"],
+                "displayName": attributes["screen_name"],
+                "givenName": attributes["first_name"],
+                "sn": attributes["last_name"],
             }, safe=True)
         elif not register['verified']:
             request.db.registered.find_and_modify({
@@ -29,9 +29,9 @@ def create_or_update(request, provider, provider_user_id, attributes):
             }, {
                 "$set": {
                     "verified": True,
-                    "screen_name": attributes["screen_name"],
-                    "first_name": attributes["first_name"],
-                    "last_name": attributes["last_name"],
+                    "displayName": attributes["screen_name"],
+                    "givenName": attributes["first_name"],
+                    "sn": attributes["last_name"],
                 }
             })
             user_id = register['_id']
