@@ -56,8 +56,8 @@ def create_or_update(request, provider, provider_user_id, attributes):
 
     request.session["email"] = attributes["email"]
 
-    return HTTPFound(request.route_url('sna_account_created'),
-                     headers=remember_headers)
+    raise HTTPFound(request.route_url('sna_account_created'),
+                    headers=remember_headers)
 
 
 def google_callback(request, user_id, attributes):
