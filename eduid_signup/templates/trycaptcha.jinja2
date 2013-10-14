@@ -6,11 +6,11 @@
 
   <div class="jumbotron">
     {% if error is defined %}
-      <h1>{{ _("Ups!") }}</h1>
-      <p class="lead">{{ _("Something was wrong with your answer. Could you repeat? please") }}</h1>
+      <h1>{{ _("Oops!") }}</h1>
+      <p class="lead">{{ _("Please try again") }}</p>
     {% else %}
-      <h1>{{ _("Only one step more!") }}</h1>
-      <p class="lead">{{ _("We have detected many registration application process from your IP address.") }}</p>
+      <h1>{{ _("Only one more step!") }}</h1>
+      <p class="lead">{{ _("eduID must verify that you are a human and not a machine.") }}</p>
     {% endif %}
 
   </div>

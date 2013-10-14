@@ -3,12 +3,12 @@
 {% block contents %}
 
 <div class="jumbotron">
-  <h1>{{ _("Your email is already registered!") }}</h1>
-  <p class="lead"> {{ _("Do you want a new verification link in your email inbox?") }}</p>
+  <h1>{{ _("Email address already in use") }}</h1>
+  <p class="lead"> {{ _("Send a new verification link to this address") }}</p>
 </div>
 <div class="row">
     <form method="POST" class="text-center">
-      <button type="submit" class="btn btn-success btn-large">{{ _("Resend verification link") }}</a>
+      <button type="submit" class="btn btn-success btn-large">{{ _("Resend verification link") }}</button>
     </form>
 </div>
 

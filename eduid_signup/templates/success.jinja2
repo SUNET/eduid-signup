@@ -3,25 +3,25 @@
 {% block contents %}
 <div class="jumbotron">
   <h1>{{ _("Welcome to eduID!") }}</h1>
-  <p class="lead">{{ _("You are successfully registered now") }}</p>
+  <p class="lead">{{ _("Account created successfully") }}</p>
 </div>
 <div class="row">
 
   <div class="span6">
-    <h4>{{ _("Complete your profile") }}</h4>
-    <p> {{ _("Now, you can complete your profile clicking in the next button") }}</p>
+    <h4>{{ _("Complete account profile") }}</h4>
+    <p> {{ _("Click this button to finish the signup process") }}</p>
     <p class="text-center">
       <form method="post" action="{{ profile_link }}">
         <input type="hidden" name="email" value="{{ email }}"/>
         <input type="hidden" name="token" value="{{ auth_token }}"/>
-        <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Fill your profile") }}</button>
+        <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Go to dashboard") }}</button>
       </form>
     </p>
   </div>
   <div class="span6">
-    <h4>{{ _("Remember! You must confirm your email") }}</h4>
-    <p>{{ _("An email with a confirmation link was sent to your inbox, remember
-       that you need to confirm your email address by clicking on that link.") }}</p>
+    <h4>{{ _("Remember to confirm email address") }}</h4>
+    <p>{{ _("An email with a confirmation link was sent to your inbox.
+             EduID can't use the email address until it has been verified.") }}</p>
   </div>
 
 </div>

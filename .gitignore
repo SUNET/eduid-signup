@@ -10,3 +10,4 @@ dist/
 sessions/
 nosetests.xml
 development.ini
+.idea
