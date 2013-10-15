@@ -1,4 +1,4 @@
 include *.rst *.cfg *.txt *.ini
 recursive-include config-templates *.ini
 recursive-include eduid_signup *.jinja2 *.ico *.png *.gif *.jpg *.css *.js
-recursive-include eduid_signup/locale/ *.pot *.po *.mo
+recursive-include eduid_signup *.pot *.po *.mo
