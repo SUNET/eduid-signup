@@ -169,7 +169,7 @@ def registered_completed(request, user, context=None):
 
     email = user.get('email')
     secret = request.registry.settings.get('auth_shared_secret')
-    timestamp = "{x}".format(int(time.time()))
+    timestamp = '{:x}'.format(int(time.time()))
     nonce = os.urandom(16).encode('hex')
 
     auth_token = generate_auth_token(secret, email, nonce, timestamp)
