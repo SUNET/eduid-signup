@@ -50,6 +50,11 @@ def create_or_update(request, provider, provider_user_id, attributes):
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', user_id)
 
+    # TODO
+    # Should add spinner here to make sure we can read back the user using eduid_am
+    # before proceeding. If the attribute manager is not working allright the user will
+    # be sent to dashboard using auth_token link below, but dashboard won't find the user.
+
     # Create an authenticated session and send the user to the
     # success screeen
     remember_headers = remember(request, user_id)
