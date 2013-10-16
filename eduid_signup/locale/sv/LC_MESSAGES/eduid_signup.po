@@ -4,13 +4,14 @@
 # 
 # Translators:
 # ft, 2013
+# leifj <leifj@sunet.se>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: eduid-signup\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-10-15 08:54+0200\n"
-"PO-Revision-Date: 2013-10-15 07:15+0000\n"
-"Last-Translator: ft\n"
+"PO-Revision-Date: 2013-10-16 07:58+0000\n"
+"Last-Translator: leifj <leifj@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-signup/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: eduid_signup/emails.py:26
 msgid "eduid-signup verification email"
-msgstr "eduID registrerings- verifikationsbrev"
+msgstr "eduID registrering"
 
 #: eduid_signup/validators.py:28
 msgid "Email is required"
@@ -55,7 +56,7 @@ msgstr "Skriv ned detta huvudlösenord och spara det på en säker plats. Enklar
 #: eduid_signup/templates/account_created.jinja2:18
 #: eduid_signup/templates/success.jinja2:11
 msgid "Complete account profile"
-msgstr "Förbättra kontots profil"
+msgstr "Komplettera användaruppgifter"
 
 #: eduid_signup/templates/account_created.jinja2:19
 #: eduid_signup/templates/success.jinja2:12
@@ -65,7 +66,7 @@ msgstr "Klicka här för att slutföra registreringsprocessen"
 #: eduid_signup/templates/account_created.jinja2:24
 #: eduid_signup/templates/success.jinja2:17
 msgid "Go to dashboard"
-msgstr "Gå till manöverpanelen"
+msgstr "Gå till huvudsidan"
 
 #: eduid_signup/templates/already_registered.jinja2:7
 #: eduid_signup/templates/already_registered.jinja2:10
@@ -79,7 +80,7 @@ msgstr "Glömt ditt lösenord?"
 
 #: eduid_signup/templates/already_registered.jinja2:13
 msgid "Reset your password"
-msgstr "Återställ lösenord"
+msgstr "Nytt lösenord"
 
 #: eduid_signup/templates/base.jinja2:6
 msgid "Sign up"
@@ -95,19 +96,19 @@ msgstr "Hjälp"
 
 #: eduid_signup/templates/home.jinja2:9
 msgid "Create an account for use with Swedish Universities."
-msgstr "Skapa ett konto att använda med svenska universistet och högskolor."
+msgstr "Skapa en identitet för Svenska universitet och högskolor."
 
 #: eduid_signup/templates/home.jinja2:19
 msgid "Sign up with your email address"
-msgstr "Skapa konto med din e-postadress"
+msgstr "Registrera dig via e-post"
 
 #: eduid_signup/templates/home.jinja2:31
 msgid "Sign up with Facebook"
-msgstr "Skapa konto med Facebook"
+msgstr "Registrera dig via Facebook"
 
 #: eduid_signup/templates/home.jinja2:37
 msgid "Sign up with Google"
-msgstr "Skapa konto med Google"
+msgstr "Registrera dig via Google"
 
 #: eduid_signup/templates/resend_email_verification.jinja2:7
 msgid "Send a new verification link to this address"
@@ -119,7 +120,7 @@ msgstr "Skicka en ny verifikationslänk"
 
 #: eduid_signup/templates/success.jinja2:6
 msgid "Account created successfully"
-msgstr "Konto skapat"
+msgstr "Identitet skapad"
 
 #: eduid_signup/templates/success.jinja2:22
 msgid "Remember to confirm email address"
@@ -133,7 +134,7 @@ msgstr "Ett e-post med en verifikationslänk har skickats till dig.\nEduID kan i
 
 #: eduid_signup/templates/trycaptcha.jinja2:9
 msgid "Oops!"
-msgstr "Oj!"
+msgstr "Ett oväntat fel inträffade!"
 
 #: eduid_signup/templates/trycaptcha.jinja2:10
 msgid "Please try again"
@@ -163,7 +164,7 @@ msgid ""
 "<p>If you did not perform this registration, then please accept our appologies and\n"
 "   ignore this email.</p>\n"
 "\n"
-msgstr ""
+msgstr "\n⏎\n<h2>Välkommen till %(site_name)s,</h2>⏎\n⏎\n<p>Du får detta meddelande eftersom denna address användes vid registering till ⏎\n<a href=\"%(site_url)s\">%(site_name)s</a>.</p>⏎\n⏎\n<p>Klicka på länken nedan för att bekräfta din e-post address.</p>⏎\n⏎\n<a href=\"%(verification_link)s\">%(verification_link)s</a>⏎\n⏎\n<p>Om det inte var du som påbörjade registreringen så ber vi om ursäkt och ber \ndig ignorera detta meddelande.</p>⏎\n⏎\n"
 
 #: eduid_signup/templates/verification_email.txt.jinja2:1
 #, python-format
@@ -182,4 +183,4 @@ msgid ""
 "If you did not perform this registration, then please accept our\n"
 "appologies and ignore this email.\n"
 "\n"
-msgstr ""
+msgstr "\n⏎\nVälkommen till %(site_name)s,\n⏎\nDu får detta meddelande eftersom denna address användes vid registering till ⏎\n%(site_name)s %(site_url)s⏎\n⏎\nKlipp och klistra länken nedan till en webläsare för att begräfta din e-post address\n⏎\n%(verification_link)s⏎\n⏎\nOm det inte var du som påbörjade registreringen så ber vi om ursäkt och ber \ndig ignorera detta meddelande.⏎\n⏎\n"
