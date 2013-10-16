@@ -1,5 +1,6 @@
 from uuid import uuid4
 from hashlib import sha256
+import time
 
 from pyramid.httpexceptions import HTTPInternalServerError
 
@@ -52,10 +53,10 @@ def check_email_status(db, email):
         return 'not_verified'
 
 
-def generate_auth_token(share_key, public_word, generator=sha256):
+def generate_auth_token(shared_key, email, nonce, timestamp, generator=sha256):
     """
-        The share_key is a secret between the two systems
+        The shared_key is a secret between the two systems
         The public word must must go through form POST or GET
     """
-
-    return generator("{0}{1}".format(share_key, public_word)).hexdigest()
+    return generator("{0}|{1}|{2}|{3}".format(
+        shared_key, email, nonce, timestamp)).hexdigest()

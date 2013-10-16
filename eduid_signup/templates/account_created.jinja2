@@ -20,6 +20,8 @@
     <p class="text-center">
       <form method="post" action="{{ profile_link }}">
         <input type="hidden" name="email" value="{{ email }}"/>
+        <input type="hidden" name="nonce" value="{{ nonce }}"/>
+        <input type="hidden" name="ts" value="{{ timestamp }}"/>
         <input type="hidden" name="token" value="{{ auth_token }}"/>
         <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Go to dashboard") }}</button>
       </form>
