@@ -142,7 +142,7 @@ def already_registered(context, request):
 def registered_completed(request, user, context=None):
     if context is None:
         context = {}
-    password_id = ObjectId()
+    password_id = str(ObjectId())
     (password, salt) = generate_password(
         request.registry.settings.get('vccs_url'),
         str(password_id),
