@@ -102,6 +102,10 @@ def trycaptcha(request):
 @view_config(route_name='success', renderer="templates/success.jinja2")
 def success(request):
 
+    if 'email' not in request.session:
+        home_url = request.route_url("home")
+        return HTTPFound(location=home_url)
+        
     email = request.session['email']
     secret = request.registry.settings.get('auth_shared_secret')
     timestamp = "{x}".format(int(time.time()))
