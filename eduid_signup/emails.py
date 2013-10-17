@@ -46,7 +46,7 @@ def send_verification_mail(request, email):
         }, update={
             '$set': {
                 "email": email,
-                "date": datetime.utcnow(),
+                "created_ts": datetime.utcnow(),
                 "code": code,
                 "verified": False,
             },

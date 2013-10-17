@@ -1,5 +1,6 @@
 from uuid import uuid4
 from hashlib import sha256
+import datetime
 
 from pyramid.httpexceptions import HTTPInternalServerError
 
@@ -21,7 +22,8 @@ def verificate_code(collection, code):
             "verified": False
         }, {
             "$set": {
-                "verified": True
+                "verified": True,
+                "verified_ts": datetime.utcnow(),
             }
         },
         new=True,
