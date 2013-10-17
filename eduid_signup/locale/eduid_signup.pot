@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-17 10:30+0200\n"
+"POT-Creation-Date: 2013-10-17 13:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,10 @@ msgstr ""
 
 #: eduid_signup/emails.py:26
 msgid "eduid-signup verification email"
+msgstr ""
+
+#: eduid_signup/utils.py:39
+msgid "Your email can't be verified now, try it later"
 msgstr ""
 
 #: eduid_signup/validators.py:28
