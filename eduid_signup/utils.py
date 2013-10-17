@@ -1,8 +1,9 @@
 from uuid import uuid4
 from hashlib import sha256
-import time
 
 from pyramid.httpexceptions import HTTPInternalServerError
+
+from eduid_signup.i18n import TranslationString as _
 
 from eduid_signup.compat import text_type
 
@@ -28,8 +29,8 @@ def verificate_code(collection, code):
     )
 
     if result is None:
-        raise HTTPInternalServerError("Your email can't be verified now, try"
-                                      " it later")
+        raise HTTPInternalServerError(_("Your email can't be verified now, "
+                                      "try it later"))
     return True
 
 
