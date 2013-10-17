@@ -14,7 +14,7 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.emails import send_verification_mail
 from eduid_signup.validators import validate_email, ValidationError
-from eduid_signup.utils import (verificate_code, check_email_status,
+from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token)
 from eduid_signup.vccs import generate_password
 
@@ -194,7 +194,7 @@ def registered_completed(request, user, context=None):
              renderer="templates/account_created.jinja2")
 def email_verification_link(context, request):
 
-    verificate_code(request.db.registered, context.code)
+    verify_email_code(request.db.registered, context.code)
 
     user = request.db.registered.find_one({
         'code': context.code

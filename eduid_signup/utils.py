@@ -15,7 +15,7 @@ def generate_verification_link(request):
     return (link, code)
 
 
-def verificate_code(collection, code):
+def verify_email_code(collection, code):
     result = collection.find_and_modify(
         {
             "code": code,
