@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-15 08:54+0200\n"
+"POT-Creation-Date: 2013-10-17 10:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,8 +59,8 @@ msgstr ""
 msgid "Click this button to finish the signup process"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:24
-#: eduid_signup/templates/success.jinja2:17
+#: eduid_signup/templates/account_created.jinja2:26
+#: eduid_signup/templates/success.jinja2:19
 msgid "Go to dashboard"
 msgstr ""
 
@@ -118,11 +118,11 @@ msgstr ""
 msgid "Account created successfully"
 msgstr ""
 
-#: eduid_signup/templates/success.jinja2:22
+#: eduid_signup/templates/success.jinja2:24
 msgid "Remember to confirm email address"
 msgstr ""
 
-#: eduid_signup/templates/success.jinja2:23
+#: eduid_signup/templates/success.jinja2:25
 msgid ""
 "An email with a confirmation link was sent to your inbox.\n"
 "             EduID can't use the email address until it has been verified."
