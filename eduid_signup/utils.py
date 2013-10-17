@@ -30,6 +30,11 @@ def verify_email_code(collection, code):
         safe=True
     )
 
+    # XXX need to handle user clicking on confirmation link more than
+    # once gracefully. Should show page saying that e-mail address was
+    # already confirmed, but NOT allow user to auth_token login to
+    # dashboard from that page.
+
     if result is None:
         raise HTTPInternalServerError(_("Your email can't be verified now, "
                                       "try it later"))
