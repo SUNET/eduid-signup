@@ -38,8 +38,6 @@ def send_verification_mail(request, email):
         ),
     )
 
-    mailer.send(message)
-
     result = request.db.registered.find_and_modify(
         query={
             'email': email,
@@ -53,6 +51,8 @@ def send_verification_mail(request, email):
         }, upsert=True, full_response=True, new=True, safe=True)
 
     user_id = result.get("value", {}).get("_id")
+
+    mailer.send(message)
 
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
