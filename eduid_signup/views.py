@@ -201,7 +201,6 @@ def email_verification_link(context, request):
         return {
             'email_already_verified': True,
             "reset_password_link": request.registry.settings.get("reset_password_link", "#"),
-            "idp_link": request.registry.settings.get("idp_link", "#"),
         }
     except CodeDoesNotExists:
         return {

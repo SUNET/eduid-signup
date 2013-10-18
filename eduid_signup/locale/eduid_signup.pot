@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-17 13:04+0200\n"
+"POT-Creation-Date: 2013-10-18 16:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,10 +21,6 @@ msgstr ""
 msgid "eduid-signup verification email"
 msgstr ""
 
-#: eduid_signup/utils.py:39
-msgid "Your email can't be verified now, try it later"
-msgstr ""
-
 #: eduid_signup/validators.py:28
 msgid "Email is required"
 msgstr ""
@@ -33,37 +29,68 @@ msgstr ""
 msgid "Email is not valid"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:5
+#: eduid_signup/templates/account_created.jinja2:7
+#: eduid_signup/templates/account_created.jinja2:21
+#: eduid_signup/templates/account_created.jinja2:43
 #: eduid_signup/templates/already_registered.jinja2:6
 #: eduid_signup/templates/home.jinja2:7 eduid_signup/templates/success.jinja2:5
 msgid "Welcome to eduID!"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:7
+#: eduid_signup/templates/account_created.jinja2:8
+msgid "Email address has already been verified"
+msgstr ""
+
+#: eduid_signup/templates/account_created.jinja2:9
+msgid "Maybe you want to reset your password again?"
+msgstr ""
+
+#: eduid_signup/templates/account_created.jinja2:15
+#: eduid_signup/templates/already_registered.jinja2:13
+msgid "Reset your password"
+msgstr ""
+
+#: eduid_signup/templates/account_created.jinja2:22
+msgid "The provided code does not exist or your link is broken"
+msgstr ""
+
+#: eduid_signup/templates/account_created.jinja2:23
+msgid "If you have a code, you should go to the verification code form to enter it"
+msgstr ""
+
+#: eduid_signup/templates/account_created.jinja2:30
+msgid "Return to the register form"
+msgstr ""
+
+#: eduid_signup/templates/account_created.jinja2:37
+msgid "Go to verification code form"
+msgstr ""
+
+#: eduid_signup/templates/account_created.jinja2:45
 msgid "Email successfully verified"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:12
+#: eduid_signup/templates/account_created.jinja2:50
 msgid "Master Password (PUK code)"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:13
+#: eduid_signup/templates/account_created.jinja2:51
 msgid ""
 "Write down this Master Password and store it in a safe place. Simpler "
 "passwords can be added to an account later."
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:18
+#: eduid_signup/templates/account_created.jinja2:56
 #: eduid_signup/templates/success.jinja2:11
 msgid "Complete account profile"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:19
+#: eduid_signup/templates/account_created.jinja2:57
 #: eduid_signup/templates/success.jinja2:12
 msgid "Click this button to finish the signup process"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:26
+#: eduid_signup/templates/account_created.jinja2:64
 #: eduid_signup/templates/success.jinja2:19
 msgid "Go to dashboard"
 msgstr ""
@@ -76,10 +103,6 @@ msgstr ""
 
 #: eduid_signup/templates/already_registered.jinja2:11
 msgid "Forgot your password?"
-msgstr ""
-
-#: eduid_signup/templates/already_registered.jinja2:13
-msgid "Reset your password"
 msgstr ""
 
 #: eduid_signup/templates/base.jinja2:6
@@ -98,15 +121,15 @@ msgstr ""
 msgid "Create an account for use with Swedish Universities."
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:19
+#: eduid_signup/templates/home.jinja2:17
 msgid "Sign up with your email address"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:31
+#: eduid_signup/templates/home.jinja2:29
 msgid "Sign up with Facebook"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:37
+#: eduid_signup/templates/home.jinja2:35
 msgid "Sign up with Google"
 msgstr ""
 

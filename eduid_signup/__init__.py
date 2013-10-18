@@ -67,7 +67,6 @@ def main(global_config, **settings):
         'profile_link',
         'site.name',
         'reset_password_link',
-        'idp_link',
         'vccs_url',
         'auth_shared_secret',
     ):
