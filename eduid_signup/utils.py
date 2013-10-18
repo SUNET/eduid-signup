@@ -2,11 +2,19 @@ from uuid import uuid4
 from hashlib import sha256
 import datetime
 
-from pyramid.httpexceptions import HTTPInternalServerError
+from pyramid.httpexceptions import HTTPInternalServerError, HTTPNotFound
 
 from eduid_signup.i18n import TranslationString as _
 
 from eduid_signup.compat import text_type
+
+
+class AlreadyVerifiedException(Exception):
+    pass
+
+
+class CodeDoesNotExists(Exception):
+    pass
 
 
 def generate_verification_link(request):
@@ -16,7 +24,16 @@ def generate_verification_link(request):
 
 
 def verify_email_code(collection, code):
-    result = collection.find_and_modify(
+    status = collection.find_one({
+        'code': code,
+    })
+
+    if status is None:
+        raise CodeDoesNotExists()
+    else:
+        raise AlreadyVerifiedException()
+
+    result = collection.update(
         {
             "code": code,
             "verified": False
@@ -35,9 +52,6 @@ def verify_email_code(collection, code):
     # already confirmed, but NOT allow user to auth_token login to
     # dashboard from that page.
 
-    if result is None:
-        raise HTTPInternalServerError(_("Your email can't be verified now, "
-                                      "try it later"))
     return True
 
 

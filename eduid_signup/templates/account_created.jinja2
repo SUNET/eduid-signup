@@ -1,31 +1,77 @@
 {% extends "templates/base.jinja2" %}
 
 {% block contents %}
-<div class="jumbotron">
-  <h1>{{ _("Welcome to eduID!") }}</h1>
-  {% if from_email is defined %}
-    <p class="lead">{{ _("Email successfully verified") }}</p>
-  {% endif %}
-</div>
 
-<div class='row'>
-  <h4>{{  _("Master Password (PUK code)") }}</h4>
-  <p>{{ _("Write down this Master Password and store it in a safe place. Simpler passwords can be added to an account later.") }}</p>
-  <pre class='text-center pre-big'>{{ password }}</pre>
-</div>
+{% if email_already_verified is defined %}
+  <div class="jumbotron">
+    <h1>{{ _("Welcome to eduID!") }}</h1>
+    <p class="lead">{{ _("Email address was already verified before") }}</p>
+    <p class="lead">{{ _("Maybe you want go to the login form or the reset password form") }}
+  </div>
+  <div class="row">
+      <div class="span6">
+        <p class="text-center">
+          <a class="btn btn-success btn-large profile-link"
+             href="{{ idp_link }}">
+              {{ _("Go to the login form") }}</a>
+        </p>
+      </div>
+      <div class="span6">
+        <p class="text-center">
+          <a class="btn btn-success btn-large profile-link" 
+             href="{{ reset_password_link }}">
+              {{ _("Reset your password") }}</a>
+        </p>
+      </div>
+  </div>
+{% elif code_does_not_exists is defined %}
+  <div class="jumbotron">
+    <h1>{{ _("Welcome to eduID!") }}</h1>
+    <p class="lead">{{ _("The provided code does not exist or your link is broken") }}</p>
+    <p class="lead">{{ _("If you have a code, you should go to the verification code form to enter it") }}
+  </div>
+  <div class="row">
+    <div class="span6">
+      <p class="text-center">
+          <a class="btn btn-success btn-large profile-link"
+             href="{{ signup_link }}">
+              {{ _("Return to the register form") }}</a>
+      </p>
+    </div>
+    <div class="span6">
+      <p class="text-center">
+          <a class="btn btn-success btn-large profile-link"
+             href="{{ code_form }}">
+              {{ _("Go to verification code form") }}</a>
+      </p>
+    </div>
+  </div>
+{% else %}
+  <div class="jumbotron">
+    <h1>{{ _("Welcome to eduID!") }}</h1>
+    {% if from_email is defined %}
+      <p class="lead">{{ _("Email successfully verified") }}</p>
+    {% endif %}
+  </div>
 
-<div class="row">
-  <h4>{{ _("Complete account profile") }}</h4>
-  <p>{{ _("Click this button to finish the signup process") }}</p>
-    <p class="text-center">
-      <form method="post" action="{{ profile_link }}">
-        <input type="hidden" name="email" value="{{ email }}"/>
-        <input type="hidden" name="nonce" value="{{ nonce }}"/>
-        <input type="hidden" name="ts" value="{{ timestamp }}"/>
-        <input type="hidden" name="token" value="{{ auth_token }}"/>
-        <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Go to dashboard") }}</button>
-      </form>
-    </p>
-</div>
+  <div class='row'>
+    <h4>{{  _("Master Password (PUK code)") }}</h4>
+    <p>{{ _("Write down this Master Password and store it in a safe place. Simpler passwords can be added to an account later.") }}</p>
+    <pre class='text-center pre-big'>{{ password }}</pre>
+  </div>
 
+  <div class="row">
+    <h4>{{ _("Complete account profile") }}</h4>
+    <p>{{ _("Click this button to finish the signup process") }}</p>
+      <p class="text-center">
+        <form method="post" action="{{ profile_link }}">
+          <input type="hidden" name="email" value="{{ email }}"/>
+          <input type="hidden" name="nonce" value="{{ nonce }}"/>
+          <input type="hidden" name="ts" value="{{ timestamp }}"/>
+          <input type="hidden" name="token" value="{{ auth_token }}"/>
+          <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Go to dashboard") }}</button>
+        </form>
+      </p>
+  </div>
+{% endif %}
 {% endblock %}

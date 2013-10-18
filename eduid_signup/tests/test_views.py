@@ -8,7 +8,7 @@ class HomeViewTests(FunctionalTests):
         self.assertEqual(res.status, '200 OK')
         res.mustcontain(
             'Welcome to eduID!',
-            'Create an account that will allow you access to all Swedish Universities.',
+            'Create an account for use with Swedish Universities.',
             'Sign up with your email',
             'Sign up with Facebook',
             'Sign up with Google',

@@ -15,7 +15,8 @@ from eduid_am.tasks import update_attributes
 from eduid_signup.emails import send_verification_mail
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.utils import (verify_email_code, check_email_status,
-                                generate_auth_token)
+                                generate_auth_token, AlreadyVerifiedException,
+                                CodeDoesNotExists)
 from eduid_signup.vccs import generate_password
 
 
@@ -194,13 +195,33 @@ def registered_completed(request, user, context=None):
              renderer="templates/account_created.jinja2")
 def email_verification_link(context, request):
 
-    verify_email_code(request.db.registered, context.code)
+    try:
+        verify_email_code(request.db.registered, context.code)
+    except AlreadyVerifiedException:
+        return {
+            'email_already_verified': True,
+            "reset_password_link": request.registry.settings.get("reset_password_link", "#"),
+            "idp_link": request.registry.settings.get("idp_link", "#"),
+        }
+    except CodeDoesNotExists:
+        return {
+            "code_does_not_exists": True,
+            "code_form": request.route_path('verification_code_form'),
+            "signup_link": request.route_path('home'),
+        }
 
     user = request.db.registered.find_one({
         'code': context.code
     })
 
     return registered_completed(request, user, {'from_email': True})
+
+
+@view_config(route_name='verification_code_form',
+             renderer="templates/verification_code_form.jinja2")
+def verification_code_form(context, request):
+    # TODO
+    return {}
 
 
 @view_config(route_name='sna_account_created',

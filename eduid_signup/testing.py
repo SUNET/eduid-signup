@@ -41,6 +41,7 @@ class FunctionalTests(DBTests):
         # db in a different way
         settings = {
             'profile_link': 'http://profiles.example.com/edit',
+            'idp_link': 'http://idp.example.com/',
             'reset_password_link': ' http://profiles.example.com/reset_password',
             'site.name': 'Test Site',
             'auth_tk_secret': '123456',
