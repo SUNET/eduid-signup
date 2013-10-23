@@ -31,7 +31,8 @@ def verify_email_code(collection, code):
     if status is None:
         raise CodeDoesNotExists()
     else:
-        raise AlreadyVerifiedException()
+        if status.get('verified'):
+            raise AlreadyVerifiedException()
 
     result = collection.update(
         {
