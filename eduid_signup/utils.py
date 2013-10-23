@@ -41,7 +41,7 @@ def verify_email_code(collection, code):
         }, {
             "$set": {
                 "verified": True,
-                "verified_ts": datetime.utcnow(),
+                "verified_ts": datetime.datetime.utcnow(),
             }
         },
         new=True,
