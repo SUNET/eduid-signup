@@ -4,6 +4,7 @@ import re
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.settings import asbool
+from pyramid.httpexceptions import HTTPNotFound
 
 from eduid_am.celery import celery
 from eduid_signup.db import MongoDB, get_db
@@ -41,6 +42,19 @@ def includeme(config):
     config.add_route('resend_email_verification', '/resend_email_verification/')
     config.add_route('email_already_registered', '/email_already_registered/')
     config.add_route('verification_code_form', '/verification_code_form/')
+
+    config.add_route('error500test', '/error500test/')
+    config.add_route('error500', '/error500/')
+
+    config.add_route('error404', '/error404/')
+
+    if not config.registry.settings.get('testing', False):
+        config.add_view(context=Exception,
+                        view='eduid_signup.views.exception_view',
+                        renderer='templates/error500.jinja2')
+        config.add_view(context=HTTPNotFound,
+                        view='eduid_signup.views.exception_view',
+                        renderer='templates/error404.jinja2')
 
 
 def main(global_config, **settings):
