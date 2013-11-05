@@ -59,3 +59,30 @@ def send_verification_mail(request, email):
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', str(user_id))
+
+
+
+def send_credentials(request, email, password):
+    mailer = get_mailer(request)
+    context = {
+        "email": email,
+        "password": password,
+        "site_url": request.route_url("home"),
+        "site_name": request.registry.settings.get("site.name", "eduid_signup"),
+    }
+    message = Message(
+        subject=_("eduid-signup credentials"),
+        sender=request.registry.settings.get("mail.default_sender"),
+        recipients=[email],
+        body=render(
+            "templates/credentials_email.txt.jinja2",
+            context,
+            request,
+        ),
+        html=render(
+            "templates/credentials_email.html.jinja2",
+            context,
+            request,
+        ),
+    )
+    mailer.send(message)

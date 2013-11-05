@@ -12,7 +12,7 @@ from wsgi_ratelimit import is_ratelimit_reached
 
 from eduid_am.tasks import update_attributes
 
-from eduid_signup.emails import send_verification_mail
+from eduid_signup.emails import send_verification_mail, send_credentials
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
@@ -190,6 +190,8 @@ def registered_completed(request, user, context=None):
         "timestamp": timestamp,
         "auth_token": auth_token,
     })
+
+    send_credentials(request, email, password)
 
     return context
 
