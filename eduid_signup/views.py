@@ -222,8 +222,28 @@ def email_verification_link(context, request):
 @view_config(route_name='verification_code_form',
              renderer="templates/verification_code_form.jinja2")
 def verification_code_form(context, request):
-    # TODO
-    return {}
+    context = {}
+    if request.method == 'POST':
+        try:
+            try:
+                code = request.POST['code']
+                verify_email_code(request.db.registered, code)
+                user = request.db.registered.find_one({
+                    'code': code
+                })
+                return registered_completed(request, user, {'from_email': True})
+            except AlreadyVerifiedException:
+                context = {
+                    'email_already_verified': True,
+                    'reset_password_link': request.registry.settings.get('reset_password_link', '#'),
+                }
+        except CodeDoesNotExists:
+            context = {
+                'code_does_not_exists': True,
+                'code_form': request.route_path('verification_code_form'),
+                'signup_link': request.route_path('home'),
+            }
+    return context
 
 
 @view_config(route_name='sna_account_created',

@@ -2,6 +2,46 @@
 
 {% block contents %}
 
-<div>Not implemented view</div>
+  <div class="jumbotron">
+    <h1>{{ _("Welcome to eduID!") }}</h1>
+  </div>
+
+{% if email_already_verified is defined %}
+  <p class="lead">{{ _("Email address has already been verified") }}</p>
+  <p class="lead">{{ _("Maybe you want to reset your password again?") }}</p>
+  <div class="row">
+      <div class="span12">
+        <p class="text-center">
+          <a class="btn btn-success btn-large profile-link" href="{{ reset_password_link }}">
+              {{ _("Reset password") }}</a>
+        </p>
+      </div>
+  </div>
+
+{% elif password is not defined %}
+
+  <p class="lead">{{ _("Put here the verification code sent to you by e-mail") }}</p>
+
+  <div class="row">
+    <div id="verification-code" class="span6">
+      <form class="form-inline" method="POST">
+        <div class="control-group {% if code_does_not_exists is defined %}error{% endif %}">
+          <div class="input-append">
+            <input type="text" name="code" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
+            <button class="btn btn-success" type="submit">{{ _("Verify account") }}</button>
+            {% if code_does_not_exists is defined %}
+              <p class="help-block">{{ _("The provided code does not exist") }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% else %}
+
+  {% include "inc.registration_completed.html" %}
+
+{% endif %}
 
 {% endblock %}
