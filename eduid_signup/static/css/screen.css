@@ -89,3 +89,24 @@
 .verification-code form p {
     text-align: left;
 }
+
+/* Bottom footer styles
+-------------------------------------------------- */
+
+html, body {
+  height: 100%;
+}
+
+#wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -3em;
+}
+
+#footer {
+  height: 3em;
+}
+
+/* end bottom footer styles
+-------------------------------------------------- */
