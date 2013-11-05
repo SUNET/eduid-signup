@@ -18,7 +18,7 @@
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
           {% else %}
-            <p class="help-block">{{ _("Do you have a verification code?") }}</p>
+            <p class="help-block"><a href="{{ request.route_path('verification_code_form') }}">{{ _("Do you have a verification code?") }}</a></p>
           {% endif %}
         </div>
        </div>
