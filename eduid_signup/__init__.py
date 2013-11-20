@@ -9,6 +9,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from eduid_am.celery import celery
 from eduid_signup.db import MongoDB, get_db
 from eduid_signup.i18n import locale_negotiator
+from eduid_signup.userdb import UserDB, get_userdb
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -31,6 +32,10 @@ def includeme(config):
     config.registry.settings['db_conn'] = mongodb.get_connection
 
     config.set_request_property(get_db, 'db', reify=True)
+
+    userdb = UserDB(config.registry.settings)
+    config.registry.settings['userdb'] = userdb
+    config.add_request_method(get_userdb, 'userdb', reify=True)
 
     # root views
     config.add_route('home', '/')
@@ -78,6 +83,7 @@ def main(global_config, **settings):
 
     for item in (
         'mongo_uri',
+        'mongo_uri_am',
         'profile_link',
         'site.name',
         'reset_password_link',

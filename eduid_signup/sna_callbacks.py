@@ -9,40 +9,47 @@ from eduid_am.tasks import update_attributes
 def create_or_update(request, provider, provider_user_id, attributes):
     provider_key = '%s_id' % provider
     # Create or update the user
-    user = request.db.users.find_one({provider_key: provider_user_id})
-    if user is None:  # first time
-        register = request.db.registered.find_one({"email": attributes["email"]})
-        if register is None:
-            user_id = request.db.registered.insert({
-                provider_key: provider_user_id,
-                "email": attributes["email"],
-                "date": datetime.datetime.utcnow(),
+
+    user = request.db.registered.find_one({provider_key: provider_user_id})
+    try:
+        am_user = request.userdb.get_user_by_email(attributes["email"])
+    except request.userdb.UserDoesNotExist:
+        am_user = None
+
+    if user is None and am_user is None:
+        # The user is new, is not registered in signup or am either
+        # then, register as usual
+        user_id = request.db.registered.save({
+            provider_key: provider_user_id,
+            "email": attributes["email"],
+            "date": datetime.datetime.utcnow(),
+            "verified": True,
+            "displayName": attributes["screen_name"],
+            "givenName": attributes["first_name"],
+            "sn": attributes["last_name"],
+        }, safe=True)
+
+    elif am_user is None:
+        # If the user is registered in signup but was not propagated to
+        # eduid_am
+        # Then, update local attributes and continue as new user
+        #
+        request.db.registered.find_and_modify({
+            "email": attributes['email'],
+            "verified": False
+        }, {
+            "$set": {
                 "verified": True,
                 "displayName": attributes["screen_name"],
                 "givenName": attributes["first_name"],
                 "sn": attributes["last_name"],
-            }, safe=True)
-        elif not register['verified']:
-            request.db.registered.find_and_modify({
-                "email": attributes['email'],
-                "verified": False
-            }, {
-                "$set": {
-                    "verified": True,
-                    "displayName": attributes["screen_name"],
-                    "givenName": attributes["first_name"],
-                    "sn": attributes["last_name"],
-                }
-            })
-            user_id = register['_id']
-        else:
-            # TODO
-            # The user is already registered and his email was verified.
-            # Maybe, we want to warm him and send to a view to change his password
-            # or edit his profile
-            user_id = register['_id']
-    else:
+            }
+        })
         user_id = user['_id']
+    else:
+        # The user is registered in the eduid_am
+        # Show a message "email already registered"
+        return HTTPFound(location=request.route_url('email_already_registered'))
 
     user_id = str(user_id)
 
