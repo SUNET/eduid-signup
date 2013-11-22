@@ -111,17 +111,17 @@ def success(request):
         return HTTPFound(location=home_url)
 
     email = request.session['email']
-    secret = request.registry.settings.get('auth_shared_secret')
-    timestamp = "{:x}".format(int(time.time()))
-    nonce = os.urandom(16).encode('hex')
-    auth_token = generate_auth_token(secret, email, nonce, timestamp)
+    #secret = request.registry.settings.get('auth_shared_secret')
+    #timestamp = "{:x}".format(int(time.time()))
+    #nonce = os.urandom(16).encode('hex')
+    #auth_token = generate_auth_token(secret, email, nonce, timestamp)
 
     return {
-        "profile_link": request.registry.settings.get("profile_link", "#"),
+        #"profile_link": request.registry.settings.get("profile_link", "#"),
         "email": email,
-        "nonce": nonce,
-        "timestamp": timestamp,
-        "auth_token": auth_token,
+        #"nonce": nonce,
+        #"timestamp": timestamp,
+        #"auth_token": auth_token,
     }
 
 

@@ -1,19 +1,25 @@
   <div class='row'>
-    <h4>{{  _("Master Password (PUK code)") }}</h4>
-    <p>{{ _("Write down this Master Password and store it in a safe place. Simpler passwords can be added to an account later.") }}</p>
+    <h4>{{  _("Password") }}</h4>
+    <p>{{ _("Write down this password and store it in a safe place.") }}</p>
+    <pre class='text-center pre-big'>{{ password }}</pre>
+  </div>
+
+  <div class='row'>
+    <h4>{{  _("You can now log in") }}</h4>
+    <p>{{ _("Your account is now ready for use with sites that only require unconfirmed identities.") }}</p>
     <pre class='text-center pre-big'>{{ password }}</pre>
   </div>
 
   <div class="row">
-    <h4>{{ _("Complete account profile") }}</h4>
-    <p>{{ _("Click this button to finish the signup process") }}</p>
+    <h4>{{ _("Confirm identity") }}</h4>
+    <p>{{ _("To get access to additional sites that require a confirmed identity, proceed to the dashboard.") }}</p>
       <p class="text-center">
         <form method="post" action="{{ profile_link }}">
           <input type="hidden" name="email" value="{{ email }}"/>
           <input type="hidden" name="nonce" value="{{ nonce }}"/>
           <input type="hidden" name="ts" value="{{ timestamp }}"/>
           <input type="hidden" name="token" value="{{ auth_token }}"/>
-          <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Go to dashboard") }}</button>
+          <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Confirm identity") }}</button>
         </form>
       </p>
   </div>

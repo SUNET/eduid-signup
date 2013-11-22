@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-18 16:40+0200\n"
+"POT-Creation-Date: 2013-11-22 14:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: eduid_signup/emails.py:26
+#: eduid_signup/emails.py:28
 msgid "eduid-signup verification email"
+msgstr ""
+
+#: eduid_signup/emails.py:74
+msgid "eduid-signup credentials"
 msgstr ""
 
 #: eduid_signup/validators.py:28
@@ -34,20 +38,23 @@ msgstr ""
 #: eduid_signup/templates/account_created.jinja2:43
 #: eduid_signup/templates/already_registered.jinja2:6
 #: eduid_signup/templates/home.jinja2:7 eduid_signup/templates/success.jinja2:5
+#: eduid_signup/templates/verification_code_form.jinja2:6
 msgid "Welcome to eduID!"
 msgstr ""
 
 #: eduid_signup/templates/account_created.jinja2:8
+#: eduid_signup/templates/verification_code_form.jinja2:9
 msgid "Email address has already been verified"
 msgstr ""
 
 #: eduid_signup/templates/account_created.jinja2:9
+#: eduid_signup/templates/verification_code_form.jinja2:10
 msgid "Maybe you want to reset your password again?"
 msgstr ""
 
 #: eduid_signup/templates/account_created.jinja2:15
-#: eduid_signup/templates/already_registered.jinja2:13
-msgid "Reset your password"
+#: eduid_signup/templates/verification_code_form.jinja2:15
+msgid "Reset password"
 msgstr ""
 
 #: eduid_signup/templates/account_created.jinja2:22
@@ -70,31 +77,6 @@ msgstr ""
 msgid "Email successfully verified"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:50
-msgid "Master Password (PUK code)"
-msgstr ""
-
-#: eduid_signup/templates/account_created.jinja2:51
-msgid ""
-"Write down this Master Password and store it in a safe place. Simpler "
-"passwords can be added to an account later."
-msgstr ""
-
-#: eduid_signup/templates/account_created.jinja2:56
-#: eduid_signup/templates/success.jinja2:11
-msgid "Complete account profile"
-msgstr ""
-
-#: eduid_signup/templates/account_created.jinja2:57
-#: eduid_signup/templates/success.jinja2:12
-msgid "Click this button to finish the signup process"
-msgstr ""
-
-#: eduid_signup/templates/account_created.jinja2:64
-#: eduid_signup/templates/success.jinja2:19
-msgid "Go to dashboard"
-msgstr ""
-
 #: eduid_signup/templates/already_registered.jinja2:7
 #: eduid_signup/templates/already_registered.jinja2:10
 #: eduid_signup/templates/resend_email_verification.jinja2:6
@@ -105,16 +87,85 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
+#: eduid_signup/templates/already_registered.jinja2:13
+msgid "Reset your password"
+msgstr ""
+
 #: eduid_signup/templates/base.jinja2:6
 msgid "Sign up"
 msgstr ""
 
-#: eduid_signup/templates/base.jinja2:20
+#: eduid_signup/templates/base.jinja2:21
 msgid "Home"
 msgstr ""
 
-#: eduid_signup/templates/base.jinja2:21
+#: eduid_signup/templates/base.jinja2:22
 msgid "Help"
+msgstr ""
+
+#: eduid_signup/templates/credentials_email.html.jinja2:1
+#, python-format
+msgid ""
+"\n"
+"<h2>Welcome to %(site_name)s,</h2>\n"
+"\n"
+"<p>This email is sent to you for remembering your initial credentials for <a "
+"href=\"%(site_url)s\">%(site_name)s</a> registration.</p>\n"
+"\n"
+"<p>Your email:</p>\n"
+"\n"
+"<p>%(email)s</p>\n"
+"\n"
+"<p>Your password:</p>\n"
+"\n"
+"<p>%(password)s</p>\n"
+"\n"
+"<p>If you did not perform this registration, then please accept our "
+"appologies and\n"
+"   ignore this email.</p>\n"
+"\n"
+msgstr ""
+
+#: eduid_signup/templates/credentials_email.txt.jinja2:1
+#, python-format
+msgid ""
+"\n"
+"Welcome to %(site_name)s,\n"
+"\n"
+"This email is sent to you for remembering your initial credentials\n"
+"for %(site_name)s registration.\n"
+"\n"
+"Your email: %(email)s\n"
+"\n"
+"Your password: %(password)s\n"
+"\n"
+"If you did not perform this registration, then please accept our appologies\n"
+"and ignore this email.\n"
+"\n"
+msgstr ""
+
+#: eduid_signup/templates/error404.jinja2:8
+msgid "The requested page doesn't exists."
+msgstr ""
+
+#: eduid_signup/templates/error404.jinja2:10
+msgid ""
+"\n"
+"  <p>Sorry, but the requested page doesn't exists.</p>\n"
+"  <p>Error code 404</p>\n"
+msgstr ""
+
+#: eduid_signup/templates/error500.jinja2:8
+msgid "An error happened."
+msgstr ""
+
+#: eduid_signup/templates/error500.jinja2:10
+msgid ""
+"\n"
+"  <p>Sorry, but the requested page is unavailable due to a server hiccup.</p>"
+"\n"
+"  <p>Our engineers have been notified, so check back later.</p>\n"
+"  <p>Error code 500</p>\n"
 msgstr ""
 
 #: eduid_signup/templates/home.jinja2:9
@@ -125,11 +176,15 @@ msgstr ""
 msgid "Sign up with your email address"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:29
+#: eduid_signup/templates/home.jinja2:21
+msgid "Do you have a verification code?"
+msgstr ""
+
+#: eduid_signup/templates/home.jinja2:31
 msgid "Sign up with Facebook"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:35
+#: eduid_signup/templates/home.jinja2:37
 msgid "Sign up with Google"
 msgstr ""
 
@@ -145,14 +200,12 @@ msgstr ""
 msgid "Account created successfully"
 msgstr ""
 
-#: eduid_signup/templates/success.jinja2:24
-msgid "Remember to confirm email address"
+#: eduid_signup/templates/success.jinja2:11
+msgid "Confirm registration"
 msgstr ""
 
-#: eduid_signup/templates/success.jinja2:25
-msgid ""
-"An email with a confirmation link was sent to your inbox.\n"
-"             EduID can't use the email address until it has been verified."
+#: eduid_signup/templates/success.jinja2:12
+msgid "An email with instructions on how to proceed was sent to {email}."
 msgstr ""
 
 #: eduid_signup/templates/trycaptcha.jinja2:9
@@ -171,23 +224,40 @@ msgstr ""
 msgid "eduID must verify that you are a human and not a machine."
 msgstr ""
 
+#: eduid_signup/templates/verification_code_form.jinja2:22
+msgid "Put here the verification code sent to you by e-mail"
+msgstr ""
+
+#: eduid_signup/templates/verification_code_form.jinja2:28
+msgid "Paste here your code"
+msgstr ""
+
+#: eduid_signup/templates/verification_code_form.jinja2:29
+msgid "Verify account"
+msgstr ""
+
+#: eduid_signup/templates/verification_code_form.jinja2:31
+msgid "The provided code does not exist"
+msgstr ""
+
 #: eduid_signup/templates/verification_email.html.jinja2:1
 #, python-format
 msgid ""
 "\n"
 "<h2>Welcome to %(site_name)s,</h2>\n"
 "\n"
-"<p>This email is sent to you because this email address was entered in the "
-"registration\n"
-"   process for <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+"<p>You recently signed up for <a href=\"%(site_url)s\">%(site_name)s</a>.</p>"
 "\n"
-"<p>Please click on the follow link to confirm this email address.</p>\n"
+"\n"
+"<p>Please confirm the e-mail address and get your password by clicking on "
+"this link :</p>\n"
 "\n"
 "<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
 "\n"
-"<p>If you did not perform this registration, then please accept our "
-"appologies and\n"
-"   ignore this email.</p>\n"
+"<p>If clicking on the link above does not work, please copy and paste the "
+"link into a web browser window.</p>\n"
+"\n"
+"<p>Confirmation code : %(code)s</p>\n"
 "\n"
 msgstr ""
 
@@ -197,16 +267,17 @@ msgid ""
 "\n"
 "Welcome to %(site_name)s,\n"
 "\n"
-"This email is sent to you because this email address was entered in\n"
-"the registration process for %(site_name)s %(site_url)s.\n"
+"You recently signed up for %(site_name)s.\n"
 "\n"
-"Please copy and paste the following link into a web browser to confirm\n"
-"this email address.\n"
+"Please confirm the e-mail address and get your password by clicking\n"
+"on this link :\n"
 "\n"
 "  %(verification_link)s\n"
 "\n"
-"If you did not perform this registration, then please accept our\n"
-"appologies and ignore this email.\n"
+"If clicking on the link above does not work, please copy and paste\n"
+"the link into a web browser window.\n"
+"\n"
+"Confirmation code : %(code)s\n"
 "\n"
 msgstr ""
 
