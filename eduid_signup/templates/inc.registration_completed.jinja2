@@ -1,24 +1,51 @@
-  <div class='row'>
-    <h4>{{  _("Password") }}</h4>
-    <p>{{ _("Write this password down and store it in a safe place.") }}</p>
+  <div class='row text-center'>
+    <p class='lead'>{{ _("Write this password down and store it in a safe place.") }}</p>
     <pre class='text-center pre-big'>{{ password }}</pre>
+    <p class="text-center">
+        <button id='gotit_btn' type="submit" class="btn btn-success btn-large profile-link"
+                onclick="$('#instructions_div').removeClass('hide'); $('#gotit_btn').addClass('hide');">
+            {{ _("OK, got it") }}</button>
+    </p>
   </div>
 
-  <div class='row'>
-    <h4>{{  _("You can now log in") }}</h4>
-    <p>{{ _("Your account is <strong>now ready</strong> for use with sites that only require <strong>unconfirmed identities</strong>.") }}</p>
-  </div>
+  <div id='instructions_div' class='hide row container'>
+      <div class='row'>
+        <div class='span6'>
+            <h4>{{  _("You can now log in") }}</h4>
+            <p>
+            {% trans %}
+              Your account is now ready for use with sites that only require <strong>unconfirmed identities</strong>.
+            {% endtrans %}
+            </p>
+        </div>
 
-  <div class="row">
-    <h4>{{ _("Access more") }}</h4>
-    <p>{{ _("To get access to additional sites that require a <strong>confirmed identity</strong>, proceed to the dashboard.") }}</p>
-      <p class="text-center">
-        <form method="post" action="{{ profile_link }}">
-          <input type="hidden" name="email" value="{{ email }}"/>
-          <input type="hidden" name="nonce" value="{{ nonce }}"/>
-          <input type="hidden" name="ts" value="{{ timestamp }}"/>
-          <input type="hidden" name="token" value="{{ auth_token }}"/>
-          <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Confirm identity") }}</button>
-        </form>
-      </p>
-  </div>
+        <div class='span6'>
+            <h4>{{ _("Access more") }}</h4>
+            <p>
+              {{ _("To get access to additional sites that require a confirmed identity, proceed to the dashboard.") }}
+            </p>
+        </div>
+      </div>
+
+      <div class="row">
+          <div class='span6'>
+              {% if finish_url is defined %}
+                <a class="btn btn-primary btn-large" href="{{ finish_url }}">{{ _("Finish") }}</a>
+              {% else %}
+                  &nbsp;
+              {% endif %}
+           </div>
+
+          <div class='span6'>
+              <p class="text-center">
+                <form method="post" action="{{ profile_link }}">
+                  <input type="hidden" name="email" value="{{ email }}"/>
+                  <input type="hidden" name="nonce" value="{{ nonce }}"/>
+                  <input type="hidden" name="ts" value="{{ timestamp }}"/>
+                  <input type="hidden" name="token" value="{{ auth_token }}"/>
+                  <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Confirm identity") }}</button>
+                </form>
+              </p>
+          </div>
+      </div>
+    </div>

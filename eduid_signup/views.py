@@ -191,7 +191,13 @@ def registered_completed(request, user, context=None):
         "auth_token": auth_token,
     })
 
-    send_credentials(request, email, password)
+    if request.registry.settings.get("default_finish_url"):
+        context['finish_url'] = request.registry.settings.get("default_finish_url")
+
+    logger.debug("Context Finish URL : {!r}".format(context.get('finish_url')))
+
+    if request.registry.settings.get("email_credentials", False):
+        send_credentials(request, email, password)
 
     return context
 
@@ -233,6 +239,12 @@ def verification_code_form(context, request):
                 user = request.db.registered.find_one({
                     'code': code
                 })
+                # XXX at this stage the confirmation code is marked as 'used' but no
+                # credential have been created yet. If that fails (done beyond registered_completed),
+                # the user will get an error and when retrying will get a message saying the email
+                # address has already been verified. The user *is* given the possibility to reset
+                # the password at that point, but it would be less surprising if the code was only
+                # marked as 'used' when everything worked as expected.
                 return registered_completed(request, user, {'from_email': True})
             except AlreadyVerifiedException:
                 context = {

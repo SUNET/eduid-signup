@@ -42,7 +42,11 @@
   <div class="jumbotron">
     <h1>{{ _("Welcome to eduID!") }}</h1>
     {% if from_email is defined %}
-      <p class="lead">{{ _("Registration completed") }}</p>
+      <p class="lead">
+        {% trans email=email %}
+          Registration of {{ email }} completed
+        {% endtrans %}
+      </p>
     {% endif %}
   </div>
 
