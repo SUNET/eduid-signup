@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 from recaptcha.client import captcha
 from bson import ObjectId
 
@@ -151,12 +152,9 @@ def registered_completed(request, user, context=None):
     if context is None:
         context = {}
     password_id = str(ObjectId())
-    (password, salt) = generate_password(
-        request.registry.settings.get('vccs_url'),
-        str(password_id),
-        user.get('email'),
-    )
-
+    (password, salt) = generate_password(request.registry.settings,
+                                         password_id, user.get('email'),
+                                         )
     request.db.registered.update(
         {
             'email': user.get('email'),
@@ -165,6 +163,8 @@ def registered_completed(request, user, context=None):
                 'passwords': {
                     'id': password_id,
                     'salt': salt,
+                    'source': 'signup',
+                    'created_ts': datetime.datetime.utcnow(),
                 }
             },
         }, safe=True)
