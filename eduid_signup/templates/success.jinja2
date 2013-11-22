@@ -9,7 +9,11 @@
     <div class="row">
         <div class="span6">
           <h4>{{ _("Confirm registration") }}</h4>
-          <p>{{ _("An email with instructions on how to proceed was sent to {email}.") }} </p>
+          <p>
+          {% trans email=email %}
+          An email with instructions on how to proceed was sent to {{ email }}.
+          {% endtrans %}
+          </p>
         </div>
     </div>
 {% endblock %}

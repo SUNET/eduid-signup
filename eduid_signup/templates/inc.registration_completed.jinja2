@@ -1,18 +1,17 @@
   <div class='row'>
     <h4>{{  _("Password") }}</h4>
-    <p>{{ _("Write down this password and store it in a safe place.") }}</p>
+    <p>{{ _("Write this password down and store it in a safe place.") }}</p>
     <pre class='text-center pre-big'>{{ password }}</pre>
   </div>
 
   <div class='row'>
     <h4>{{  _("You can now log in") }}</h4>
-    <p>{{ _("Your account is now ready for use with sites that only require unconfirmed identities.") }}</p>
-    <pre class='text-center pre-big'>{{ password }}</pre>
+    <p>{{ _("Your account is <strong>now ready</strong> for use with sites that only require <strong>unconfirmed identities</strong>.") }}</p>
   </div>
 
   <div class="row">
-    <h4>{{ _("Confirm identity") }}</h4>
-    <p>{{ _("To get access to additional sites that require a confirmed identity, proceed to the dashboard.") }}</p>
+    <h4>{{ _("Access more") }}</h4>
+    <p>{{ _("To get access to additional sites that require a <strong>confirmed identity</strong>, proceed to the dashboard.") }}</p>
       <p class="text-center">
         <form method="post" action="{{ profile_link }}">
           <input type="hidden" name="email" value="{{ email }}"/>
