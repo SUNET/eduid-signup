@@ -16,7 +16,7 @@ def generate_password(settings, credential_id, email):
     :param email: user e-mail address as string
     :return: (password, salt) both strings
     """
-    password = pwgen(settings.get('password_length'), no_symbols = True)
+    password = pwgen(settings.get('password_length'), no_capitalize = True, no_symbols = True)
     factor = vccs_client.VCCSPasswordFactor(password,
                                             credential_id = credential_id)
     vccs = vccs_client.VCCSClient(base_url = settings.get('vccs_url'))
