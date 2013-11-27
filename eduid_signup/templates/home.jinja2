@@ -17,8 +17,6 @@
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
-          {% else %}
-            <p class="help-block"><a href="{{ request.route_path('verification_code_form') }}">{{ _("Do you have a verification code?") }}</a></p>
           {% endif %}
         </div>
        </div>
