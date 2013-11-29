@@ -153,7 +153,7 @@ def registered_completed(request, user, context=None):
         context = {}
     password_id = str(ObjectId())
     (password, salt) = generate_password(request.registry.settings,
-                                         password_id, user.get('email'),
+                                         password_id, user,
                                          )
     request.db.registered.update(
         {

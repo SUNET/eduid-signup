@@ -4,7 +4,7 @@ from re import findall
 import vccs_client
 
 
-def generate_password(settings, credential_id, email):
+def generate_password(settings, credential_id, user):
     """
     Generate a new password credential and add it to the VCCS authentication backend.
 
@@ -13,16 +13,15 @@ def generate_password(settings, credential_id, email):
 
     :param settings: settings dict
     :param credential_id: VCCS credential_id as string
-    :param email: user e-mail address as string
+    :param user: user data as dict
     :return: (password, salt) both strings
     """
     password = pwgen(settings.get('password_length'), no_capitalize = True, no_symbols = True)
-    factor = vccs_client.VCCSPasswordFactor(password,
-                                            credential_id = credential_id)
+    factor = vccs_client.VCCSPasswordFactor(password, credential_id)
     vccs = vccs_client.VCCSClient(base_url = settings.get('vccs_url'))
-    vccs.add_credentials(email, [factor])
+    vccs.add_credentials(user['_id'], [factor])
 
-    return (_human_readable(password), factor.salt)
+    return _human_readable(password), factor.salt
 
 
 def _human_readable(password):
