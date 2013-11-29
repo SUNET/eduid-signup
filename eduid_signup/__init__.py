@@ -110,7 +110,7 @@ def main(global_config, **settings):
     settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
     settings['facebook_callback'] = 'eduid_signup.sna_callbacks.facebook_callback'
 
-    settings['password_length'] = int(read_setting_from_env(settings, 'password_length', '20'))
+    settings['password_length'] = int(read_setting_from_env(settings, 'password_length', '10'))
 
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)

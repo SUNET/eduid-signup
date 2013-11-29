@@ -1,34 +1,33 @@
-# Swedish translations for eduid_signup.
+# Translations template for eduid_signup.
 # Copyright (C) 2013 ORGANIZATION
-# This file is distributed under the same license as the eduid_signup
-# project.
-#
+# This file is distributed under the same license as the eduid_signup project.
+# 
 # Translators:
 # ft, 2013
 # leifj <leifj@sunet.se>, 2013
+# Ratler <swold@sunet.se>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version:  eduid-signup\n"
+"Project-Id-Version: eduid-signup\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-22 14:52+0100\n"
-"PO-Revision-Date: 2013-10-16 07:58+0000\n"
-"Last-Translator: leifj <leifj@sunet.se>\n"
-"Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
-"signup/language/sv/)\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2013-11-28 10:33+0100\n"
+"PO-Revision-Date: 2013-11-28 09:53+0000\n"
+"Last-Translator: Ratler <swold@sunet.se>\n"
+"Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-signup/language/sv/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: eduid_signup/emails.py:28
 msgid "eduid-signup verification email"
 msgstr "eduID registrering"
 
 #: eduid_signup/emails.py:74
-#, fuzzy
 msgid "eduid-signup credentials"
-msgstr "eduID registrering"
+msgstr "eduID inloggningsuppgifter"
 
 #: eduid_signup/validators.py:28
 msgid "Email is required"
@@ -42,49 +41,51 @@ msgstr "Ogiltig e-postadress"
 #: eduid_signup/templates/account_created.jinja2:21
 #: eduid_signup/templates/account_created.jinja2:43
 #: eduid_signup/templates/already_registered.jinja2:6
-#: eduid_signup/templates/home.jinja2:7 eduid_signup/templates/success.jinja2:5
+#: eduid_signup/templates/home.jinja2:7
+#: eduid_signup/templates/success.jinja2:5
 #: eduid_signup/templates/verification_code_form.jinja2:6
 msgid "Welcome to eduID!"
 msgstr "Välkommen till eduID!"
 
 #: eduid_signup/templates/account_created.jinja2:8
 #: eduid_signup/templates/verification_code_form.jinja2:9
-#, fuzzy
 msgid "Email address has already been verified"
-msgstr "E-postadressen används redan"
+msgstr "E-postadressen har redan bekräftats"
 
 #: eduid_signup/templates/account_created.jinja2:9
 #: eduid_signup/templates/verification_code_form.jinja2:10
 msgid "Maybe you want to reset your password again?"
-msgstr ""
+msgstr "Vill du kanske få ett nytt lösenord igen?"
 
 #: eduid_signup/templates/account_created.jinja2:15
 #: eduid_signup/templates/verification_code_form.jinja2:15
-#, fuzzy
 msgid "Reset password"
-msgstr "Nytt lösenord"
+msgstr "Återställ lösenord"
 
 #: eduid_signup/templates/account_created.jinja2:22
 msgid "The provided code does not exist or your link is broken"
-msgstr ""
+msgstr "Den angivna koden är felaktig, eller så är länken trasig"
 
 #: eduid_signup/templates/account_created.jinja2:23
 msgid ""
-"If you have a code, you should go to the verification code form to enter "
-"it"
-msgstr ""
+"If you have a code, you should go to the verification code form to enter it"
+msgstr "Om du har en kod anger du den i bekräftelseformuläret"
 
 #: eduid_signup/templates/account_created.jinja2:30
 msgid "Return to the register form"
-msgstr ""
+msgstr "Tillbaka till registreringsformuläret"
 
 #: eduid_signup/templates/account_created.jinja2:37
 msgid "Go to verification code form"
-msgstr ""
+msgstr "Gå till bekräftelsesidan"
 
-#: eduid_signup/templates/account_created.jinja2:45
-msgid "Email successfully verified"
-msgstr "E-postadress verifierad"
+#: eduid_signup/templates/account_created.jinja2:46
+#, python-format
+msgid ""
+"\n"
+"          Registration of %(email)s completed\n"
+"        "
+msgstr "\nRegistrering av %(email)s är klar"
 
 #: eduid_signup/templates/already_registered.jinja2:7
 #: eduid_signup/templates/already_registered.jinja2:10
@@ -102,13 +103,13 @@ msgstr "Nytt lösenord"
 
 #: eduid_signup/templates/base.jinja2:6
 msgid "Sign up"
-msgstr "Skapa konto"
+msgstr "Registrering"
 
-#: eduid_signup/templates/base.jinja2:21
+#: eduid_signup/templates/base.jinja2:20
 msgid "Home"
 msgstr "Hem"
 
-#: eduid_signup/templates/base.jinja2:22
+#: eduid_signup/templates/base.jinja2:21
 msgid "Help"
 msgstr "Hjälp"
 
@@ -118,20 +119,15 @@ msgid ""
 "\n"
 "<h2>Welcome to %(site_name)s,</h2>\n"
 "\n"
-"<p>This email is sent to you for remembering your initial credentials for"
-" <a href=\"%(site_url)s\">%(site_name)s</a> registration.</p>\n"
+"<p>This email is sent to you for remembering your initial credentials for <a href=\"%(site_url)s\">%(site_name)s</a> registration.</p>\n"
 "\n"
-"<p>Your email:</p>\n"
+"<p>Your email :</p>\n"
 "\n"
 "<p>%(email)s</p>\n"
 "\n"
-"<p>Your password:</p>\n"
+"<p>Your password :</p>\n"
 "\n"
 "<p>%(password)s</p>\n"
-"\n"
-"<p>If you did not perform this registration, then please accept our "
-"appologies and\n"
-"   ignore this email.</p>\n"
 "\n"
 msgstr ""
 
@@ -148,35 +144,33 @@ msgid ""
 "\n"
 "Your password: %(password)s\n"
 "\n"
-"If you did not perform this registration, then please accept our "
-"appologies\n"
+"If you did not perform this registration, then please accept our appologies\n"
 "and ignore this email.\n"
 "\n"
-msgstr ""
+msgstr "\nWelcome to %(site_name)s,\n\nThis email is sent to you for remembering your initial credentials\nfor %(site_name)s registration.\n\nYour email: %(email)s\n\nYour password: %(password)s\n\nIf you did not perform this registration, then please accept our appologies\nand ignore this email.\n\n"
 
 #: eduid_signup/templates/error404.jinja2:8
 msgid "The requested page doesn't exists."
-msgstr ""
+msgstr "Sidan finns inte."
 
 #: eduid_signup/templates/error404.jinja2:10
 msgid ""
 "\n"
 "  <p>Sorry, but the requested page doesn't exists.</p>\n"
 "  <p>Error code 404</p>\n"
-msgstr ""
+msgstr "\n<p>Sidan kunde inte hittas.</p>\n<p>Felkod 404</p>\n"
 
 #: eduid_signup/templates/error500.jinja2:8
 msgid "An error happened."
-msgstr ""
+msgstr "Ett fel inträffade."
 
 #: eduid_signup/templates/error500.jinja2:10
 msgid ""
 "\n"
-"  <p>Sorry, but the requested page is unavailable due to a server "
-"hiccup.</p>\n"
+"  <p>Sorry, but the requested page is unavailable due to a server hiccup.</p>\n"
 "  <p>Our engineers have been notified, so check back later.</p>\n"
 "  <p>Error code 500</p>\n"
-msgstr ""
+msgstr "\n<p>Sidan kunde inte visas på grund av ett serverproblem.</p>\n<p>Våra tekniker är informerade, var god försök senare.</p>\n<p>Felkod 500</p>\n"
 
 #: eduid_signup/templates/home.jinja2:9
 msgid "Create an account for use with Swedish Universities."
@@ -184,19 +178,52 @@ msgstr "Skapa en identitet för Svenska universitet och högskolor."
 
 #: eduid_signup/templates/home.jinja2:17
 msgid "Sign up with your email address"
-msgstr "Registrera dig via e-post"
-
-#: eduid_signup/templates/home.jinja2:21
-msgid "Do you have a verification code?"
-msgstr ""
+msgstr "Registrering via e-post"
 
 #: eduid_signup/templates/home.jinja2:31
 msgid "Sign up with Facebook"
-msgstr "Registrera dig via Facebook"
+msgstr "Registrering via Facebook"
 
 #: eduid_signup/templates/home.jinja2:37
 msgid "Sign up with Google"
-msgstr "Registrera dig via Google"
+msgstr "Registrering via Google"
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:2
+msgid "Write this password down and store it in a safe place."
+msgstr "Skriv ned det här lösenordet och spara det på ett säkert ställe."
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:7
+msgid "OK, got it"
+msgstr "Klart"
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:14
+msgid "You can now log in"
+msgstr "Du kan nu logga in"
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:16
+msgid ""
+"\n"
+"              Your account is now ready for use with sites that only require <strong>unconfirmed identities</strong>.\n"
+"            "
+msgstr "\nDitt konto är nu klart att användas med webbplatser som nöjer sig med <strong>obekräftade identiteter</strong>."
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:23
+msgid "Access more"
+msgstr "Kom åt mer"
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:25
+msgid ""
+"To get access to additional sites that require a confirmed identity, proceed"
+" to the dashboard."
+msgstr "För att få åtkomst till webbplatser som kräver en bekräftad identitet behöver du först bekräfta din identitet. "
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:33
+msgid "Finish"
+msgstr "Slutför"
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:46
+msgid "Confirm identity"
+msgstr "Bekräfta identitet"
 
 #: eduid_signup/templates/resend_email_verification.jinja2:7
 msgid "Send a new verification link to this address"
@@ -212,11 +239,15 @@ msgstr "Identitet skapad"
 
 #: eduid_signup/templates/success.jinja2:11
 msgid "Confirm registration"
-msgstr ""
+msgstr "Bekräfta registrering"
 
-#: eduid_signup/templates/success.jinja2:12
-msgid "An email with instructions on how to proceed was sent to {email}."
-msgstr ""
+#: eduid_signup/templates/success.jinja2:13
+#, python-format
+msgid ""
+"\n"
+"          An email with instructions on how to proceed has been sent to <strong>%(email)s</strong>.\n"
+"          "
+msgstr "\nEtt epost-meddelande med instruktioner för hur du kommer vidare har skickats till <strong>%(email)s</strong>."
 
 #: eduid_signup/templates/trycaptcha.jinja2:9
 msgid "Oops!"
@@ -236,19 +267,19 @@ msgstr "eduID måste verifiera att du är en människa och inte en maskin."
 
 #: eduid_signup/templates/verification_code_form.jinja2:22
 msgid "Put here the verification code sent to you by e-mail"
-msgstr ""
+msgstr "Ange bekräftelsekoden som skickats till din e-postadress"
 
 #: eduid_signup/templates/verification_code_form.jinja2:28
 msgid "Paste here your code"
-msgstr ""
+msgstr "Ange din kod här"
 
 #: eduid_signup/templates/verification_code_form.jinja2:29
 msgid "Verify account"
-msgstr ""
+msgstr "Bekräfta konto"
 
 #: eduid_signup/templates/verification_code_form.jinja2:31
 msgid "The provided code does not exist"
-msgstr ""
+msgstr "Den angivna koden hittades inte"
 
 #: eduid_signup/templates/verification_email.html.jinja2:1
 #, python-format
@@ -256,20 +287,17 @@ msgid ""
 "\n"
 "<h2>Welcome to %(site_name)s,</h2>\n"
 "\n"
-"<p>You recently signed up for <a "
-"href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+"<p>You recently signed up for <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
 "\n"
-"<p>Please confirm the e-mail address and get your password by clicking on"
-" this link :</p>\n"
+"<p>Please confirm the e-mail address and get your password by clicking on this link :</p>\n"
 "\n"
 "<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
 "\n"
-"<p>If clicking on the link above does not work, please copy and paste the"
-" link into a web browser window.</p>\n"
+"<p>If clicking on the link above does not work, please copy and paste the link into a web browser window.</p>\n"
 "\n"
 "<p>Confirmation code : %(code)s</p>\n"
 "\n"
-msgstr ""
+msgstr "\n<h2>Välkommen till %(site_name)s,</h2>\n\n<p>Du anmälde dig nyligen till <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n\n<p>Var vänlig bekräfta e-postadressen genom att klicka på den här länken:</p>\n\n<a href=\"%(verification_link)s\">%(verification_link)s</a>\n\n<p>Om länken inte går att klicka på, vänligen kopiera länken till ett nytt webbläsarfönster.</p>\n\n<p>Bekräftelse kod: %(code)s</p>\n\n"
 
 #: eduid_signup/templates/verification_email.txt.jinja2:1
 #, python-format
@@ -289,33 +317,4 @@ msgid ""
 "\n"
 "Confirmation code : %(code)s\n"
 "\n"
-msgstr ""
-
-#~ msgid "Master Password (PUK code)"
-#~ msgstr "Huvudlösenord (PUK-kod)"
-
-# | msgid "" "\n" "Welcome to %(site_name)s,\n" "\n" "This email is sent to
-# you
-# | because this email address was entered in\n" "the registration process for
-# | %(site_name)s %(site_url)s.\n" "\n" "Please copy and paste the following
-# | link into a web browser to confirm\n" "this email address.\n" "\n" "
-# | %(verification_link)s\n" "\n" "If you did not perform this registration,
-# | then please accept our\n" "appologies and ignore this email.\n" "\n"
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Complete account profile"
-#~ msgstr "Komplettera användaruppgifter"
-
-#~ msgid "Remember to confirm email address"
-#~ msgstr "Kom ihåg att bekräfta din e-postadress"
-
-#~ msgid "Check your "
-#~ msgstr ""
-
-#~ msgid "Click this button to finish the signup process"
-#~ msgstr "Klicka här för att slutföra registreringsprocessen"
-
-#~ msgid "Go to dashboard"
-#~ msgstr "Gå till huvudsidan"
-
+msgstr "\nVälkommen till %(site_name)s,\n\nDu anmälde dig nyligen till %(site_name)s.\n\nVar vänlig bekräfta e-postadressen genom att klicka på den här länken:\n\n%(verification_link)s\n\nOm länken inte går att klicka på, vänligen kopiera länken till ett nytt webbläsarfönster.\n\nBekräftelse kod: %(code)s\n"

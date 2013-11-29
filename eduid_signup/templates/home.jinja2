@@ -8,8 +8,8 @@
 
   <p class="lead">{{ _("Create an account for use with Swedish Universities.") }}</p>
 
-  <div class="row">
-    <div id="email-register" class="span6">
+  <div class="row text-center">
+    <div id="email-register" class="span12">
       <form class="form-inline" method="POST">
        <div class="control-group{% if email_error is defined %} error{% endif %}">
         <div class="input-append">
@@ -17,14 +17,14 @@
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
-          {% else %}
-            <p class="help-block"><a href="{{ request.route_path('verification_code_form') }}">{{ _("Do you have a verification code?") }}</a></p>
           {% endif %}
         </div>
        </div>
       </form>
     </div>
-    <div id="social-register" class="span6">
+  </div>
+  <div class="row text-center">
+    <div id="social-register" class="span12">
       {% if request.registry.settings['facebook_auth_enabled'] %}
         <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
           <span class="btn-icon"></span>
@@ -40,36 +40,5 @@
     </div>
   </div>
 </div>
-
-
-<!--
-
-<div class="row">
-
-  <div class="span6">
-    <h4>Subheading</h4>
-    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-    <h4>Subheading</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-  </div>
-
-  <div class="span6">
-    <h4>Subheading</h4>
-    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-    <h4>Subheading</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-  </div>
-
-</div>
-
--->
 
 {% endblock %}

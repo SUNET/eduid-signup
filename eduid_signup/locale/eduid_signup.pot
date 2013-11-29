@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-22 14:52+0100\n"
+"POT-Creation-Date: 2013-11-28 10:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,8 +73,12 @@ msgstr ""
 msgid "Go to verification code form"
 msgstr ""
 
-#: eduid_signup/templates/account_created.jinja2:45
-msgid "Email successfully verified"
+#: eduid_signup/templates/account_created.jinja2:46
+#, python-format
+msgid ""
+"\n"
+"          Registration of %(email)s completed\n"
+"        "
 msgstr ""
 
 #: eduid_signup/templates/already_registered.jinja2:7
@@ -95,11 +99,11 @@ msgstr ""
 msgid "Sign up"
 msgstr ""
 
-#: eduid_signup/templates/base.jinja2:21
+#: eduid_signup/templates/base.jinja2:20
 msgid "Home"
 msgstr ""
 
-#: eduid_signup/templates/base.jinja2:22
+#: eduid_signup/templates/base.jinja2:21
 msgid "Help"
 msgstr ""
 
@@ -112,17 +116,13 @@ msgid ""
 "<p>This email is sent to you for remembering your initial credentials for <a "
 "href=\"%(site_url)s\">%(site_name)s</a> registration.</p>\n"
 "\n"
-"<p>Your email:</p>\n"
+"<p>Your email :</p>\n"
 "\n"
 "<p>%(email)s</p>\n"
 "\n"
-"<p>Your password:</p>\n"
+"<p>Your password :</p>\n"
 "\n"
 "<p>%(password)s</p>\n"
-"\n"
-"<p>If you did not perform this registration, then please accept our "
-"appologies and\n"
-"   ignore this email.</p>\n"
 "\n"
 msgstr ""
 
@@ -176,16 +176,50 @@ msgstr ""
 msgid "Sign up with your email address"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:21
-msgid "Do you have a verification code?"
-msgstr ""
-
 #: eduid_signup/templates/home.jinja2:31
 msgid "Sign up with Facebook"
 msgstr ""
 
 #: eduid_signup/templates/home.jinja2:37
 msgid "Sign up with Google"
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:2
+msgid "Write this password down and store it in a safe place."
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:7
+msgid "OK, got it"
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:14
+msgid "You can now log in"
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:16
+msgid ""
+"\n"
+"              Your account is now ready for use with sites that only require "
+"<strong>unconfirmed identities</strong>.\n"
+"            "
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:23
+msgid "Access more"
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:25
+msgid ""
+"To get access to additional sites that require a confirmed identity, proceed "
+"to the dashboard."
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:33
+msgid "Finish"
+msgstr ""
+
+#: eduid_signup/templates/inc.registration_completed.jinja2:46
+msgid "Confirm identity"
 msgstr ""
 
 #: eduid_signup/templates/resend_email_verification.jinja2:7
@@ -204,8 +238,13 @@ msgstr ""
 msgid "Confirm registration"
 msgstr ""
 
-#: eduid_signup/templates/success.jinja2:12
-msgid "An email with instructions on how to proceed was sent to {email}."
+#: eduid_signup/templates/success.jinja2:13
+#, python-format
+msgid ""
+"\n"
+"          An email with instructions on how to proceed has been sent to "
+"<strong>%(email)s</strong>.\n"
+"          "
 msgstr ""
 
 #: eduid_signup/templates/trycaptcha.jinja2:9
