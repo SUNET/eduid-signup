@@ -121,6 +121,11 @@ def main(global_config, **settings):
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
 
+    try:
+        settings['session.cookie_expires'] = int(settings['session.cookie_expires'])
+    except ValueError:
+        raise ConfigurationError('session.cookie_expires must be a integer value')
+
     # include other packages
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')

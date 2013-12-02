@@ -12,6 +12,7 @@ from eduid_signup.db import MongoDB
 
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
+MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
 
 
 class DBTests(unittest.TestCase):
@@ -45,7 +46,9 @@ class FunctionalTests(DBTests):
             'site.name': 'Test Site',
             'auth_tk_secret': '123456',
             'auth_shared_secret': '123123',
+            'session.cookie_expires': '3600',
             'mongo_uri': MONGO_URI_TEST,
+            'mongo_uri_am': MONGO_URI_TEST_AM,
             'testing': True,
             'jinja2.directories': 'eduid_signup:templates',
             'jinja2.undefined': 'strict',
