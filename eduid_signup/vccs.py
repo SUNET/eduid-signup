@@ -19,7 +19,7 @@ def generate_password(settings, credential_id, user):
     password = pwgen(settings.get('password_length'), no_capitalize = True, no_symbols = True)
     factor = vccs_client.VCCSPasswordFactor(password, credential_id)
     vccs = vccs_client.VCCSClient(base_url = settings.get('vccs_url'))
-    vccs.add_credentials(user['_id'], [factor])
+    vccs.add_credentials(str(user['_id']), [factor])
 
     return _human_readable(password), factor.salt
 
