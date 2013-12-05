@@ -8,11 +8,22 @@ from eduid_am.tasks import update_attributes
 
 def create_or_update(request, provider, provider_user_id, attributes):
     provider_key = '%s_id' % provider
-    # Create or update the user
 
-    user = request.db.registered.find_one({provider_key: provider_user_id})
+    user = request.db.registered.find_one({
+        "email": attributes['email'],
+        "verified": True
+    })
+
     try:
-        am_user = request.userdb.get_user_by_email(attributes["email"])
+        am_user = request.userdb.get_user_by_filter({
+            'mailAliases': {
+                '$elemMatch': {
+                    'email': attributes["email"],
+                    'verified': True
+                }
+            }
+        })
+
     except request.userdb.UserDoesNotExist:
         am_user = None
 
@@ -39,6 +50,7 @@ def create_or_update(request, provider, provider_user_id, attributes):
             "verified": False
         }, {
             "$set": {
+                provider_key: provider_user_id,
                 "verified": True,
                 "displayName": attributes["screen_name"],
                 "givenName": attributes["first_name"],
