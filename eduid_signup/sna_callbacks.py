@@ -15,7 +15,7 @@ def create_or_update(request, provider, provider_user_id, attributes):
     })
 
     try:
-        am_user = request.userdb.get_user_by_filter({
+        am_user_exists = request.userdb.exists_by_filter({
             'mailAliases': {
                 '$elemMatch': {
                     'email': attributes["email"],
@@ -25,9 +25,9 @@ def create_or_update(request, provider, provider_user_id, attributes):
         })
 
     except request.userdb.UserDoesNotExist:
-        am_user = None
+        am_user_exists = None
 
-    if user is None and am_user is None:
+    if user is None and not am_user_exists:
         # The user is new, is not registered in signup or am either
         # then, register as usual
         user_id = request.db.registered.save({
@@ -40,7 +40,7 @@ def create_or_update(request, provider, provider_user_id, attributes):
             "sn": attributes["last_name"],
         }, safe=True)
 
-    elif am_user is None:
+    elif not am_user_exists:
         # If the user is registered in signup but was not propagated to
         # eduid_am
         # Then, update local attributes and continue as new user
