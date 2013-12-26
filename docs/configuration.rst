@@ -180,6 +180,34 @@ You can also set these options with environment variables:
 
 These two options are required and there are no default values for them.
 
+Microsoft Live Connect authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+eduID Sign Up allows the user to easily register clicking on a Microsoft Live
+Connect button that will fetch their Microsoft Live account information with
+their consent.
+
+This is implemented using the
+library `pyramid_sna <https://pypi.python.org/pypi/pyramid_sna/>`_
+
+At the very minimum you need to add the public and private Microsoft Live
+Connect API keys but you can configure other things. To learn how to get
+this information check the
+`pyramid_sna documentation <https://pyramid_sna.readthedocs.org/en/latest/>`_
+
+.. code-block:: ini
+
+   liveconnect_client_id = 123
+   liveconnect_client_secret = s3cr3t
+
+You can also set these options with environment variables:
+
+.. code-block:: bash
+
+   $ export LIVECONNECT_CLIENT_ID=123
+   $ export LIVECONNECT_CLIENT_SECRET=s3cr3t
+
+These two options are required and there are no default values for them.
+
 Profile link
 ^^^^^^^^^^^^
 When a user succesfully register in this application he gets a message
