@@ -62,6 +62,11 @@
     background: url("../img/facebook_icon_32.png") no-repeat scroll 10px 50% transparent;
 }
 
+.btn-liveconnect .btn-icon {
+    background: url("../img/liveconnect_icon_32.png") no-repeat scroll 10px 50% transparent;
+    padding-right: 3px;
+}
+
 .btn-google {
     background-color: rgb(204, 55, 50);
 }
@@ -76,6 +81,14 @@
 
 .btn-facebook:hover {
     background-color: rgb(114, 136, 181);
+}
+
+.btn-liveconnect {
+    background-color: rgb(38, 114, 236);
+}
+
+.btn-liveconnect:hover {
+    background-color: rgb(30, 93, 194);
 }
 
 .pre-big {

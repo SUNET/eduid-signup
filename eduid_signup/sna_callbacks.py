@@ -90,3 +90,7 @@ def google_callback(request, user_id, attributes):
 
 def facebook_callback(request, user_id, attributes):
     return create_or_update(request, 'facebook', user_id, attributes)
+
+
+def liveconnect_callback(request, user_id, attributes):
+    return create_or_update(request, 'liveconnect', user_id, attributes)

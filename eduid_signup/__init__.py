@@ -115,6 +115,7 @@ def main(global_config, **settings):
 
     settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
     settings['facebook_callback'] = 'eduid_signup.sna_callbacks.facebook_callback'
+    settings['liveconnect_callback'] = 'eduid_signup.sna_callbacks.liveconnect_callback'
 
     settings['password_length'] = int(read_setting_from_env(settings, 'password_length', '10'))
 
