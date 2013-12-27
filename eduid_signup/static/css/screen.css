@@ -112,6 +112,20 @@
   max-height: 110px;
 }
 
+
+div.falseform .uneditable-input {
+  color: #555;
+}
+
+body div.falseform {
+  width: 620px;
+}
+
+
+form.accept-cancel {
+  margin-top: 20px;
+}
+
 /* Bottom footer styles
 -------------------------------------------------- */
 

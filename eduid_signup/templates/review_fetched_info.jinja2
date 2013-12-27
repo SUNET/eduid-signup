@@ -1,0 +1,95 @@
+{% extends "templates/base.jinja2" %}
+
+{% block contents %}
+    <div class="jumbotron">
+      <h1>{{ _("Welcome to eduID!") }}</h1>
+      <p class="lead">{{ _("Please, review the data fetched from your Social Network") }}</p>
+    </div>
+
+    <div class="row">
+      <div class="span8">
+        {% if not mail_empty and not mail_registered %}
+        <p>{% trans %} We haven't stored any of your data yet. If you want that we store
+          these data in a new account, you should click on <strong>Accept</strong> button.
+          Otherwise, you can click on <strong>Cancel</strong> button to discard the data 
+          and return to the home page of signup process.
+          {% endtrans %}
+        </p>
+        {% elif mail_empty %}
+        <p>{% trans %}<strong>Your social network hasn't provided an email account.</strong>
+          The email is a required value, so we can't continue registering your account with
+          this info. You should click on <strong>Cancel</strong> to discard the data and 
+          return to the home page of signup process. Then you can use another social network 
+          account or the email form.
+          {% endtrans %}
+        </p>
+        {% elif mail_registered %}
+        <p>{% trans %}<strong>The email provided by your social network is already in use.</strong>
+          You can reset your password clicking {% endtrans %}
+          <a href={{request.registry.settings['reset_password_link']}}>{{ _("here")}}</a>.
+        </p>
+        {% endif %}
+        <p>
+        {% trans %}The follow fields are uneditable. So please,
+                   don't try to fill up these fields.{% endtrans %}
+        </p>
+      </div>
+    </div>
+
+    <div class="falseform well well-small">
+      <div class='row'>
+        <div class="span4">
+          <div class="control-group{% if mail_empty or mail_registered %} error{% endif %}">
+            <label class="control-lavel" for="email">{{_("Email")}}</label>
+            <div class="controls">
+              <span class="input-xlarge uneditable-input">{{ social_info.email }}</span>
+              {% if mail_registered %}
+                <span class="help-block">{{ _("Email address already in use") }}</span>
+              {% elif mail_empty %}
+                <span class="help-block">{{ _("Your Social Network hasn't provided an email and it is required") }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class='span4'>
+          <div class="control-group">
+            <label class="control-lavel" for="screenname">{{_("Screen name")}}</label>
+            <div class="controls">
+              <span class="input-xlarge uneditable-input">{{ social_info.screen_name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class='span4'>
+          <div class="control-group">
+            <label class="control-lavel" for="firstname">{{_("First name")}}</label>
+            <div class="controls">
+              <span class="input-xlarge uneditable-input">{{ social_info.first_name }}</span>
+            </div>
+          </div>
+        </div>
+        <div class='span4'>
+          <div class="control-group">
+            <label class="control-lavel" for="lastname">{{_("Last name")}}</label>
+            <div class="controls">
+              <span class="input-xlarge uneditable-input">{{ social_info.last_name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <form class="form-horizontal accept-cancel span8" method="POST">
+          <div class="control-group">
+             <button class="btn btn-danger" name="action" type="submit" value="cancel">{{ _("Cancel") }}</button>
+             <button class="btn btn-success pull-right" name="action" type="submit"
+              {% if mail_registered or mail_empty %}
+                disabled value="disabled"
+              {% else %}
+                value="accept"
+              {% endif %}>{{ _("Accept") }}</button>
+          </div>
+      </form>
+    </div>
+{% endblock %}

@@ -6,7 +6,12 @@ from pyramid.security import remember
 from eduid_am.tasks import update_attributes
 
 
-def create_or_update(request, provider, provider_user_id, attributes):
+def create_or_update_sna(request):
+
+    provider = request.session['provider']
+    provider_user_id = request.session['provider_user_id']
+    attributes = request.session['social_info']
+
     provider_key = '%s_id' % provider
 
     user = request.db.registered.find_one({
@@ -58,10 +63,6 @@ def create_or_update(request, provider, provider_user_id, attributes):
             }
         })
         user_id = user['_id']
-    else:
-        # The user is registered in the eduid_am
-        # Show a message "email already registered"
-        return HTTPFound(location=request.route_url('email_already_registered'))
 
     user_id = str(user_id)
 
@@ -76,21 +77,36 @@ def create_or_update(request, provider, provider_user_id, attributes):
 
     # Create an authenticated session and send the user to the
     # success screeen
-    remember_headers = remember(request, user_id)
 
     request.session["email"] = attributes["email"]
+    return user_id
 
-    raise HTTPFound(request.route_url('sna_account_created'),
+
+
+def save_data_in_session(request, provider, provider_user_id, attributes):
+
+    remember_headers = remember(request, provider_user_id)
+
+    request.session.update({
+        "social_info": attributes,
+        "provider": provider,
+        "provider_user_id": provider_user_id,
+    })
+
+    raise HTTPFound(request.route_url('review_fetched_info'),
                     headers=remember_headers)
 
 
 def google_callback(request, user_id, attributes):
-    return create_or_update(request, 'google', user_id, attributes)
+    return save_data_in_session(request, 'google', user_id, attributes)
+    #return create_or_update(request, 'google', user_id, attributes)
 
 
 def facebook_callback(request, user_id, attributes):
-    return create_or_update(request, 'facebook', user_id, attributes)
+    return save_data_in_session(request, 'facebook', user_id, attributes)
+    #return create_or_update(request, 'facebook', user_id, attributes)
 
 
 def liveconnect_callback(request, user_id, attributes):
-    return create_or_update(request, 'liveconnect', user_id, attributes)
+    return save_data_in_session(request, 'liveconnect', user_id, attributes)
+    #return create_or_update(request, 'liveconnect', user_id, attributes)

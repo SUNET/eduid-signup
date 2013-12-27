@@ -47,6 +47,7 @@ def includeme(config):
     config.add_route('resend_email_verification', '/resend_email_verification/')
     config.add_route('email_already_registered', '/email_already_registered/')
     config.add_route('verification_code_form', '/verification_code_form/')
+    config.add_route('review_fetched_info', '/review_fetched_info/')
 
     config.add_route('error500test', '/error500test/')
     config.add_route('error500', '/error500/')

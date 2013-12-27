@@ -5,7 +5,9 @@ from recaptcha.client import captcha
 from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
-from pyramid.httpexceptions import HTTPFound, HTTPMethodNotAllowed
+from pyramid.httpexceptions import (HTTPFound, HTTPMethodNotAllowed,
+                                    HTTPBadRequest)
+from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
 
@@ -15,6 +17,7 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.emails import send_verification_mail, send_credentials
 from eduid_signup.validators import validate_email, ValidationError
+from eduid_signup.sna_callbacks import create_or_update_sna
 from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
                                 CodeDoesNotExists)
@@ -146,6 +149,55 @@ def already_registered(context, request):
         'reset_password_link': request.registry.settings.get(
             'reset_password_link', '#'),
     }
+
+
+@view_config(route_name='review_fetched_info',
+             renderer='templates/review_fetched_info.jinja2')
+def review_fetched_info(context, request):
+
+    if not 'social_info' in request.session:
+        raise HTTPBadRequest()
+
+    social_info = request.session.get('social_info', {})
+    email = social_info.get('email', None)
+
+    if email:
+        signup_user = request.db.registered.find_one({
+            "email": email,
+            "verified": True
+        })
+
+        try:
+            am_user_exists = request.userdb.exists_by_filter({
+                'mailAliases': {
+                    '$elemMatch': {
+                        'email': email,
+                        'verified': True
+                    }
+                }
+            })
+        except request.userdb.UserDoesNotExist:
+            am_user_exists = None
+
+    mail_registered = signup_user or am_user_exists
+
+    if request.method == 'GET':
+        return {
+            'social_info': social_info,
+            'mail_registered': mail_registered,
+            'mail_empty': not email,
+        }
+
+    else:
+        if request.POST.get('action', 'cancel') == 'accept':
+            create_or_update_sna(request)
+            raise HTTPFound(location=request.route_url('sna_account_created'))
+        else:
+            if request.session is not None:
+                request.session.delete()
+            headers = forget(request)
+            raise HTTPFound(location=request.route_url('home'),
+                            headers=headers)
 
 
 def registered_completed(request, user, context=None):
