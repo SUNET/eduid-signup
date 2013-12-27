@@ -5,6 +5,7 @@ from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.settings import asbool
 from pyramid.httpexceptions import HTTPNotFound
+from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
 from eduid_signup.db import MongoDB, get_db
@@ -33,6 +34,8 @@ def includeme(config):
 
     config.set_request_property(get_db, 'db', reify=True)
 
+    config.set_request_property(get_locale_name, 'locale', reify=True)
+
     userdb = UserDB(config.registry.settings)
     config.registry.settings['userdb'] = userdb
     config.add_request_method(get_userdb, 'userdb', reify=True)
@@ -48,6 +51,7 @@ def includeme(config):
     config.add_route('email_already_registered', '/email_already_registered/')
     config.add_route('verification_code_form', '/verification_code_form/')
     config.add_route('review_fetched_info', '/review_fetched_info/')
+    config.add_route('set_language', '/set_language/')
 
     config.add_route('error500test', '/error500test/')
     config.add_route('error500', '/error500/')
@@ -103,6 +107,13 @@ def main(global_config, **settings):
     settings['recaptcha_private_key'] = read_setting_from_env(settings,
                                                               'recaptcha_private_key',
                                                               None)
+    settings['lang_cookie_domain'] = read_setting_from_env(settings,
+                                                           'lang_cookie_domain',
+                                                           None)
+
+    settings['lang_cookie_name'] = read_setting_from_env(settings,
+                                                         'lang_cookie_name',
+                                                         'lang')
 
     mongo_replicaset = read_setting_from_env(settings, 'mongo_replicaset', None)
     if mongo_replicaset is not None:

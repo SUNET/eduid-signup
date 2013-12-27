@@ -5,8 +5,8 @@ from recaptcha.client import captcha
 from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
-from pyramid.httpexceptions import (HTTPFound, HTTPMethodNotAllowed,
-                                    HTTPBadRequest)
+from pyramid.httpexceptions import (HTTPFound, HTTPNotFound,
+                                    HTTPMethodNotAllowed, HTTPBadRequest)
 from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
@@ -360,3 +360,23 @@ def exception_view(context, request):
 def not_found_view(context, request):
     request.response.status = 404
     return {}
+
+
+@view_config(route_name='set_language', request_method='GET')
+def set_language(context, request):
+    settings = request.registry.settings
+    lang = request.GET.get('lang', 'en')
+    if lang not in settings['available_languages']:
+        return HTTPNotFound()
+
+    response = HTTPFound(location=request.environ['HTTP_REFERER'])
+    cookie_domain = settings.get('lang_cookie_domain', None)
+    cookie_name = settings.get('lang_cookie_name')
+
+    extra_options = {}
+    if cookie_domain is not None:
+        extra_options['domain'] = cookie_domain
+
+    response.set_cookie(cookie_name, value=lang, **extra_options)
+
+    return response
