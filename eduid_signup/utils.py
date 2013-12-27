@@ -23,7 +23,7 @@ def generate_verification_link(request):
     return (link, code)
 
 
-def verify_email_code(collection, code):
+def verify_email_code(request, collection, code):
     status = collection.find_one({
         'code': code,
     })
@@ -33,6 +33,10 @@ def verify_email_code(collection, code):
     else:
         if status.get('verified'):
             raise AlreadyVerifiedException()
+
+    pending_code = request.session.get('code', None)
+    if pending_code is None or code != pending_code:
+        raise CodeDoesNotExists()
 
     result = collection.update(
         {
@@ -47,11 +51,6 @@ def verify_email_code(collection, code):
         new=True,
         safe=True
     )
-
-    # XXX need to handle user clicking on confirmation link more than
-    # once gracefully. Should show page saying that e-mail address was
-    # already confirmed, but NOT allow user to auth_token login to
-    # dashboard from that page.
 
     return True
 

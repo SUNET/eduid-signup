@@ -37,13 +37,15 @@ EMAIL_STATUS_VIEWS = {
 def get_url_from_email_status(request, email):
     status = check_email_status(request.db, email)
     if status == 'new':
-        send_verification_mail(request, email)
+        headers = send_verification_mail(request, email)
         namedview = 'success'
     else:
         request.session['email'] = email
         namedview = EMAIL_STATUS_VIEWS[status]
+        headers = []
     url = request.route_url(namedview)
-    return HTTPFound(location=url)
+
+    return HTTPFound(location=url, headers=headers)
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
@@ -135,9 +137,10 @@ def resend_email_verification(context, request):
     if request.method == 'POST':
         email = request.session.get('email', '')
         if email:
-            send_verification_mail(request, email)
+            headers = send_verification_mail(request, email)
             url = request.route_url('success')
-            return HTTPFound(location=url)
+
+            return HTTPFound(location=url, headers=headers)
 
     return {}
 
@@ -259,7 +262,7 @@ def registered_completed(request, user, context=None):
 def email_verification_link(context, request):
 
     try:
-        verify_email_code(request.db.registered, context.code)
+        verify_email_code(request, request.db.registered, context.code)
     except AlreadyVerifiedException:
         return {
             'email_already_verified': True,
@@ -287,7 +290,7 @@ def verification_code_form(context, request):
         try:
             try:
                 code = request.POST['code']
-                verify_email_code(request.db.registered, code)
+                verify_email_code(request, request.db.registered, code)
                 user = request.db.registered.find_one({
                     'code': code
                 })
