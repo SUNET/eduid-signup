@@ -34,8 +34,6 @@ def includeme(config):
 
     config.set_request_property(get_db, 'db', reify=True)
 
-    config.set_request_property(get_locale_name, 'locale', reify=True)
-
     userdb = UserDB(config.registry.settings)
     config.registry.settings['userdb'] = userdb
     config.add_request_method(get_userdb, 'userdb', reify=True)
@@ -57,6 +55,10 @@ def includeme(config):
     config.add_route('error500', '/error500/')
 
     config.add_route('error404', '/error404/')
+
+    config.set_request_property(get_locale_name, 'locale', reify=True)
+    config.add_subscriber('eduid_signup.i18n.add_localizer',
+                          'pyramid.events.NewRequest')
 
     if not config.registry.settings.get('testing', False):
         config.add_view(context=Exception,

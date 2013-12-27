@@ -7,13 +7,13 @@ from pyramid_mailer.message import Message
 
 from eduid_am.tasks import update_attributes
 
-from eduid_signup.i18n import TranslationString as _
 from eduid_signup.utils import generate_verification_link
 
 
 def send_verification_mail(request, email):
     mailer = get_mailer(request)
     (verification_link, code) = generate_verification_link(request)
+    _ = request.translate
 
     context = {
         "email": email,
@@ -61,8 +61,8 @@ def send_verification_mail(request, email):
     update_attributes.delay('eduid_signup', str(user_id))
 
 
-
 def send_credentials(request, email, password):
+    _ = request.translate
     mailer = get_mailer(request)
     context = {
         "email": email,
