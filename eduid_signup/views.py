@@ -63,7 +63,7 @@ def generate_eppn(request):
     :rtype: string
     """
     for _ in range(10):
-        eppn_int = struct.unpack('I', os.urandom(4))
+        eppn_int = struct.unpack('I', os.urandom(4))[0]
         eppn = proquint.from_int(eppn_int)
         try:
             request.userdb.get_user_by_attr('eduPersonPrincipalName', eppn)
