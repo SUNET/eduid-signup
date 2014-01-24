@@ -10,6 +10,29 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.utils import generate_verification_link
 
+import struct
+import proquint
+
+
+def generate_eppn(request):
+    """
+    Generate a unique eduPersonPrincipalName.
+
+    Unique is defined as 'at least it doesn't exist right now'.
+
+    :param request:
+    :return: eppn
+    :rtype: string
+    """
+    for _ in range(10):
+        eppn_int = struct.unpack('I', os.urandom(4))[0]
+        eppn = proquint.from_int(eppn_int)
+        try:
+            request.userdb.get_user_by_attr('eduPersonPrincipalName', eppn)
+        except request.userdb.UserDoesNotExist:
+            return eppn
+    raise HTTPServerError()
+
 
 def send_verification_mail(request, email):
     mailer = get_mailer(request)
@@ -41,11 +64,13 @@ def send_verification_mail(request, email):
         ),
     )
 
+    eppn = generate_eppn(request)
     result = request.db.registered.find_and_modify(
         query={
             'email': email,
         }, update={
             '$set': {
+                "eduPersonPrincipalName": eppn,
                 "email": email,
                 "created_ts": datetime.utcnow(),
                 "code": code,
