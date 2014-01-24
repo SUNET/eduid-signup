@@ -6,8 +6,7 @@ from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import (HTTPFound, HTTPNotFound,
-                                    HTTPMethodNotAllowed, HTTPBadRequest,
-                                    HTTPServerError)
+                                    HTTPMethodNotAllowed, HTTPBadRequest,)
 from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
