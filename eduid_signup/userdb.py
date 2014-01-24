@@ -91,7 +91,7 @@ class UserDB(object):
         logger.debug("Looking in {!r} for user with {!r} = {!r}".format(
             self._db, attr, value))
         try:
-            user = self._db.get_user_by_field(attr, value)
+            user = self._db.get_user_by_field(attr, value, raise_on_missing=True)
             logger.debug("Found user {!r}".format(user))
             return user
         except UserDoesNotExist:
