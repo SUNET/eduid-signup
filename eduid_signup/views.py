@@ -6,7 +6,8 @@ from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import (HTTPFound, HTTPNotFound,
-                                    HTTPMethodNotAllowed, HTTPBadRequest)
+                                    HTTPMethodNotAllowed, HTTPBadRequest,
+                                    HTTPServerError)
 from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
@@ -22,6 +23,9 @@ from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
                                 CodeDoesNotExists)
 from eduid_signup.vccs import generate_password
+
+import struct
+import proquint
 
 import logging
 logger = logging.getLogger(__name__)
@@ -46,6 +50,26 @@ def get_url_from_email_status(request, email):
     url = request.route_url(namedview)
 
     return HTTPFound(location=url, headers=headers)
+
+
+def generate_eppn(request):
+    """
+    Generate a unique eduPersonPrincipalName.
+
+    Unique is defined as 'at least it doesn't exist right now'.
+
+    :param request:
+    :return: eppn
+    :rtype: string
+    """
+    for _ in range(10):
+        eppn_int = struct.unpack('I', os.urandom(4))
+        eppn = proquint.from_int(eppn_int)
+        try:
+            request.userdb.get_user_by_attr('eduPersonPrincipalName', eppn)
+        except request.userdb.UserDoesNotExist:
+            return eppn
+    raise HTTPServerError()
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
@@ -210,9 +234,11 @@ def registered_completed(request, user, context=None):
     (password, salt) = generate_password(request.registry.settings,
                                          password_id, user,
                                          )
+    eppn = generate_eppn(request)
     request.db.registered.update(
         {
             'email': user.get('email'),
+            'eduPersonPrincipalName': eppn,
         }, {
             '$push': {
                 'passwords': {

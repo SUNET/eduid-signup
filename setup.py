@@ -25,6 +25,7 @@ requires = [
     'waitress==0.8.2',
     'recaptcha-client==1.0.6',
     'pwgen==0.4',
+    'proquint==0.1.0',
 ]
 
 if sys.version_info[0] < 3:
