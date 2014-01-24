@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from pyramid.httpexceptions import HTTPServerError
 from pyramid.renderers import render
 from pyramid.security import authenticated_userid, remember
 
@@ -10,6 +11,7 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.utils import generate_verification_link
 
+import os
 import struct
 import proquint
 
