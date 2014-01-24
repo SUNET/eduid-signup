@@ -109,6 +109,7 @@
 }
 
 .masthead img {
+  max-width: 108px;
   max-height: 110px;
 }
 
