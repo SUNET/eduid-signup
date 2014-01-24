@@ -257,19 +257,19 @@ def registered_completed(request, user, context=None):
     update_attributes.delay('eduid_signup', str(user_id))
 
     email = user.get('email')
-    #secret = request.registry.settings.get('auth_shared_secret')
-    #timestamp = '{:x}'.format(int(time.time()))
-    #nonce = os.urandom(16).encode('hex')
+    secret = request.registry.settings.get('auth_shared_secret')
+    timestamp = '{:x}'.format(int(time.time()))
+    nonce = os.urandom(16).encode('hex')
 
-    #auth_token = generate_auth_token(secret, email, nonce, timestamp)
+    auth_token = generate_auth_token(secret, email, nonce, timestamp)
 
     context.update({
         "profile_link": request.registry.settings.get("profile_link", "#"),
         "password": password,
         "email": email,
-        #"nonce": nonce,
-        #"timestamp": timestamp,
-        #"auth_token": auth_token,
+        "nonce": nonce,
+        "timestamp": timestamp,
+        "auth_token": auth_token,
     })
 
     if request.registry.settings.get("default_finish_url"):
