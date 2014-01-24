@@ -95,7 +95,7 @@ class UserDB(object):
             logger.debug("Found user {!r}".format(user))
             return user
         except UserDoesNotExist:
-            logger.error("UserDoesNotExist, {!r} = {!r}".format(attr, value))
+            logger.debug("UserDoesNotExist, {!r} = {!r}".format(attr, value))
             raise self.UserDoesNotExist()
         except MultipleUsersReturned:
             logger.error("MultipleUsersReturned, {!r} = {!r}".format(attr, value))
