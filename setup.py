@@ -21,7 +21,7 @@ requires = [
     'pyramid_jinja2==1.6',
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
-    'pyramid_sna==0.2',
+    'pyramid_sna==0.3.1',
     'waitress==0.8.2',
     'recaptcha-client==1.0.6',
     'pwgen==0.4',
