@@ -1,12 +1,10 @@
 from uuid import uuid4
 from hashlib import sha256
 import datetime
-
-from pyramid.httpexceptions import HTTPInternalServerError, HTTPNotFound
-
-from eduid_signup.i18n import TranslationString as _
-
 from eduid_signup.compat import text_type
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class AlreadyVerifiedException(Exception):
@@ -29,13 +27,16 @@ def verify_email_code(request, collection, code):
     })
 
     if status is None:
+        logger.debug("Code {!r} not found in database".format(code))
         raise CodeDoesNotExists()
     else:
         if status.get('verified'):
+            logger.debug("Code {!r} already verified".format(code))
             raise AlreadyVerifiedException()
 
     pending_code = request.session.get('code', None)
     if pending_code is None or code != pending_code:
+        logger.debug("Code {!r} (or this sessions code {!r}) does not exist".format(code, pending_code))
         raise CodeDoesNotExists()
 
     result = collection.update(
@@ -52,6 +53,7 @@ def verify_email_code(request, collection, code):
         safe=True
     )
 
+    logger.debug("Code {!r} verified : {!r}".format(code, result))
     return True
 
 
