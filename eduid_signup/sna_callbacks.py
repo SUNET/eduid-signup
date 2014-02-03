@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
 from eduid_am.tasks import update_attributes
+from eduid_signup.utils import generate_eppn
 
 
 def create_or_update_sna(request):
@@ -35,6 +36,7 @@ def create_or_update_sna(request):
     if user is None and not am_user_exists:
         # The user is new, is not registered in signup or am either
         # then, register as usual
+        eppn = generate_eppn(request)
         user_id = request.db.registered.save({
             provider_key: provider_user_id,
             "email": attributes["email"],
@@ -43,6 +45,7 @@ def create_or_update_sna(request):
             "displayName": attributes["screen_name"],
             "givenName": attributes["first_name"],
             "sn": attributes["last_name"],
+            "eduPersonPrincipalName": eppn,
         }, safe=True)
 
     elif not am_user_exists:

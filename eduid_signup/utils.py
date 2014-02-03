@@ -3,6 +3,11 @@ from hashlib import sha256
 import datetime
 from eduid_signup.compat import text_type
 
+import os
+import struct
+import proquint
+from pyramid.httpexceptions import HTTPServerError
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -84,3 +89,24 @@ def generate_auth_token(shared_key, email, nonce, timestamp, generator=sha256):
     """
     return generator("{0}|{1}|{2}|{3}".format(
         shared_key, email, nonce, timestamp)).hexdigest()
+
+
+def generate_eppn(request):
+    """
+    Generate a unique eduPersonPrincipalName.
+
+    Unique is defined as 'at least it doesn't exist right now'.
+
+    :param request:
+    :return: eppn
+    :rtype: string
+    """
+    for _ in range(10):
+        eppn_int = struct.unpack('I', os.urandom(4))[0]
+        eppn = proquint.from_int(eppn_int)
+        try:
+            request.userdb.get_user_by_attr('eduPersonPrincipalName', eppn)
+        except request.userdb.UserDoesNotExist:
+            return eppn
+    raise HTTPServerError()
+
