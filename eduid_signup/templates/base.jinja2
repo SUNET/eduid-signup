@@ -19,18 +19,6 @@
        <ul class="nav nav-pills pull-right">
          <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
          <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
-         <li class="nav-separator"></li>
-         {% for lang in request.registry.settings.get('available_languages', []) %}
-         <li class="langselector">
-           {% if request.locale == lang %}
-             <span>{{ lang }}</span>
-           {% else %}
-             <a href="{{ request.route_path('set_language')}}?lang={{lang}}">
-                {{ lang }}
-            </a>
-           {% endif %}
-          </li>
-         {% endfor %}
        </ul>
        <a href="{{ request.route_path('home') }}"><img src="{{'eduid_signup:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
      </div>
@@ -46,7 +34,21 @@
 
    <div class="footer">
     <div class="container">
-     <p>&copy; SUNET 2013</p>
+        <p>
+            &copy; SUNET 2013
+            <span class="nav-separator"></span>
+            {% for lang in request.registry.settings.get('available_languages', []) %}
+                <span class="langselector">
+                    {% if request.locale == lang %}
+                        <span>{{ lang }}</span>
+                    {% else %}
+                        <a href="{{ request.route_path('set_language')}}?lang={{lang}}">
+                            {{ lang }}
+                        </a>
+                    {% endif %}
+                </span>
+            {% endfor %}
+        </p>
     </div>
    </div>
 
