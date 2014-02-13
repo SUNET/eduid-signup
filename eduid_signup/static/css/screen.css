@@ -143,7 +143,7 @@ div#footer span.nav-separator {
   margin-bottom: -10px;
 }
 
-div#footer span.langselector span {
+div#footer span.langselector {
   color: rgb(85, 85, 85);;
   display: inline-block;
   height: 14px;
