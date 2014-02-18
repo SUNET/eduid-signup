@@ -83,10 +83,14 @@ def main(global_config, **settings):
         settings[option] = read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
-    available_languages = read_setting_from_env(settings, 'available_languages', 'en es')
-    settings['available_languages'] = [
-        lang for lang in available_languages.split(' ') if lang
-    ]
+    available_languages = read_setting_from_env(settings, 'available_languages', 'en:English sv:Svenska')
+
+    languages = {}
+    for l in available_languages.split(' '):
+        lang, label = l.split(':')
+        languages[lang] = label
+
+    settings['available_languages'] = languages
 
     for item in (
         'mongo_uri',

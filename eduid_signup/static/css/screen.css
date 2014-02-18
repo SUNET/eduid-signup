@@ -133,16 +133,6 @@ form.accept-cancel {
   margin-top: 20px;
 }
 
-div#footer span.nav-separator {
-  height: 34px;
-  width: 0px;
-  border-left: 1px solid rgb(0, 136, 204);
-  display: inline-block;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: -10px;
-}
-
 div#footer span.langselector {
   color: rgb(85, 85, 85);;
   display: inline-block;
@@ -151,12 +141,10 @@ div#footer span.langselector {
   margin-bottom: 2px;
   margin-right: 2px;
   margin-top: 2px;
-  padding-bottom: 8px;
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-top: 8px;
+  padding: 4px;
   text-align: left;
   width: 15px;
+  float: right;
 }
 
 
