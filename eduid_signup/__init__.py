@@ -21,6 +21,34 @@ def read_setting_from_env(settings, key, default=None):
         return settings.get(key, default)
 
 
+def read_mapping(settings, prop, available_keys=None, default=None, required=True):
+    raw = read_setting_from_env(settings, prop, '') 
+
+    if raw.strip() == '': 
+        return default
+
+    rows = raw.strip('\n ').split('\n')
+
+    mapping = {}
+
+    for row in rows:
+        splitted_row = row.split('=')
+        key = splitted_row[0].strip()
+        if len(splitted_row) > 1:
+            value = splitted_row[1].strip()
+        else:
+            value = ''
+        if available_keys is None or key in available_keys:
+            mapping[key] = value
+
+    if available_keys is not None:
+        if (len(mapping.keys()) != len(available_keys) and 
+                not 'testing' in settings):
+            return None
+
+    return mapping
+
+
 def includeme(config):
     # DB setup
     mongo_replicaset = config.registry.settings.get('mongo_replicaset', None)
@@ -83,14 +111,12 @@ def main(global_config, **settings):
         settings[option] = read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
-    available_languages = read_setting_from_env(settings, 'available_languages', 'en:English sv:Svenska')
+    available_languages = read_mapping(settings,
+                                       'available_languages',
+                                       default={'en': 'English',
+                                                'sv': 'Svenska'})
 
-    languages = {}
-    for l in available_languages.split(' '):
-        lang, label = l.split(':')
-        languages[lang] = label
-
-    settings['available_languages'] = languages
+    settings['available_languages'] = available_languages
 
     for item in (
         'mongo_uri',

@@ -110,7 +110,7 @@ def trycaptcha(request):
 
 
 @view_config(route_name='success', renderer="templates/success.jinja2")
-def success(request):
+def success(context, request):
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
@@ -339,7 +339,7 @@ def help(request):
     # as well as this template
 
     locale_name = get_locale_name(request)
-    template = 'eduid_signup:templates/help-%s.jinja2' % locale_name
+    template = 'templates/help-%s.jinja2' % locale_name
 
     return render_to_response(template, {}, request=request)
 
