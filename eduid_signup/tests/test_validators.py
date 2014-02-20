@@ -4,6 +4,7 @@ import unittest
 
 from eduid_signup.validators import validate_email_format
 from eduid_signup.validators import validate_email, ValidationError
+from eduid_signup.utils import normalize_email
 from eduid_signup.testing import DBTests
 
 
@@ -20,11 +21,11 @@ class EmailFormatTests(unittest.TestCase):
 
     def test_verified_emails(self):
         for email in self.read_emails("verified_emails.txt"):
-            self.assertTrue(validate_email_format(email))
+            self.assertTrue(validate_email_format(normalize_email(email)))
 
     def test_wrong_emails(self):
         for email in self.read_emails("wrong_emails.txt"):
-            self.assertFalse(validate_email_format(email))
+            self.assertFalse(validate_email_format(normalize_email(email)))
 
 
 class ValidateEmailTests(DBTests):
