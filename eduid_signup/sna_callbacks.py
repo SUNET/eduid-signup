@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
 from eduid_am.tasks import update_attributes
-from eduid_signup.utils import generate_eppn
+from eduid_signup.utils import generate_eppn, normalize_email
 
 
 def create_or_update_sna(request):
@@ -89,6 +89,9 @@ def create_or_update_sna(request):
 def save_data_in_session(request, provider, provider_user_id, attributes):
 
     remember_headers = remember(request, provider_user_id)
+
+    if 'email' in attributes:
+        attributes['email'] = normalize_email(attributes['email'])
 
     request.session.update({
         "social_info": attributes,

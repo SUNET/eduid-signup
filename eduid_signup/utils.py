@@ -110,3 +110,6 @@ def generate_eppn(request):
             return eppn
     raise HTTPServerError()
 
+
+def normalize_email(addr):
+    return addr.lower()
