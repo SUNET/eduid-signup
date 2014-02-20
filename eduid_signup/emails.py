@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from pyramid.renderers import render
-from pyramid.security import authenticated_userid, remember
 
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
@@ -62,15 +61,6 @@ def send_verification_mail(request, email):
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', str(user_id))
-
-    user_session = authenticated_userid(request)
-    if user_session is not None:
-        request.session['code'] = code
-        return {}
-    else:
-        headers = remember(request, user_id)
-        request.session['code'] = code
-        return headers
 
 
 def send_credentials(request, email, password):

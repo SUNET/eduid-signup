@@ -26,7 +26,7 @@ def generate_verification_link(request):
     return (link, code)
 
 
-def verify_email_code(request, collection, code):
+def verify_email_code(collection, code):
     status = collection.find_one({
         'code': code,
     })
@@ -38,11 +38,6 @@ def verify_email_code(request, collection, code):
         if status.get('verified'):
             logger.debug("Code {!r} already verified".format(code))
             raise AlreadyVerifiedException()
-
-    pending_code = request.session.get('code', None)
-    if pending_code is None or code != pending_code:
-        logger.debug("Code {!r} (or this sessions code {!r}) does not exist".format(code, pending_code))
-        raise CodeDoesNotExists()
 
     result = collection.update(
         {
