@@ -7,8 +7,8 @@ from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
 from pyramid.testing import DummyRequest
 
+from eduid_am.db import MongoDB
 from eduid_signup import main
-from eduid_signup.db import MongoDB
 
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'

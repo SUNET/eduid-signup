@@ -8,9 +8,9 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
-from eduid_signup.db import MongoDB, get_db
+from eduid_am.db import MongoDB, get_db
+from eduid_am.userdb import UserDB, get_userdb
 from eduid_signup.i18n import locale_negotiator
-from eduid_signup.userdb import UserDB, get_userdb
 
 
 def read_setting_from_env(settings, key, default=None):
