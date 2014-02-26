@@ -10,6 +10,7 @@ from pyramid.httpexceptions import (HTTPFound, HTTPNotFound,
 from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
+from pyramid.settings import asbool
 
 from wsgi_ratelimit import is_ratelimit_reached
 
@@ -382,6 +383,9 @@ def set_language(context, request):
     extra_options = {}
     if cookie_domain is not None:
         extra_options['domain'] = cookie_domain
+
+    extra_options['httponly'] = asbool(settings.get('session.httponly'))
+    extra_options['secure'] = asbool(settings.get('session.secure'))
 
     response.set_cookie(cookie_name, value=lang, **extra_options)
 
