@@ -8,8 +8,8 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
-from eduid_am.db import MongoDB, get_db
-from eduid_am.userdb import UserDB, get_userdb
+from eduid_am.db import MongoDB
+from eduid_am.userdb import UserDB
 from eduid_signup.i18n import locale_negotiator
 
 
@@ -22,9 +22,9 @@ def read_setting_from_env(settings, key, default=None):
 
 
 def read_mapping(settings, prop, available_keys=None, default=None, required=True):
-    raw = read_setting_from_env(settings, prop, '') 
+    raw = read_setting_from_env(settings, prop, '')
 
-    if raw.strip() == '': 
+    if raw.strip() == '':
         return default
 
     rows = raw.strip('\n ').split('\n')
@@ -42,7 +42,7 @@ def read_mapping(settings, prop, available_keys=None, default=None, required=Tru
             mapping[key] = value
 
     if available_keys is not None:
-        if (len(mapping.keys()) != len(available_keys) and 
+        if (len(mapping.keys()) != len(available_keys) and
                 not 'testing' in settings):
             return None
 
@@ -57,14 +57,17 @@ def includeme(config):
                           replicaSet=mongo_replicaset)
     else:
         mongodb = MongoDB(config.registry.settings['mongo_uri'])
+    # Create mongodb client instance and store it in our config,
+    # and make a getter lambda for pyramid to retreive it
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['db_conn'] = mongodb.get_connection
+    config.add_request_method(lambda x: x.registry.settings['mongodb'], 'db', reify=True)
 
-    config.set_request_property(get_db, 'db', reify=True)
-
-    userdb = UserDB(config.registry.settings)
-    config.registry.settings['userdb'] = userdb
-    config.add_request_method(get_userdb, 'userdb', reify=True)
+    # Create userdb instance and store it in our config,
+    # and make a getter lambda for pyramid to retreive it
+    _userdb = UserDB(config.registry.settings)
+    config.registry.settings['userdb'] = _userdb
+    config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
     # root views
     config.add_route('home', '/')
