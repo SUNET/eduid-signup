@@ -164,6 +164,7 @@ def review_fetched_info(context, request):
     social_info = request.session.get('social_info', {})
     email = social_info.get('email', None)
 
+    mail_registered = False
     if email:
         signup_user = request.db.registered.find_one({
             "email": email,
@@ -179,10 +180,10 @@ def review_fetched_info(context, request):
                     }
                 }
             })
-        except request.userdb.UserDoesNotExist:
+        except request.userdb.exceptions.UserDoesNotExist:
             am_user_exists = None
 
-    mail_registered = signup_user or am_user_exists
+        mail_registered = signup_user or am_user_exists
 
     if request.method == 'GET':
         return {
