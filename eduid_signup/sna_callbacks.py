@@ -30,7 +30,7 @@ def create_or_update_sna(request):
             }
         })
 
-    except request.userdb.UserDoesNotExist:
+    except request.userdb.exceptions.UserDoesNotExist:
         am_user_exists = None
 
     if user is None and not am_user_exists:
@@ -83,7 +83,6 @@ def create_or_update_sna(request):
 
     request.session["email"] = attributes["email"]
     return user_id
-
 
 
 def save_data_in_session(request, provider, provider_user_id, attributes):

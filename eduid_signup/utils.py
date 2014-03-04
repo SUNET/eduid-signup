@@ -101,7 +101,7 @@ def generate_eppn(request):
         eppn = proquint.from_int(eppn_int)
         try:
             request.userdb.get_user_by_attr('eduPersonPrincipalName', eppn)
-        except request.userdb.UserDoesNotExist:
+        except request.userdb.exceptions.UserDoesNotExist:
             return eppn
     raise HTTPServerError()
 

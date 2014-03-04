@@ -11,9 +11,9 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 version = '0.1'
 
 requires = [
-    'eduid_am',
-    'wsgi_ratelimit',
-    'vccs_client==0.4.0',
+    'eduid_am==0.3.0',
+    'wsgi_ratelimit==0.1',
+    'vccs_client==0.4.1',
     'pymongo==2.5.1',
     'pyramid==1.4.1',
     'pyramid_beaker==0.7',

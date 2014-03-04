@@ -1,6 +1,6 @@
 import unittest
 
-from eduid_signup import db
+from eduid_am import db
 
 
 class DummyDatabase(object):
