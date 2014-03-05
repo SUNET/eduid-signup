@@ -3,35 +3,35 @@
 {% block contents %}
     <div class="jumbotron">
       <h1>{{ _("Welcome to eduID!") }}</h1>
-      <p class="lead">{{ _("Please, review the data fetched from your Social Network") }}</p>
+      <p class="lead">{{ _("Please review the data received from the social network") }}</p>
     </div>
 
     <div class="row">
       <div class="span8">
         {% if not mail_empty and not mail_registered %}
-        <p>{% trans %} We haven't stored any of your data yet. If you want that we store
-          these data in a new account, you should click on <strong>Accept</strong> button.
-          Otherwise, you can click on <strong>Cancel</strong> button to discard the data 
-          and return to the home page of signup process.
+        <p>{% trans %} No account has been created in eduID yet. If the data below is
+            correct, click the <strong>Accept</strong> button. Otherwise click the
+            <strong>Cancel</strong> button to get back to the signup page, and choose
+            another option for signing up with eduID.
           {% endtrans %}
         </p>
         {% elif mail_empty %}
-        <p>{% trans %}<strong>Your social network hasn't provided an email account.</strong>
-          The email is a required value, so we can't continue registering your account with
-          this info. You should click on <strong>Cancel</strong> to discard the data and 
-          return to the home page of signup process. Then you can use another social network 
-          account or the email form.
+        <p>{% trans %}
+          <strong>The social network did not provide eduID with an e-mail address.</strong>
+            You should click on <strong>Cancel</strong> to discard the data and
+            return to the signup page to choose another option for signing up with eduID.
           {% endtrans %}
         </p>
         {% elif mail_registered %}
-        <p>{% trans %}<strong>The email provided by your social network is already in use.</strong>
-          You can reset your password clicking {% endtrans %}
-          <a href={{request.registry.settings['reset_password_link']}}>{{ _("here")}}</a>.
+        <p>{% trans reset_password_link=reset_password_link %}
+          <strong>The email provided by your social network is already in use.</strong>
+            You can reset your password clicking <a href='{{ reset_password_link }}'>here</a>.
+           {% endtrans %}
         </p>
         {% endif %}
         <p>
-        {% trans %}The follow fields are uneditable. So please,
-                   don't try to fill up these fields.{% endtrans %}
+        {% trans %}The data received from the social network cannot be edited here.
+            Click <strong>Cancel</strong> if it is not correct.{% endtrans %}
         </p>
       </div>
     </div>
@@ -46,14 +46,14 @@
               {% if mail_registered %}
                 <span class="help-block">{{ _("Email address already in use") }}</span>
               {% elif mail_empty %}
-                <span class="help-block">{{ _("Your Social Network hasn't provided an email and it is required") }}</span>
+                <span class="help-block">{{ _("Email address is required, but none was received from social network") }}</span>
               {% endif %}
             </div>
           </div>
         </div>
         <div class='span4'>
           <div class="control-group">
-            <label class="control-lavel" for="screenname">{{_("Screen name")}}</label>
+            <label class="control-lavel" for="screenname">{{_("Display name")}}</label>
             <div class="controls">
               <span class="input-xlarge uneditable-input">{{ social_info.screen_name }}</span>
             </div>

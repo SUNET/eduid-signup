@@ -190,6 +190,7 @@ def review_fetched_info(context, request):
             'social_info': social_info,
             'mail_registered': mail_registered,
             'mail_empty': not email,
+            'reset_password_link': request.registry.settings['reset_password_link'],
         }
 
     else:

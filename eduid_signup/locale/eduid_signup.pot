@@ -1,14 +1,14 @@
 # Translations template for eduid_signup.
-# Copyright (C) 2013 ORGANIZATION
+# Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the eduid_signup project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid_signup 0.1dev\n"
+"Project-Id-Version: eduid_signup 0.2.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-28 10:33+0100\n"
+"POT-Creation-Date: 2014-03-05 14:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,15 +21,15 @@ msgstr ""
 msgid "eduid-signup verification email"
 msgstr ""
 
-#: eduid_signup/emails.py:74
+#: eduid_signup/emails.py:76
 msgid "eduid-signup credentials"
 msgstr ""
 
-#: eduid_signup/validators.py:28
+#: eduid_signup/validators.py:29
 msgid "Email is required"
 msgstr ""
 
-#: eduid_signup/validators.py:31
+#: eduid_signup/validators.py:33
 msgid "Email is not valid"
 msgstr ""
 
@@ -37,7 +37,9 @@ msgstr ""
 #: eduid_signup/templates/account_created.jinja2:21
 #: eduid_signup/templates/account_created.jinja2:43
 #: eduid_signup/templates/already_registered.jinja2:6
-#: eduid_signup/templates/home.jinja2:7 eduid_signup/templates/success.jinja2:5
+#: eduid_signup/templates/home.jinja2:7
+#: eduid_signup/templates/review_fetched_info.jinja2:5
+#: eduid_signup/templates/success.jinja2:5
 #: eduid_signup/templates/verification_code_form.jinja2:6
 msgid "Welcome to eduID!"
 msgstr ""
@@ -84,6 +86,7 @@ msgstr ""
 #: eduid_signup/templates/already_registered.jinja2:7
 #: eduid_signup/templates/already_registered.jinja2:10
 #: eduid_signup/templates/resend_email_verification.jinja2:6
+#: eduid_signup/templates/review_fetched_info.jinja2:47
 msgid "Email address already in use"
 msgstr ""
 
@@ -184,6 +187,10 @@ msgstr ""
 msgid "Sign up with Google"
 msgstr ""
 
+#: eduid_signup/templates/home.jinja2:43
+msgid "Sign up with Microsoft Live Connect"
+msgstr ""
+
 #: eduid_signup/templates/inc.registration_completed.jinja2:2
 msgid "Write this password down and store it in a safe place."
 msgstr ""
@@ -228,6 +235,78 @@ msgstr ""
 
 #: eduid_signup/templates/resend_email_verification.jinja2:11
 msgid "Resend verification link"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:6
+msgid "Please review the data received from the social network"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:12
+msgid ""
+" No account has been created in eduID yet. If the data below is\n"
+"            correct, click the <strong>Accept</strong> button. Otherwise "
+"click the\n"
+"            <strong>Cancel</strong> button to get back to the signup page, "
+"and choose\n"
+"            another option for signing up with eduID.\n"
+"          "
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:19
+msgid ""
+"\n"
+"          <strong>The social network did not provide eduID with an e-mail "
+"address.</strong>\n"
+"            You should click on <strong>Cancel</strong> to discard the data "
+"and\n"
+"            return to the signup page to choose another option for signing up"
+" with eduID.\n"
+"          "
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:26
+#, python-format
+msgid ""
+"\n"
+"          <strong>The email provided by your social network is already in "
+"use.</strong>\n"
+"            You can reset your password clicking <a "
+"href='%(reset_password_link)s'>here</a>.\n"
+"           "
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:33
+msgid ""
+"The data received from the social network cannot be edited here.\n"
+"            Click <strong>Cancel</strong> if it is not correct."
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:43
+msgid "Email"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:49
+msgid "Email address is required, but none was received from social network"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:56
+msgid "Display name"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:66
+msgid "First name"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:74
+msgid "Last name"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:85
+msgid "Cancel"
+msgstr ""
+
+#: eduid_signup/templates/review_fetched_info.jinja2:91
+msgid "Accept"
 msgstr ""
 
 #: eduid_signup/templates/success.jinja2:6
