@@ -12,7 +12,6 @@ from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
 from eduid_signup.i18n import locale_negotiator
 
-
 def read_setting_from_env(settings, key, default=None):
     env_variable = key.upper()
     if env_variable in os.environ:
@@ -61,7 +60,7 @@ def includeme(config):
     # and make a getter lambda for pyramid to retreive it
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['db_conn'] = mongodb.get_connection
-    config.add_request_method(lambda x: x.registry.settings['mongodb'], 'db', reify=True)
+    config.add_request_method(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
