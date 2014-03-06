@@ -21,6 +21,9 @@
          <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
        </ul>
        <a href="{{ request.route_path('home') }}"><img src="{{'eduid_signup:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
+       <a href="http://www.sunet.se/" target="_blank">
+           <img src="{{'eduiddashboard:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
+       </a>
      </div>
      {% block contents %}
 
