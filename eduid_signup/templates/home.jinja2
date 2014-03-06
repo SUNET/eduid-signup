@@ -13,7 +13,7 @@
       <form class="form-inline" method="POST">
        <div class="control-group{% if email_error is defined %} error{% endif %}">
         <div class="input-append">
-          <input type="email" name="email" placeholder="you@example.com" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
+          <input type="email" name="email" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
