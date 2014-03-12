@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: lgs@yaco.es\n"
-"POT-Creation-Date: 2014-03-05 14:47+0100\n"
+"POT-Creation-Date: 2014-03-12 14:21+0100\n"
 "PO-Revision-Date: 2013-04-30 18:47+0200\n"
 "Last-Translator: Lorenzo Gil <lgs@yaco.es>\n"
 "Language-Team: es <ES@li.org>\n"
@@ -198,6 +198,15 @@ msgstr "Regístrate con Google"
 msgid "Sign up with Microsoft Live Connect"
 msgstr ""
 
+#: eduid_signup/templates/home.jinja2:53
+msgid "Reject"
+msgstr ""
+
+#: eduid_signup/templates/home.jinja2:54
+#: eduid_signup/templates/review_fetched_info.jinja2:91
+msgid "Accept"
+msgstr ""
+
 #: eduid_signup/templates/inc.registration_completed.jinja2:2
 msgid "Write this password down and store it in a safe place."
 msgstr ""
@@ -310,10 +319,6 @@ msgstr ""
 
 #: eduid_signup/templates/review_fetched_info.jinja2:85
 msgid "Cancel"
-msgstr ""
-
-#: eduid_signup/templates/review_fetched_info.jinja2:91
-msgid "Accept"
 msgstr ""
 
 #: eduid_signup/templates/success.jinja2:6

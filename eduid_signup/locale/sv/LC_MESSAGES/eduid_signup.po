@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-signup\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 14:47+0100\n"
-"PO-Revision-Date: 2014-03-05 13:59+0000\n"
+"POT-Creation-Date: 2014-03-12 14:21+0100\n"
+"PO-Revision-Date: 2014-03-12 13:26+0000\n"
 "Last-Translator: ft\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
 "signup/language/sv/)\n"
@@ -235,6 +235,15 @@ msgstr "Registrering via Google"
 msgid "Sign up with Microsoft Live Connect"
 msgstr "Registrering via Microsoft Live Connect"
 
+#: eduid_signup/templates/home.jinja2:53
+msgid "Reject"
+msgstr "Avbryt"
+
+#: eduid_signup/templates/home.jinja2:54
+#: eduid_signup/templates/review_fetched_info.jinja2:91
+msgid "Accept"
+msgstr "Godkänn"
+
 #: eduid_signup/templates/inc.registration_completed.jinja2:2
 msgid "Write this password down and store it in a safe place."
 msgstr "Skriv ned det här lösenordet och spara det på ett säkert ställe."
@@ -371,10 +380,6 @@ msgstr "Efternamn"
 #: eduid_signup/templates/review_fetched_info.jinja2:85
 msgid "Cancel"
 msgstr "Avbryt"
-
-#: eduid_signup/templates/review_fetched_info.jinja2:91
-msgid "Accept"
-msgstr "Godkänn"
 
 #: eduid_signup/templates/success.jinja2:6
 msgid "Account created successfully"
