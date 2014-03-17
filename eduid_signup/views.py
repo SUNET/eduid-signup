@@ -11,6 +11,7 @@ from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
 from pyramid.settings import asbool
+from pyramid.response import FileResponse
 
 from wsgi_ratelimit import is_ratelimit_reached
 
@@ -46,6 +47,13 @@ def get_url_from_email_status(request, email):
     url = request.route_url(namedview)
 
     return HTTPFound(location=url)
+
+
+@view_config(name='favicon.ico')
+def favicon_view(context, request):
+    path = os.path.dirname(__file__)
+    icon = os.path.join(path, 'static', 'favicon.ico')
+    return FileResponse(icon, request=request)
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')

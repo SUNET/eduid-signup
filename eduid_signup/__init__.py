@@ -98,6 +98,10 @@ def includeme(config):
                         view='eduid_signup.views.exception_view',
                         renderer='templates/error404.jinja2')
 
+    # Favicon
+    config.add_route('favicon', '/favicon.ico')
+    config.add_view('eduid_signup.views.favicon_view', route_name='favicon')
+
 
 def main(global_config, **settings):
 
