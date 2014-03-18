@@ -55,7 +55,7 @@ def create_or_update_sna(request):
         #
         request.db.registered.find_and_modify({
             "email": attributes['email'],
-            "verified": False
+            "verified": True
         }, {
             "$set": {
                 provider_key: provider_user_id,

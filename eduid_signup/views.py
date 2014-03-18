@@ -179,17 +179,14 @@ def review_fetched_info(context, request):
             "verified": True
         })
 
-        try:
-            am_user_exists = request.userdb.exists_by_filter({
-                'mailAliases': {
-                    '$elemMatch': {
-                        'email': email,
-                        'verified': True
-                    }
+        am_user_exists = request.userdb.exists_by_filter({
+            'mailAliases': {
+                '$elemMatch': {
+                    'email': email,
+                    'verified': True
                 }
-            })
-        except request.userdb.exceptions.UserDoesNotExist:
-            am_user_exists = None
+            }
+        })
 
         mail_registered = signup_user or am_user_exists
 

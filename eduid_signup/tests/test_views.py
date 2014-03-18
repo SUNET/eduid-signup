@@ -1,4 +1,6 @@
+from pyramid_sna.compat import urlparse
 from eduid_signup.testing import FunctionalTests
+from mock import patch
 
 
 class HomeViewTests(FunctionalTests):
@@ -53,3 +55,42 @@ class HelpViewTests(FunctionalTests):
         })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Help')
+
+
+class GoogleCallbackTests(FunctionalTests):
+
+    def test_callback(self):
+        # call the login to fill the session
+        res = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        self.assertEqual(res.status, '302 Found')
+        url = urlparse.urlparse(res.location)
+        query = urlparse.parse_qs(url.query)
+        state = query['state'][0]
+
+        with patch('requests.post') as fake_post:
+            # taken from pyramid_sna
+            fake_post.return_value.status_code = 200
+            fake_post.return_value.json = lambda: {
+                'access_token': '1234',
+            }
+            with patch('requests.get') as fake_get:
+                fake_get.return_value.status_code = 200
+                fake_get.return_value.json = lambda: {
+                    'id': '789',
+                    'name': 'John Smith',
+                    'given_name': 'John',
+                    'family_name': 'Smith',
+                    'email': 'johnsmith@example.com',
+                }
+
+                res = self.testapp.get('/google/callback', {
+                    'code': '1234',
+                    'state': state,
+                })
+        res = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.db.registered.find({}).count(), 0)
+        res = res.form.submit('action')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(self.db.registered.find({}).count(), 1)
