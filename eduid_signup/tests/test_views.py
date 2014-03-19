@@ -1,6 +1,12 @@
-from pyramid_sna.compat import urlparse
-from eduid_signup.testing import FunctionalTests
 from mock import patch
+import pymongo
+from pyramid_sna.compat import urlparse
+
+from webtest import TestApp
+
+from eduid_am.testing import MongoTestCase
+from eduid_signup import main
+from eduid_signup.testing import FunctionalTests, SETTINGS
 
 
 class HomeViewTests(FunctionalTests):
@@ -57,17 +63,44 @@ class HelpViewTests(FunctionalTests):
         res.mustcontain('Help')
 
 
-class GoogleCallbackTests(FunctionalTests):
+EXISTING_USER = {
+                    'id': '789',
+                    'name': 'John Smith',
+                    'given_name': 'John',
+                    'family_name': 'Smith',
+                    'email': 'johnsmith@example.com',
+                }
 
-    def test_callback(self):
-        # call the login to fill the session
-        res = self.testapp.get('/google/login', {
-            'next_url': 'https://localhost/foo/bar',
-        })
-        self.assertEqual(res.status, '302 Found')
-        url = urlparse.urlparse(res.location)
-        query = urlparse.parse_qs(url.query)
-        state = query['state'][0]
+NEW_USER = {
+                    'id': '789',
+                    'name': 'John Brown',
+                    'given_name': 'John',
+                    'family_name': 'Brown',
+                    'email': 'johnbrown@example.com',
+                }
+
+
+
+class SNATests(MongoTestCase):
+
+    def setUp(self):
+        # Don't call DBTests.setUp because we are getting the
+        # db in a different way
+        super(SNATests, self).setUp()
+        try:
+            app = main({}, **SETTINGS)
+            self.testapp = TestApp(app)
+            self.db = app.registry.settings['mongodb'].get_database()
+        except pymongo.errors.ConnectionFailure:
+            raise unittest.SkipTest("requires accessible MongoDB server")
+        self.db.registered.drop()
+
+    def tearDown(self):
+        super(SNATests, self).tearDown()
+        self.testapp.reset()
+        self.db.registered.drop()
+
+    def _google_callback(self, state, user):
 
         with patch('requests.post') as fake_post:
             # taken from pyramid_sna
@@ -77,18 +110,65 @@ class GoogleCallbackTests(FunctionalTests):
             }
             with patch('requests.get') as fake_get:
                 fake_get.return_value.status_code = 200
-                fake_get.return_value.json = lambda: {
-                    'id': '789',
-                    'name': 'John Smith',
-                    'given_name': 'John',
-                    'family_name': 'Smith',
-                    'email': 'johnsmith@example.com',
-                }
+                fake_get.return_value.json = lambda: user
 
                 res = self.testapp.get('/google/callback', {
                     'code': '1234',
                     'state': state,
                 })
+
+    def test_google(self):
+        # call the login to fill the session
+        res = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        self.assertEqual(res.status, '302 Found')
+        url = urlparse.urlparse(res.location)
+        query = urlparse.parse_qs(url.query)
+        state = query['state'][0]
+
+        self._google_callback(state, NEW_USER)
+
+        res = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.db.registered.find({}).count(), 0)
+        res = res.form.submit('action')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(self.db.registered.find({}).count(), 1)
+
+    def test_google_existing_user(self):
+        # call the login to fill the session
+        res = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        self.assertEqual(res.status, '302 Found')
+        url = urlparse.urlparse(res.location)
+        query = urlparse.parse_qs(url.query)
+        state = query['state'][0]
+
+        self._google_callback(state, EXISTING_USER)
+
+        res = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.db.registered.find({}).count(), 0)
+        res = res.form.submit('action')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(self.db.registered.find({}).count(), 0)
+
+    def test_google_retry(self):
+        # call the login to fill the session
+        res = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        self.assertEqual(res.status, '302 Found')
+        res = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        self.assertEqual(res.status, '302 Found')
+        url = urlparse.urlparse(res.location)
+        query = urlparse.parse_qs(url.query)
+        state = query['state'][0]
+
+        self._google_callback(state, NEW_USER)
+
         res = self.testapp.get('/review_fetched_info/')
         self.assertEqual(self.db.registered.find({}).count(), 0)
         res = res.form.submit('action')
