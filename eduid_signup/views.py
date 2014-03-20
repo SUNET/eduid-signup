@@ -179,28 +179,24 @@ def review_fetched_info(context, request):
             "verified": True
         })
 
-        am_user_exists = request.userdb.exists_by_filter({
-            'mailAliases': {
-                '$elemMatch': {
-                    'email': email,
-                    'verified': True
-                }
-            }
-        })
+        try:
+            am_user = request.userdb.get_user_by_email(email)
+        except request.userdb.exceptions.UserDoesNotExist:
+            am_user = None
 
-        mail_registered = signup_user or am_user_exists
+        mail_registered = signup_user or am_user
 
     if request.method == 'GET':
         return {
             'social_info': social_info,
-            'mail_registered': mail_registered,
+            'mail_registered': bool(mail_registered),
             'mail_empty': not email,
             'reset_password_link': request.registry.settings['reset_password_link'],
         }
 
-    else:
+    elif email:
         if request.POST.get('action', 'cancel') == 'accept':
-            create_or_update_sna(request)
+            create_or_update_sna(request, social_info, signup_user, am_user)
             raise HTTPFound(location=request.route_url('sna_account_created'))
         else:
             if request.session is not None:
@@ -208,6 +204,8 @@ def review_fetched_info(context, request):
             headers = forget(request)
             raise HTTPFound(location=request.route_url('home'),
                             headers=headers)
+    else:
+        raise HTTPBadRequest()
 
 
 def registered_completed(request, user, context=None):
