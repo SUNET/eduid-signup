@@ -216,7 +216,7 @@ def review_fetched_info(context, request):
 def registered_completed(request, user, context=None):
     if context is None:
         context = {}
-    password_id = str(ObjectId())
+    password_id = ObjectId()
     (password, salt) = generate_password(request.registry.settings,
                                          password_id, user,
                                          )
