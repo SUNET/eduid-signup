@@ -8,13 +8,13 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-version = '0.1dev'
+version = '0.2.0'
 
 requires = [
-    'eduid_am',
+    'eduid_am==0.4.2',
     'wsgi_ratelimit',
     'vccs_client==0.3',
-    'pymongo==2.5.1',
+    'pymongo==2.6.3',
     'pyramid==1.4',
     'pyramid_beaker==0.7',
     'pyramid_debugtoolbar==1.0.4',
