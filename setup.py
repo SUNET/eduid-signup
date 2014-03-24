@@ -12,19 +12,20 @@ version = '0.2.0'
 
 requires = [
     'eduid_am==0.4.2',
-    'wsgi_ratelimit',
-    'vccs_client==0.3',
+    'wsgi_ratelimit==0.1',
+    'vccs_client==0.4.1',
     'pymongo==2.6.3',
-    'pyramid==1.4',
+    'pyramid==1.4.1',
     'pyramid_beaker==0.7',
     'pyramid_debugtoolbar==1.0.4',
     'pyramid_jinja2==1.6',
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
-    'pyramid_sna==0.2',
+    'pyramid_sna==0.3.1',
     'waitress==0.8.2',
     'recaptcha-client==1.0.6',
     'pwgen==0.4',
+    'proquint==0.1.0',
 ]
 
 if sys.version_info[0] < 3:

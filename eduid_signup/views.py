@@ -5,9 +5,13 @@ from recaptcha.client import captcha
 from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
-from pyramid.httpexceptions import HTTPFound, HTTPMethodNotAllowed
+from pyramid.httpexceptions import (HTTPFound, HTTPNotFound,
+                                    HTTPMethodNotAllowed, HTTPBadRequest,)
+from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
+from pyramid.settings import asbool
+from pyramid.response import FileResponse
 
 from wsgi_ratelimit import is_ratelimit_reached
 
@@ -15,6 +19,7 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.emails import send_verification_mail, send_credentials
 from eduid_signup.validators import validate_email, ValidationError
+from eduid_signup.sna_callbacks import create_or_update_sna
 from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
                                 CodeDoesNotExists)
@@ -40,7 +45,15 @@ def get_url_from_email_status(request, email):
         request.session['email'] = email
         namedview = EMAIL_STATUS_VIEWS[status]
     url = request.route_url(namedview)
+
     return HTTPFound(location=url)
+
+
+@view_config(name='favicon.ico')
+def favicon_view(context, request):
+    path = os.path.dirname(__file__)
+    icon = os.path.join(path, 'static', 'favicon.ico')
+    return FileResponse(icon, request=request)
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
@@ -105,7 +118,7 @@ def trycaptcha(request):
 
 
 @view_config(route_name='success', renderer="templates/success.jinja2")
-def success(request):
+def success(context, request):
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
@@ -134,6 +147,7 @@ def resend_email_verification(context, request):
         if email:
             send_verification_mail(request, email)
             url = request.route_url('success')
+
             return HTTPFound(location=url)
 
     return {}
@@ -148,12 +162,63 @@ def already_registered(context, request):
     }
 
 
+@view_config(route_name='review_fetched_info',
+             renderer='templates/review_fetched_info.jinja2')
+def review_fetched_info(context, request):
+
+    if not 'social_info' in request.session:
+        raise HTTPBadRequest()
+
+    social_info = request.session.get('social_info', {})
+    email = social_info.get('email', None)
+
+    mail_registered = False
+    if email:
+        signup_user = request.db.registered.find_one({
+            "email": email,
+            "verified": True
+        })
+
+        try:
+            am_user_exists = request.userdb.exists_by_filter({
+                'mailAliases': {
+                    '$elemMatch': {
+                        'email': email,
+                        'verified': True
+                    }
+                }
+            })
+        except request.userdb.exceptions.UserDoesNotExist:
+            am_user_exists = None
+
+        mail_registered = signup_user or am_user_exists
+
+    if request.method == 'GET':
+        return {
+            'social_info': social_info,
+            'mail_registered': mail_registered,
+            'mail_empty': not email,
+            'reset_password_link': request.registry.settings['reset_password_link'],
+        }
+
+    else:
+        if request.POST.get('action', 'cancel') == 'accept':
+            create_or_update_sna(request)
+            raise HTTPFound(location=request.route_url('sna_account_created'))
+        else:
+            if request.session is not None:
+                request.session.delete()
+            headers = forget(request)
+            raise HTTPFound(location=request.route_url('home'),
+                            headers=headers)
+
+
 def registered_completed(request, user, context=None):
     if context is None:
         context = {}
-    password_id = str(ObjectId())
+    password_id = ObjectId()
     (password, salt) = generate_password(request.registry.settings,
-                                         password_id, user,
+                                         str(password_id), user,
                                          )
     request.db.registered.update(
         {
@@ -284,7 +349,7 @@ def help(request):
     # as well as this template
 
     locale_name = get_locale_name(request)
-    template = 'eduid_signup:templates/help-%s.jinja2' % locale_name
+    template = 'templates/help-%s.jinja2' % locale_name
 
     return render_to_response(template, {}, request=request)
 
@@ -308,3 +373,30 @@ def exception_view(context, request):
 def not_found_view(context, request):
     request.response.status = 404
     return {}
+
+
+@view_config(route_name='set_language', request_method='GET')
+def set_language(context, request):
+    settings = request.registry.settings
+    lang = request.GET.get('lang', 'en')
+    if lang not in settings['available_languages']:
+        return HTTPNotFound()
+
+    url = request.environ.get('HTTP_REFERER', None)
+    if url is None:
+        url = request.route_path('home')
+    response = HTTPFound(location=url)
+
+    cookie_domain = settings.get('lang_cookie_domain', None)
+    cookie_name = settings.get('lang_cookie_name')
+
+    extra_options = {}
+    if cookie_domain is not None:
+        extra_options['domain'] = cookie_domain
+
+    extra_options['httponly'] = asbool(settings.get('session.httponly'))
+    extra_options['secure'] = asbool(settings.get('session.secure'))
+
+    response.set_cookie(cookie_name, value=lang, **extra_options)
+
+    return response

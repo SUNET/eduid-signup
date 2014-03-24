@@ -13,7 +13,7 @@
       <form class="form-inline" method="POST">
        <div class="control-group{% if email_error is defined %} error{% endif %}">
         <div class="input-append">
-          <input type="email" name="email" placeholder="you@example.com" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
+          <input type="email" name="email" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
@@ -25,20 +25,85 @@
   </div>
   <div class="row text-center">
     <div id="social-register" class="span12">
-      {% if request.registry.settings['facebook_auth_enabled'] %}
+      {% if request.registry.settings.get('facebook_auth_enabled', False) %}
         <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
           <span class="btn-icon"></span>
           <span class="btn-text">{{ _("Sign up with Facebook") }}</span>
         </a>
       {% endif %}
-      {% if request.registry.settings['google_auth_enabled'] %}
+      {% if request.registry.settings.get('google_auth_enabled', False) %}
         <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">
           <span class="btn-icon"></span>
           <span class="btn-text">{{ _("Sign up with Google") }}</span>
+        </a>
+      {% endif %}
+      {% if request.registry.settings.get('liveconnect_auth_enabled', False) %}
+        <a class="btn-social btn-liveconnect" href="{{ request.route_path('liveconnect_login') }}">
+          <span class="btn-icon"></span>
+          <span class="btn-text">{{ _("Sign up with Microsoft Live Connect") }}</span>
         </a>
       {% endif %}
     </div>
   </div>
 </div>
 
+<div class="modal hide fade aup">
+    {% include "acceptable_use_policy-{0}.jinja2".format(request.locale) %}
+    <div class="modal-footer">
+        <a href="#reject" class="btn btn-danger">{{  _("Reject") }}</a>
+        <a href="#accept" class="btn btn-success">{{ _("Accept") }}</a>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block extrajs %}
+<script>
+$(function () {
+    "use strict";
+
+    var prepare_modal = function (e, callback) {
+            e.preventDefault();
+
+            $('.aup a[href=#reject]').off().click(function (e) {
+                e.preventDefault();
+                $('.aup').modal('hide');
+            });
+
+            $('.aup a[href=#accept]').click(callback);
+
+            $('.aup').modal('show');
+        };
+
+    $(document).ready(function () {
+        $('a.btn-social').click(function (e) {
+            var login_action = e.target;
+
+            prepare_modal(e, function (e) {
+                var loc;
+                e.preventDefault();
+
+                if ('href' in login_action) {
+                    loc = login_action.href;
+                } else {
+                    loc = $(login_action).parents('a').attr('href');
+                }
+
+                document.location = loc;
+            });
+        });
+        $('#email-register button[type=submit]').click(function (e) {
+            var login_action = e.target;
+
+            prepare_modal(e, function (e) {
+                e.preventDefault();
+                $(login_action).parents('form').submit();
+            });
+        });
+    });
+
+}());
+</script>
 {% endblock %}

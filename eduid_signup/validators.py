@@ -1,6 +1,7 @@
 import re
 
 from eduid_signup.i18n import TranslationString as _
+from eduid_signup.utils import normalize_email
 
 
 # http://www.regular-expressions.info/email.html
@@ -17,7 +18,7 @@ class ValidationError(Exception):
 
 
 def validate_email_format(email):
-    return RFC2822_email.match(email.lower())
+    return RFC2822_email.match(email)
 
 
 def validate_email(db, data):
@@ -27,6 +28,7 @@ def validate_email(db, data):
     except KeyError:
         raise ValidationError(_("Email is required"))
 
+    email = normalize_email(email)
     if not validate_email_format(email):
         raise ValidationError(_("Email is not valid"), email)
 

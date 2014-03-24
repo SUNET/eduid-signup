@@ -62,6 +62,11 @@
     background: url("../img/facebook_icon_32.png") no-repeat scroll 10px 50% transparent;
 }
 
+.btn-liveconnect .btn-icon {
+    background: url("../img/liveconnect_icon_32.png") no-repeat scroll 10px 50% transparent;
+    padding-right: 3px;
+}
+
 .btn-google {
     background-color: rgb(204, 55, 50);
 }
@@ -76,6 +81,14 @@
 
 .btn-facebook:hover {
     background-color: rgb(114, 136, 181);
+}
+
+.btn-liveconnect {
+    background-color: rgb(38, 114, 236);
+}
+
+.btn-liveconnect:hover {
+    background-color: rgb(30, 93, 194);
 }
 
 .pre-big {
@@ -96,7 +109,40 @@
 }
 
 .masthead img {
+  max-width: 108px;
   max-height: 110px;
+}
+
+
+div.falseform .uneditable-input {
+  color: #555;
+}
+
+body div.falseform {
+  width: 620px;
+}
+
+.nav-pills li.nav-separator {
+  height: 34px;
+  width: 0px;
+  border-left: solid rgb(0, 136, 204) 1px;
+  display: inline-block;
+}
+
+form.accept-cancel {
+  margin-top: 20px;
+}
+
+div#footer span.langselector {
+  color: rgb(85, 85, 85);;
+  display: inline-block;
+  height: 14px;
+  line-height: 14px;
+  margin-bottom: 2px;
+  margin-right: 2px;
+  margin-top: 2px;
+  padding: 4px;
+  text-align: left;
 }
 
 /* Bottom footer styles

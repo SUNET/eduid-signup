@@ -10,6 +10,7 @@
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link href="{{'eduid_signup:static/css/bootstrap-2.3.1.min.css'|static_url}}" rel="stylesheet" media="screen">
     <link href="{{'eduid_signup:static/css/screen.css'|static_url}}" rel="stylesheet" media="screen">
   </head>
@@ -20,7 +21,10 @@
          <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
          <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
        </ul>
-       <a href="{{ request.route_path('home') }}"><img src="{{'eduid_signup:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
+       <a href="https://www.eduid.se/"><img src="{{'eduid_signup:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
+       <a href="http://www.sunet.se/" target="_blank">
+           <img src="{{'eduid_signup:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
+       </a>
      </div>
      {% block contents %}
 
@@ -32,17 +36,24 @@
 
    <div class="clearfix"></div>
 
-   <div class="footer">
+   <div id="footer">
     <div class="container">
-     <p>&copy; SUNET 2013</p>
+        <p>
+            &copy; SUNET 2013-2014
+            <span class="pull-right">
+            {% for lang, label in request.registry.settings.get('available_languages', {}).items() %}
+                <span class="langselector">
+                    {% if request.locale == lang %}
+                        <span>{{ label }}</span>
+                    {% else %}
+                        <a href="{{ request.route_path('set_language')}}?lang={{lang}}">{{ label }}</a>
+                    {% endif %}
+                </span>
+            {% endfor %}
+            </span>
+        </p>
     </div>
    </div>
-
-   <div id="getsat-widget-6824"></div>
-   <script type="text/javascript" src="https://loader.engage.gsfn.us/loader.js"></script>
-   <script type="text/javascript">
-      if (typeof GSFN !== "undefined") { GSFN.loadWidget(6824,{"containerId":"getsat-widget-6824"}); }
-   </script>
 
     {% block extrajs %}
     {% endblock %}
