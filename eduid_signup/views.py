@@ -221,9 +221,11 @@ def review_fetched_info(context, request):
         try:
             am_user = request.userdb.get_user_by_email(email)
         except request.userdb.exceptions.UserDoesNotExist:
-            am_user = None
+            pass
+        else:
+            raise HTTPFound(location=request.route_url('email_already_registered'))
 
-        mail_registered = signup_user or am_user
+        mail_registered = signup_user
 
     if request.method == 'GET':
         return {
@@ -235,7 +237,7 @@ def review_fetched_info(context, request):
 
     elif email:
         if request.POST.get('action', 'cancel') == 'accept':
-            create_or_update_sna(request, social_info, signup_user, am_user)
+            create_or_update_sna(request, social_info, signup_user)
             raise HTTPFound(location=request.route_url('sna_account_created'))
         else:
             if request.session is not None:

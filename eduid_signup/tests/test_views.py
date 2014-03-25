@@ -149,8 +149,9 @@ class SNATests(MongoTestCase):
 
         res = self.testapp.get('/review_fetched_info/')
         self.assertEqual(self.db.registered.find({}).count(), 0)
-        res = res.form.submit('action')
+        #res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/email_already_registered/')
         self.assertEqual(self.db.registered.find({}).count(), 0)
 
     def test_google_retry(self):
