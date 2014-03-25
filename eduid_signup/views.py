@@ -37,6 +37,17 @@ EMAIL_STATUS_VIEWS = {
 
 
 def get_url_from_email_status(request, email):
+    '''
+    Return a view depending on
+    the verification status of the provided email.
+
+    :param request: the request
+    :type request: WebOb Request
+    :param email: the email
+    :type email: string
+
+    :return: redirect response
+    '''
     status = check_email_status(request.db, email)
     if status == 'new':
         send_verification_mail(request, email)
@@ -58,6 +69,14 @@ def favicon_view(context, request):
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
+    '''
+    Home view.
+    If request.method is GET, 
+    return the initial signup form.
+    If request.method is POST, 
+    validate the sent email and
+    redirects as appropriate.
+    '''
     context = {}
     if request.method == 'POST':
         try:
@@ -81,6 +100,10 @@ def home(request):
 
 @view_config(route_name='trycaptcha', renderer='templates/trycaptcha.jinja2')
 def trycaptcha(request):
+    '''
+    After too many attempts to signup have been tried,
+    present a captcha before allowing any more attempts.
+    '''
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
@@ -119,6 +142,10 @@ def trycaptcha(request):
 
 @view_config(route_name='success', renderer="templates/success.jinja2")
 def success(context, request):
+    '''
+    After a successful operation with no
+    immediate follow up on the web.
+    '''
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
@@ -142,6 +169,10 @@ def success(context, request):
 @view_config(route_name='resend_email_verification',
              renderer='templates/resend_email_verification.jinja2')
 def resend_email_verification(context, request):
+    '''
+    The user has no yet verified the email address.
+    Send a verification message to the address so it can be verified.
+    '''
     if request.method == 'POST':
         email = request.session.get('email', '')
         if email:
@@ -156,6 +187,10 @@ def resend_email_verification(context, request):
 @view_config(route_name='email_already_registered',
              renderer='templates/already_registered.jinja2')
 def already_registered(context, request):
+    '''
+    There is already an account with that address.
+    Return a link to reset the password for that account.
+    '''
     return {
         'reset_password_link': request.registry.settings.get(
             'reset_password_link', '#'),
@@ -165,6 +200,10 @@ def already_registered(context, request):
 @view_config(route_name='review_fetched_info',
              renderer='templates/review_fetched_info.jinja2')
 def review_fetched_info(context, request):
+    '''
+    Once user info has been retrieved from a social network,
+    present it to the user so she can review and accept it.
+    '''
 
     if not 'social_info' in request.session:
         raise HTTPBadRequest()
@@ -209,6 +248,14 @@ def review_fetched_info(context, request):
 
 
 def registered_completed(request, user, context=None):
+    '''
+    After a successful registration
+    (through the mail or through a social network),
+    generate a password,
+    add it to the registration record in the registrations db,
+    update the attribute manager db with the new account,
+    and send the pertinent information to the user.
+    '''
     if context is None:
         context = {}
     password_id = ObjectId()
@@ -270,6 +317,10 @@ def registered_completed(request, user, context=None):
 @view_config(route_name='email_verification_link',
              renderer="templates/account_created.jinja2")
 def email_verification_link(context, request):
+    '''
+    View for the link sent to the user's mail
+    so that she can verify the address she has provided.
+    '''
 
     try:
         verify_email_code(request.db.registered, context.code)
@@ -295,6 +346,9 @@ def email_verification_link(context, request):
 @view_config(route_name='verification_code_form',
              renderer="templates/verification_code_form.jinja2")
 def verification_code_form(context, request):
+    '''
+    form to enter the verification code
+    '''
     context = {}
     if request.method == 'POST':
         try:
@@ -328,6 +382,10 @@ def verification_code_form(context, request):
 @view_config(route_name='sna_account_created',
              renderer="templates/account_created.jinja2")
 def account_created_from_sna(context, request):
+    '''
+    View where the registration from a social network is completed,
+    after the user has reviewed the information fetched from the s.n.
+    '''
 
     user = request.db.registered.find_one({
         'email': request.session.get('email')
@@ -338,6 +396,9 @@ def account_created_from_sna(context, request):
 
 @view_config(route_name='help')
 def help(request):
+    '''
+    help view
+    '''
     # We don't want to mess up the gettext .po file
     # with a lot of strings which don't belong to the
     # application interface.
