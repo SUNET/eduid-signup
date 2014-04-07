@@ -245,6 +245,11 @@ def registered_completed(request, user, context=None):
     timestamp = '{:x}'.format(int(time.time()))
     nonce = os.urandom(16).encode('hex')
 
+    # TODO
+    # Should add spinner here to make sure we can read back the user using eduid_am
+    # before proceeding. If the attribute manager is not working allright the user will
+    # be sent to dashboard using auth_token link below, but dashboard won't find the user.
+
     auth_token = generate_auth_token(secret, email, nonce, timestamp)
 
     context.update({
