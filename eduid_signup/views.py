@@ -240,7 +240,7 @@ def registered_completed(request, user, context=None):
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', str(user_id))
 
-    email = user.get('email')
+    eppn = user.get('eduPersonPrincipalName')
     secret = request.registry.settings.get('auth_shared_secret')
     timestamp = '{:x}'.format(int(time.time()))
     nonce = os.urandom(16).encode('hex')
@@ -250,12 +250,12 @@ def registered_completed(request, user, context=None):
     # before proceeding. If the attribute manager is not working allright the user will
     # be sent to dashboard using auth_token link below, but dashboard won't find the user.
 
-    auth_token = generate_auth_token(secret, email, nonce, timestamp)
+    auth_token = generate_auth_token(secret, eppn, nonce, timestamp)
 
     context.update({
         "profile_link": request.registry.settings.get("profile_link", "#"),
         "password": password,
-        "email": email,
+        "email": eppn,
         "nonce": nonce,
         "timestamp": timestamp,
         "auth_token": auth_token,
@@ -267,7 +267,7 @@ def registered_completed(request, user, context=None):
     logger.debug("Context Finish URL : {!r}".format(context.get('finish_url')))
 
     if request.registry.settings.get("email_credentials", False):
-        send_credentials(request, email, password)
+        send_credentials(request, eppn, password)
 
     return context
 

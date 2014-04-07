@@ -82,6 +82,7 @@ def generate_auth_token(shared_key, email, nonce, timestamp, generator=sha256):
         The shared_key is a secret between the two systems
         The public word must must go through form POST or GET
     """
+    logger.info("Generating auth-token for user {!r}, nonce {!r}, ts {!r}".format(email, nonce, timestamp))
     return generator("{0}|{1}|{2}|{3}".format(
         shared_key, email, nonce, timestamp)).hexdigest()
 
