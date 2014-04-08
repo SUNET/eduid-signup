@@ -13,7 +13,11 @@ def locale_negotiator(request):
     if cookie_lang and cookie_lang in available_languages:
         return cookie_lang
 
-    return request.accept_language.best_match(available_languages)
+    locale_name = request.accept_language.best_match(available_languages)
+
+    if locale_name not in available_languages:
+        locale_name = settings.get('default_locale_name', 'sv')
+    return locale_name
 
 
 def add_localizer(event):
