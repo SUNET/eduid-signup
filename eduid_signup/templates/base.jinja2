@@ -25,7 +25,21 @@
        <a href="http://www.sunet.se/" target="_blank">
            <img src="{{'eduid_signup:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
        </a>
+       <div class="clear-right"></div>
      </div>
+
+     <div class="messages-wrapper">
+       <div class="messages">
+       {% for message in request.session.pop_flash() %}
+         <div class="alert">
+           <button type="button" class="close" data-dismiss="alert">&times;</button>
+           {{ message }}
+         </div>
+       {% endfor %}
+       </div>
+     </div>
+
+
      {% block contents %}
 
      {% endblock %}
