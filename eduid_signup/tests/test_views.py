@@ -1,5 +1,6 @@
 from mock import patch
 import pymongo
+import unittest
 from pyramid_sna.compat import urlparse
 
 from webtest import TestApp
