@@ -48,7 +48,7 @@ def get_url_from_email_status(request, email):
 
     :return: redirect response
     '''
-    status = check_email_status(request.db, email)
+    status = check_email_status(request.userdb, email)
     if status == 'new':
         send_verification_mail(request, email)
         namedview = 'success'

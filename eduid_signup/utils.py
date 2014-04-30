@@ -57,7 +57,7 @@ def verify_email_code(collection, code):
     return True
 
 
-def check_email_status(db, email):
+def check_email_status(userdb, email):
     """
         Check the email registration status.
 
@@ -67,14 +67,15 @@ def check_email_status(db, email):
 
         If exists and it has been verified before, then return 'verified'.
     """
-
-    email = db.registered.find_one({'email': email})
-    if not email:
+    try:
+        am_user = userdb.get_user_by_email(email)
+    except userdb.exceptions.UserDoesNotExist:
         return 'new'
-    if email.get('verified', False):
-        return 'verified'
-    else:
-        return 'not_verified'
+    emails = am_user.get_mail_aliases()
+    for mail in emails:
+        if mail.get('email', '') == email and mail.get('verified', False):
+            return 'verified'
+    return 'not_verified'
 
 
 def generate_auth_token(shared_key, email, nonce, timestamp, generator=sha256):
