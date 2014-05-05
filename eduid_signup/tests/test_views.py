@@ -1,3 +1,4 @@
+import time
 from mock import patch
 import pymongo
 import unittest
@@ -135,6 +136,13 @@ class SNATests(MongoTestCase):
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(self.db.registered.find({}).count(), 1)
+        from eduid_am.db import MongoDB
+        with patch.object(MongoDB, 'get_database', clear=True):
+            MongoDB.get_database.return_value = self.db
+            res = self.testapp.get(res.location)
+            time.sleep(0.1)
+            self.assertEqual(self.db.registered.find({}).count(), 0)
+
 
     def test_google_existing_user(self):
         # call the login to fill the session
