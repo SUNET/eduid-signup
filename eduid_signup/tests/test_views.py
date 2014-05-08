@@ -89,18 +89,30 @@ class SNATests(MongoTestCase):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
         super(SNATests, self).setUp()
+        mongo_settings = {
+            'mongo_uri_tou': self.am_settings['MONGO_URI'] + 'tou',
+            'tou_version': '2014-v1',
+        }   
+
+        if getattr(self, 'settings', None) is None:
+            self.settings = mongo_settings
+        else:
+            self.settings.update(mongo_settings)
         try:
             app = main({}, **SETTINGS)
             self.testapp = TestApp(app)
             self.db = app.registry.settings['mongodb'].get_database()
+            self.toudb = app.registry.settings['mongodb_tou'].get_database()
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
         self.db.registered.drop()
+        self.toudb.consent.drop()
 
     def tearDown(self):
         super(SNATests, self).tearDown()
         self.testapp.reset()
         self.db.registered.drop()
+        self.toudb.consent.drop()
 
     def _google_callback(self, state, user):
 
@@ -133,6 +145,7 @@ class SNATests(MongoTestCase):
 
         res = self.testapp.get('/review_fetched_info/')
         self.assertEqual(self.db.registered.find({}).count(), 0)
+        self.assertEqual(self.toudb.consent.find({}).count(), 0)
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(self.db.registered.find({}).count(), 1)
@@ -142,7 +155,7 @@ class SNATests(MongoTestCase):
             res = self.testapp.get(res.location)
             time.sleep(0.1)
             self.assertEqual(self.db.registered.find({}).count(), 0)
-
+            self.assertEqual(self.toudb.consent.find({}).count(), 1)
 
     def test_google_existing_user(self):
         # call the login to fill the session

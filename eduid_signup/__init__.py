@@ -20,8 +20,11 @@ def includeme(config):
     if mongo_replicaset is not None:
         mongodb = MongoDB(config.registry.settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
+        mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'],
+                          replicaSet=mongo_replicaset)
     else:
         mongodb = MongoDB(config.registry.settings['mongo_uri'])
+        mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'])
     # Create mongodb client instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
     config.registry.settings['mongodb'] = mongodb
@@ -33,6 +36,11 @@ def includeme(config):
     _userdb = UserDB(config.registry.settings)
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
+
+    # store mongodb tou client instance in our config,
+    # and make a getter lambda for pyramid to retreive it
+    config.registry.settings['mongodb_tou'] = mongodb_tou
+    config.add_request_method(lambda x: x.registry.settings['mongodb_tou'].get_database(), 'toudb', reify=True)
 
     # root views
     config.add_route('home', '/')
@@ -93,6 +101,7 @@ def main(global_config, **settings):
     for item in (
         'mongo_uri',
         'mongo_uri_am',
+        'mongo_uri_tou',
         'profile_link',
         'site.name',
         'reset_password_link',

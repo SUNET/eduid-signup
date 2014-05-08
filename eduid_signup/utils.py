@@ -110,3 +110,26 @@ def generate_eppn(request):
 
 def normalize_email(addr):
     return addr.lower()
+
+
+def record_tou(request, user_id, source):
+    """
+    Record user acceptance of terms of use.
+
+    :param request: The request
+    :type request: Request
+    :param user_id: the _id of the user that has accepted the ToU
+    :type user_id: ObjectId
+    :param source: An identificator for the proccess during which the user has accepted the ToU (e.g., "signup")
+    :type source: str
+    :return:
+    :rtype: string
+    """
+    tou_version = request.registry.settings['tou_version']
+    request.toudb.consent.save({
+        'user_id': user_id,
+        'eduid_ToU': {tou_version: 
+            {'ts': datetime.datetime.utcnow(),
+            'source': source},
+        }
+    }, safe=True)
