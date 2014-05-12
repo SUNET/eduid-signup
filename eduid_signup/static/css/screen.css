@@ -1,9 +1,13 @@
-/* No script message */
+/* No javascript */
 div#no-script {
     text-align: center;
     color: #CC3732;
 }
-/* End no script message */
+
+div#content-block {
+    display: none;
+}
+/* End no javascript */
 
 
 /* Main marketing message and sign up button */
