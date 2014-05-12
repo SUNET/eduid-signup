@@ -26,9 +26,12 @@
            <img src="{{'eduid_signup:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
        </a>
      </div>
-     {% block contents %}
+     <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
+     <div id="content-block">
+       {% block contents %}
 
-     {% endblock %}
+       {% endblock %}
+     </div>
    </div>
    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
    <script>window.jQuery || document.write('<script src=\'{{"eduid_signup:static/js/libs/jquery-1.9.1.min.js"|static_url}}\'><\/script>')</script>
@@ -54,6 +57,9 @@
         </p>
     </div>
    </div>
+   <script type="text/javascript">
+       $(document).ready(function () {$('div#content-block').show()});
+   </script>
 
     {% block extrajs %}
     {% endblock %}
