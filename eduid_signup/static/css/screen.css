@@ -1,3 +1,11 @@
+/* No script message */
+div#no-script {
+    text-align: center;
+    color: #CC3732;
+}
+/* End no script message */
+
+
 /* Main marketing message and sign up button */
 .jumbotron {
     margin: 60px 0;
