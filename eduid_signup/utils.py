@@ -122,8 +122,6 @@ def record_tou(request, user_id, source):
     :type user_id: ObjectId
     :param source: An identificator for the proccess during which the user has accepted the ToU (e.g., "signup")
     :type source: str
-    :return:
-    :rtype: string
     """
     tou_version = request.registry.settings['tou_version']
     request.toudb.consent.save({
