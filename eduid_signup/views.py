@@ -22,7 +22,7 @@ from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.sna_callbacks import create_or_update_sna
 from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
-                                CodeDoesNotExists)
+                                CodeDoesNotExists, record_tou)
 from eduid_signup.vccs import generate_password
 
 import logging
@@ -312,6 +312,10 @@ def registered_completed(request, user, context=None):
 
     if request.registry.settings.get("email_credentials", False):
         send_credentials(request, eppn, password)
+
+    # Record the acceptance of the terms of use
+
+    record_tou(request, user_id, 'signup')
 
     return context
 

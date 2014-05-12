@@ -13,6 +13,7 @@ from eduid_signup import main
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
 MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
+MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
 
 
 class DBTests(unittest.TestCase):
@@ -43,6 +44,8 @@ SETTINGS = {
     'session.cookie_expires': '3600',
     'mongo_uri': MONGO_URI_TEST,
     'mongo_uri_am': MONGO_URI_TEST_AM,
+    'mongo_uri_tou': MONGO_URI_TEST_TOU,
+    'tou_version': '2014-v1',
     'testing': True,
     'jinja2.directories': 'eduid_signup:templates',
     'jinja2.undefined': 'strict',
