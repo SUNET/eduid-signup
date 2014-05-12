@@ -145,7 +145,6 @@ class SNATests(MongoTestCase):
 
         res = self.testapp.get('/review_fetched_info/')
         self.assertEqual(self.db.registered.find({}).count(), 0)
-        self.assertEqual(self.toudb.consent.find({}).count(), 0)
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(self.db.registered.find({}).count(), 1)
@@ -155,7 +154,25 @@ class SNATests(MongoTestCase):
             res = self.testapp.get(res.location)
             time.sleep(0.1)
             self.assertEqual(self.db.registered.find({}).count(), 0)
-            self.assertEqual(self.toudb.consent.find({}).count(), 1)
+
+    def test_google_tou(self):
+        # call the login to fill the session
+        res = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        self.assertEqual(res.status, '302 Found')
+        url = urlparse.urlparse(res.location)
+        query = urlparse.parse_qs(url.query)
+        state = query['state'][0]
+
+        self._google_callback(state, NEW_USER)
+
+        res = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.toudb.consent.find({}).count(), 0)
+        res = res.form.submit('action')
+        self.assertEqual(res.status, '302 Found')
+        self.testapp.get(res.location)
+        self.assertEqual(self.toudb.consent.find({}).count(), 1)
 
     def test_google_existing_user(self):
         # call the login to fill the session
