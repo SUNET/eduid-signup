@@ -266,7 +266,7 @@ def registered_completed(request, user, context=None):
                                          )
     request.db.registered.update(
         {
-            'email': user.get('email'),
+            'eduPersonPrincipalName': user.get('eduPersonPrincipalName'),
         }, {
             '$push': {
                 'passwords': {
@@ -299,7 +299,8 @@ def registered_completed(request, user, context=None):
     context.update({
         "profile_link": request.registry.settings.get("profile_link", "#"),
         "password": password,
-        "email": eppn,
+        "email": user.get('email'),
+        "eppn": eppn,
         "nonce": nonce,
         "timestamp": timestamp,
         "auth_token": auth_token,
