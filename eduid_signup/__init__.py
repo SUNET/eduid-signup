@@ -158,6 +158,8 @@ def main(global_config, **settings):
 
     if 'testing' in settings and asbool(settings['testing']):
         config.include('pyramid_mailer.testing')
+    elif 'development' in settings and asbool(settings['development']):
+        config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')
 
