@@ -7,6 +7,7 @@
     </div>
 
     <div class="row">
+      <div class="span2"></div>
       <div class="span8">
         {% if not mail_empty and not mail_registered %}
         <p>{% trans %} No account has been created in eduID yet. If the data below is
@@ -34,55 +35,61 @@
             Click <strong>Cancel</strong> if it is not correct.{% endtrans %}
         </p>
       </div>
+      <div class="span2"></div>
     </div>
 
-    <div class="falseform well well-small">
-      <div class='row'>
-        <div class="span4">
-          <div class="control-group{% if mail_empty or mail_registered %} error{% endif %}">
-            <label class="control-lavel" for="email">{{_("Email")}}</label>
-            <div class="controls">
-              <span class="input-xlarge uneditable-input">{{ social_info.email }}</span>
-              {% if mail_registered %}
-                <span class="help-block">{{ _("Email address already in use") }}</span>
-              {% elif mail_empty %}
-                <span class="help-block">{{ _("Email address is required, but none was received from social network") }}</span>
-              {% endif %}
+    <div class="row">
+      <div class="span2"></div>
+        <div class="falseform well well-small span8">
+          <div class='row'>
+            <div class="span4">
+              <div class="control-group{% if mail_empty or mail_registered %} error{% endif %}">
+                <label class="control-lavel" for="email">{{_("Email")}}</label>
+                <div class="controls">
+                  <span class="input-xlarge uneditable-input">{{ social_info.email }}</span>
+                  {% if mail_registered %}
+                    <span class="help-block">{{ _("Email address already in use") }}</span>
+                  {% elif mail_empty %}
+                    <span class="help-block">{{ _("Email address is required, but none was received from social network") }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class='span4'>
+              <div class="control-group">
+                <label class="control-lavel" for="screenname">{{_("Display name")}}</label>
+                <div class="controls">
+                  <span class="input-xlarge uneditable-input">{{ social_info.screen_name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class='span4'>
+              <div class="control-group">
+                <label class="control-lavel" for="firstname">{{_("First name")}}</label>
+                <div class="controls">
+                  <span class="input-xlarge uneditable-input">{{ social_info.first_name }}</span>
+                </div>
+              </div>
+            </div>
+            <div class='span4'>
+              <div class="control-group">
+                <label class="control-lavel" for="lastname">{{_("Last name")}}</label>
+                <div class="controls">
+                  <span class="input-xlarge uneditable-input">{{ social_info.last_name }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class='span4'>
-          <div class="control-group">
-            <label class="control-lavel" for="screenname">{{_("Display name")}}</label>
-            <div class="controls">
-              <span class="input-xlarge uneditable-input">{{ social_info.screen_name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class='span4'>
-          <div class="control-group">
-            <label class="control-lavel" for="firstname">{{_("First name")}}</label>
-            <div class="controls">
-              <span class="input-xlarge uneditable-input">{{ social_info.first_name }}</span>
-            </div>
-          </div>
-        </div>
-        <div class='span4'>
-          <div class="control-group">
-            <label class="control-lavel" for="lastname">{{_("Last name")}}</label>
-            <div class="controls">
-              <span class="input-xlarge uneditable-input">{{ social_info.last_name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="span2"></div>
     </div>
     <div class="row">
+      <div class="span2"></div>
       <form class="form-horizontal accept-cancel span8" method="POST">
           <div class="control-group">
-             <button class="btn btn-danger" name="action" type="submit" value="cancel">{{ _("Cancel") }}</button>
+             <button class="btn btn-danger" name="cancel" type="submit" value="cancel">{{ _("Cancel") }}</button>
              <button class="btn btn-success pull-right" name="action" type="submit"
               {% if mail_registered or mail_empty %}
                 disabled value="disabled"
@@ -91,5 +98,6 @@
               {% endif %}>{{ _("Accept") }}</button>
           </div>
       </form>
+      <div class="span2"></div>
     </div>
 {% endblock %}

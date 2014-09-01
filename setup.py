@@ -8,10 +8,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-version = '0.2.10-dev'
+version = '0.3.3-dev'
 
 requires = [
-    'eduid_am==0.4.3',
+    'eduid_am==0.4.8-dev',
     'wsgi_ratelimit==0.1',
     'vccs_client==0.4.1',
     'pymongo==2.6.3',
@@ -35,6 +35,8 @@ if sys.version_info[0] < 3:
 
 test_requires = [
     'WebTest==1.4.3',
+    'mock==1.0.1',
+    'eduid_signup_amp==0.2.5',
 ]
 
 
@@ -46,6 +48,7 @@ docs_extras = [
 testing_extras = test_requires + [
     'nose==1.2.1',
     'coverage==3.6',
+    'nosexcover==1.0.8',
 ]
 
 

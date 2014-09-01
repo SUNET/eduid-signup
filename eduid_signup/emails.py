@@ -64,6 +64,10 @@ def send_verification_mail(request, email):
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', str(user_id))
+    # Development
+    if request.registry.settings.get("development", '') == 'true':
+        for mail in mailer.outbox:
+            print mail.body
 
 
 def send_credentials(request, email, password):
@@ -91,3 +95,7 @@ def send_credentials(request, email, password):
         ),
     )
     mailer.send(message)
+    # Development
+    if request.registry.settings.get("development", '') == 'true':
+        for mail in mailer.outbox:
+            print mail.body

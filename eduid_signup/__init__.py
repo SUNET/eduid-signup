@@ -10,42 +10,8 @@ from pyramid.i18n import get_locale_name
 from eduid_am.celery import celery
 from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
+from eduid_am.config import read_setting_from_env, read_mapping
 from eduid_signup.i18n import locale_negotiator
-
-def read_setting_from_env(settings, key, default=None):
-    env_variable = key.upper()
-    if env_variable in os.environ:
-        return os.environ[env_variable]
-    else:
-        return settings.get(key, default)
-
-
-def read_mapping(settings, prop, available_keys=None, default=None, required=True):
-    raw = read_setting_from_env(settings, prop, '')
-
-    if raw.strip() == '':
-        return default
-
-    rows = raw.strip('\n ').split('\n')
-
-    mapping = {}
-
-    for row in rows:
-        splitted_row = row.split('=')
-        key = splitted_row[0].strip()
-        if len(splitted_row) > 1:
-            value = splitted_row[1].strip()
-        else:
-            value = ''
-        if available_keys is None or key in available_keys:
-            mapping[key] = value
-
-    if available_keys is not None:
-        if (len(mapping.keys()) != len(available_keys) and
-                not 'testing' in settings):
-            return None
-
-    return mapping
 
 
 def includeme(config):
@@ -54,8 +20,11 @@ def includeme(config):
     if mongo_replicaset is not None:
         mongodb = MongoDB(config.registry.settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
+        mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'],
+                          replicaSet=mongo_replicaset)
     else:
         mongodb = MongoDB(config.registry.settings['mongo_uri'])
+        mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'])
     # Create mongodb client instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
     config.registry.settings['mongodb'] = mongodb
@@ -67,6 +36,11 @@ def includeme(config):
     _userdb = UserDB(config.registry.settings)
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
+
+    # store mongodb tou client instance in our config,
+    # and make a getter lambda for pyramid to retreive it
+    config.registry.settings['mongodb_tou'] = mongodb_tou
+    config.add_request_method(lambda x: x.registry.settings['mongodb_tou'].get_database(), 'toudb', reify=True)
 
     # root views
     config.add_route('home', '/')
@@ -127,6 +101,7 @@ def main(global_config, **settings):
     for item in (
         'mongo_uri',
         'mongo_uri_am',
+        'mongo_uri_tou',
         'profile_link',
         'site.name',
         'reset_password_link',
@@ -182,6 +157,8 @@ def main(global_config, **settings):
     config.include('pyramid_jinja2')
 
     if 'testing' in settings and asbool(settings['testing']):
+        config.include('pyramid_mailer.testing')
+    elif 'development' in settings and asbool(settings['development']):
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')

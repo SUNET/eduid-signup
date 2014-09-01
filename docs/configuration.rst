@@ -106,6 +106,33 @@ You can also set this option with an environment variable:
 
 The default value for this option is ``mongodb://localhost:27017/eduid_signup``
 
+Terms Of Use Database
+^^^^^^^^^^^^^^^^^^^^^
+This option allows you to customize the database location for the acceptance of the terms of use
+
+The syntax is defined in MongoDB reference documentation as the
+`Connection String URI Format <http://docs.mongodb.org/manual/reference/connection-string/>`_
+
+.. code-block:: ini
+
+   mongo_uri_tou = mongodb://localhost:27017/eduid_consent
+
+You can also set this option with an environment variable:
+
+.. code-block:: bash
+
+   $ export MONGO_URI_TOU=mongodb://localhost:27017/eduid_consent
+
+The default value for this option is ``mongodb://localhost:27017/eduid_consent``
+
+The current version for the terms of use is configured through the setting:
+
+.. code-block:: ini
+
+   tou_version = 2014-v1
+
+The default value for this option is ``2014-v1``
+
 Email
 ^^^^^
 The application uses an SMTP server to send verification emails when users

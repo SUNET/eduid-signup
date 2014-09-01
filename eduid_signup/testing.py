@@ -13,6 +13,7 @@ from eduid_signup import main
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
 MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
+MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
 
 
 class DBTests(unittest.TestCase):
@@ -34,37 +35,41 @@ class DBTests(unittest.TestCase):
             self.db.drop_collection(collection)
 
 
+SETTINGS = {
+    'profile_link': 'http://profiles.example.com/edit',
+    'reset_password_link': ' http://profiles.example.com/reset_password',
+    'site.name': 'Test Site',
+    'auth_tk_secret': '123456',
+    'auth_shared_secret': '123123',
+    'session.cookie_expires': '3600',
+    'mongo_uri': MONGO_URI_TEST,
+    'mongo_uri_am': MONGO_URI_TEST_AM,
+    'mongo_uri_tou': MONGO_URI_TEST_TOU,
+    'tou_version': '2014-v1',
+    'testing': True,
+    'jinja2.directories': 'eduid_signup:templates',
+    'jinja2.undefined': 'strict',
+    'jinja2.i18n.domain': 'eduid_signup',
+    'jinja2.filters': """
+route_url = pyramid_jinja2.filters:route_url_filter
+static_url = pyramid_jinja2.filters:static_url_filter
+""",
+    'vccs_url': 'http://localhost:8550/',
+    'google_client_id': '123',
+    'google_client_secret': 'abc',
+    'facebook_app_id': '456',
+    'facebook_app_secret': 'def',
+}
+
+
 class FunctionalTests(DBTests):
     """Base TestCase for those tests that need a full environment setup"""
 
     def setUp(self):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
-        settings = {
-            'profile_link': 'http://profiles.example.com/edit',
-            'reset_password_link': ' http://profiles.example.com/reset_password',
-            'site.name': 'Test Site',
-            'auth_tk_secret': '123456',
-            'auth_shared_secret': '123123',
-            'session.cookie_expires': '3600',
-            'mongo_uri': MONGO_URI_TEST,
-            'mongo_uri_am': MONGO_URI_TEST_AM,
-            'testing': True,
-            'jinja2.directories': 'eduid_signup:templates',
-            'jinja2.undefined': 'strict',
-            'jinja2.i18n.domain': 'eduid_signup',
-            'jinja2.filters': """
-    route_url = pyramid_jinja2.filters:route_url_filter
-    static_url = pyramid_jinja2.filters:static_url_filter
-""",
-            'vccs_url': 'http://localhost:8550/',
-            'google_client_id': '123',
-            'google_client_secret': 'abc',
-            'facebook_app_id': '456',
-            'facebook_app_secret': 'def',
-        }
         try:
-            app = main({}, **settings)
+            app = main({}, **SETTINGS)
             self.testapp = TestApp(app)
             self.db = app.registry.settings['mongodb'].get_database()
         except pymongo.errors.ConnectionFailure:
