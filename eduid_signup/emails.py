@@ -58,6 +58,9 @@ def send_verification_mail(request, email):
 
     mailer.send(message)
 
+    # XXX REMOVE THIS? otherwise users appear in eduid_am without 'passwords'
+    # so they can't log in but exceptions are logged in the IdP when they try
+
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', str(user_id))
