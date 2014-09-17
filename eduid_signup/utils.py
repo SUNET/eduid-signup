@@ -124,10 +124,14 @@ def record_tou(request, user_id, source):
     :type source: str
     """
     tou_version = request.registry.settings['tou_version']
-    request.toudb.consent.save({
-        'user_id': user_id,
-        'eduid_ToU': {tou_version: 
-            {'ts': datetime.datetime.utcnow(),
-            'source': source},
-        }
-    }, safe=True)
+    request.toudb.consent.update(
+        {'_id': user_id},
+        {'$push': {
+            'eduid_ToU': {
+                tou_version: {
+                    'ts': datetime.datetime.utcnow(),
+                    'source': source
+                }
+            }
+        }}
+        , safe=True, upsert=True)
