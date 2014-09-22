@@ -9,10 +9,10 @@
   <p class="lead">{{ _("Create an account for use with Swedish Universities.") }}</p>
 
   <div class="row text-center">
-    <div id="email-register" class="span12">
+    <div id="email-register" class="col-md-12">
       <form class="form-inline" method="POST">
-       <div class="control-group{% if email_error is defined %} error{% endif %}">
-        <div class="input-append">
+       <div class="form-group{% if email_error is defined %} has-error{% endif %}">
+        <div class="input-group">
           <input type="email" name="email" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
           {% if email_error is defined %}
@@ -24,7 +24,7 @@
     </div>
   </div>
   <div class="row text-center">
-    <div id="social-register" class="span12">
+    <div id="social-register" class="col-md-12">
       {% if request.registry.settings.get('facebook_auth_enabled', False) %}
         <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
           <span class="btn-icon"></span>

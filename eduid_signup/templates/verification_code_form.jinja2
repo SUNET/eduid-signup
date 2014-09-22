@@ -9,9 +9,9 @@
   <p class="lead">{{ _("Email address has already been verified") }}</p>
   <p class="lead">{{ _("Maybe you want to reset your password again?") }}</p>
   <div class="row">
-      <div class="span12">
+      <div class="col-md-12">
         <p class="text-center">
-          <a class="btn btn-success btn-large profile-link" href="{{ reset_password_link }}">
+          <a class="btn btn-success btn-lg profile-link" href="{{ reset_password_link }}">
               {{ _("Reset password") }}</a>
         </p>
       </div>
@@ -23,8 +23,8 @@
 
   <div class="row">
       <form class="form-inline" method="POST">
-        <div class="control-group {% if code_does_not_exists is defined %}error{% endif %}">
-          <div class="input-append">
+        <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
+          <div class="input-group">
             <input type="text" name="code" class="input-xlarge" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
             <button class="btn btn-success" type="submit">{{ _("Verify account") }}</button>
             {% if code_does_not_exists is defined %}
