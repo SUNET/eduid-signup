@@ -25,7 +25,7 @@
       <form class="form-inline" method="POST">
         <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
           <div class="input-group">
-            <input type="text" name="code" class="input-xlarge" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
+            <input type="text" name="code" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
             <button class="btn btn-success" type="submit">{{ _("Verify account") }}</button>
             {% if code_does_not_exists is defined %}
               <p class="help-block">{{ _("The provided code does not exist") }}</p>
