@@ -26,6 +26,7 @@ requires = [
     'recaptcha-client==1.0.6',
     'pwgen==0.4',
     'proquint==0.1.0',
+    'gunicorn==18.0',
 ]
 
 if sys.version_info[0] < 3:
@@ -51,6 +52,9 @@ testing_extras = test_requires + [
     'nosexcover==1.0.8',
 ]
 
+waitress_extras = requires + [
+    'waitress==0.8.2',
+]
 
 setup(
     name='eduid_signup',
@@ -73,6 +77,7 @@ setup(
     extras_require={
         'testing': testing_extras,
         'docs': docs_extras,
+        'waitress': waitress_extras,
     },
     test_suite='eduid_signup',
     entry_points="""\
