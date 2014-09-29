@@ -10,15 +10,13 @@
 
   <div class="row text-center">
     <div id="email-register" class="col-md-12">
-      <form class="form-inline" method="POST">
+      <form class="form-inline" role="form" method="POST">
        <div class="form-group{% if email_error is defined %} has-error{% endif %}">
-        <div class="input-group">
-          <input type="email" name="email" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
+          <input type="email" name="email" class="form-control" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
           {% endif %}
-        </div>
        </div>
       </form>
     </div>
