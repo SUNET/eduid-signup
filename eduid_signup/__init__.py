@@ -6,12 +6,24 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.settings import asbool
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_locale_name
+from pyramid.interfaces import IStaticURLInfo
+from pyramid.config.views import StaticURLInfo
 
 from eduid_am.celery import celery
 from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
 from eduid_am.config import read_setting_from_env, read_mapping
 from eduid_signup.i18n import locale_negotiator
+
+
+class ConfiguredHostStaticURLInfo(StaticURLInfo):
+
+    def generate(self, path, request, **kw):
+        host = request.registry.settings.get('static_assets_host_override', None)
+        kw.update({'_host': host})
+        return super(ConfiguredHostStaticURLInfo, self).generate(path,
+                                                                 request,
+                                                                 **kw)
 
 
 def includeme(config):
@@ -167,6 +179,7 @@ def main(global_config, **settings):
     config.include('pyramid_sna')
 
     # global directives
+    config.registry.registerUtility(ConfiguredHostStaticURLInfo(), IStaticURLInfo)
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_translation_dirs('eduid_signup:locale/')
 
