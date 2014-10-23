@@ -89,11 +89,8 @@ def home(request):
             return context
 
         request.session['email'] = email
-        if is_ratelimit_reached(request.environ):
-            trycaptcha_url = request.route_url("trycaptcha")
-            return HTTPFound(location=trycaptcha_url)
-
-        return get_url_from_email_status(request, email)
+        trycaptcha_url = request.route_url("trycaptcha")
+        return HTTPFound(location=trycaptcha_url)
 
     return context
 
