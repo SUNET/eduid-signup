@@ -12,27 +12,20 @@ div#content-block {
 
 /* Main marketing message and sign up button */
 .jumbotron {
-    margin: 60px 0;
+    background-color: #fff;
 }
+
 .jumbotron h1, .jumbotron p.lead {
     text-align: center;
 }
 .jumbotron h1 {
     font-size: 72px;
     line-height: 1;
+    font-weight: 800;
 }
 
-.jumbotron .lead {
-    margin: 1em 0 2em 0;
-}
-
-.jumbotron input {
-    height: 30px;
-}
-
-.jumbotron .btn {
-    height: 40px;
-    border-radius: 0 5px 5px 0;
+.jumbotron .form-inline .form-group {
+    margin: 30px;
 }
 
 .input-group .help-block {
