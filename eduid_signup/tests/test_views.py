@@ -32,7 +32,7 @@ class HomeViewTests(FunctionalTests):
     def test_sign_up_with_good_email(self):
         res = self.testapp.post('/', {'email': 'foo@example.com'})
         self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/success/')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
 
 
 class SuccessViewTests(FunctionalTests):
