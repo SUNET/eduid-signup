@@ -10,3 +10,5 @@ Mock VCCS backend
     import json
     with path('/add_creds') as r:
         r.body(json.dumps({'add_creds_response': {'version': 1, 'success': True,}}))
+    with path('/revoke_creds') as r:
+        r.body(json.dumps({'revoke_creds_response': {'version': 1, 'success': True,}}))
