@@ -50,12 +50,16 @@
   </div>
 </div>
 
-<div class="modal hide fade aup">
-    {% include "acceptable_use_policy-{0}.jinja2".format(request.locale) %}
-    <div class="modal-footer">
-        <a href="#reject" class="btn btn-danger">{{  _("Reject") }}</a>
-        <a href="#accept" class="btn btn-success">{{ _("Accept") }}</a>
+<div class="modal fade aup">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      {% include "acceptable_use_policy-{0}.jinja2".format(request.locale) %}
+      <div class="modal-footer">
+          <a href="#reject" class="btn btn-danger">{{  _("Reject") }}</a>
+          <a href="#accept" class="btn btn-success">{{ _("Accept") }}</a>
+      </div>
     </div>
+  </div>
 </div>
 
 
