@@ -40,56 +40,58 @@
 
     <div class="row">
       <div class="col-md-2"></div>
-        <div class="falseform well well-small col-md-8">
-          <div class='row'>
-            <div class="col-md-4">
-              <div class="form-group{% if mail_empty or mail_registered %} has-error{% endif %}">
-                <label class="control-label" for="email">{{_("Email")}}</label>
-                <span class="form-control uneditable-input">{{ social_info.email }}</span>
-                {% if mail_registered %}
-                  <span class="help-block">{{ _("Email address already in use") }}</span>
-                {% elif mail_empty %}
-                  <span class="help-block">{{ _("Email address is required, but none was received from social network") }}</span>
-                {% endif %}
-              </div>
-            </div>
-            <div class='col-md-4'>
-              <div class="form-group">
-                <label class="control-label" for="screenname">{{_("Display name")}}</label>
-                <span class="form-control uneditable-input">{{ social_info.screen_name }}</span>
-              </div>
+      <div class="well col-md-8">
+        <div class='row'>
+          <div class="col-md-6">
+            <div class="form-group{% if mail_empty or mail_registered %} has-error{% endif %}">
+              <label class="control-label" for="email">{{_("Email")}}</label>
+              <span class="form-control uneditable-input">{{ social_info.email }}</span>
+              {% if mail_registered %}
+                <span class="help-block">{{ _("Email address already in use") }}</span>
+              {% elif mail_empty %}
+                <span class="help-block">{{ _("Email address is required, but none was received from social network") }}</span>
+              {% endif %}
             </div>
           </div>
-          <div class="row">
-            <div class='col-md-4'>
-              <div class="form-group">
-                <label class="control-label" for="firstname">{{_("First name")}}</label>
-                <span class="form-control uneditable-input">{{ social_info.first_name }}</span>
-              </div>
-            </div>
-            <div class='col-md-4'>
-              <div class="form-group">
-                <label class="control-label" for="lastname">{{_("Last name")}}</label>
-                <span class="form-control uneditable-input">{{ social_info.last_name }}</span>
-              </div>
+          <div class='col-md-6'>
+            <div class="form-group">
+              <label class="control-label" for="screenname">{{_("Display name")}}</label>
+              <span class="form-control uneditable-input">{{ social_info.screen_name }}</span>
             </div>
           </div>
         </div>
+        <div class="row">
+          <div class='col-md-6'>
+            <div class="form-group">
+              <label class="control-label" for="firstname">{{_("First name")}}</label>
+              <span class="form-control uneditable-input">{{ social_info.first_name }}</span>
+            </div>
+          </div>
+          <div class='col-md-6'>
+            <div class="form-group">
+              <label class="control-label" for="lastname">{{_("Last name")}}</label>
+              <span class="form-control uneditable-input">{{ social_info.last_name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="col-md-2"></div>
     </div>
     <div class="row">
       <div class="col-md-2"></div>
-      <form class="form-horizontal accept-cancel col-md-8" method="POST">
-          <div class="form-group">
-             <button class="btn btn-danger" name="cancel" type="submit" value="cancel">{{ _("Cancel") }}</button>
-             <button class="btn btn-success pull-right" name="action" type="submit"
-              {% if mail_registered or mail_empty %}
-                disabled value="disabled"
-              {% else %}
-                value="accept"
-              {% endif %}>{{ _("Accept") }}</button>
-          </div>
-      </form>
+      <div class="col-md-8">
+        <form class="form-horizontal accept-cancel" method="POST">
+            <div class="form-group">
+               <button class="btn btn-danger" name="cancel" type="submit" value="cancel">{{ _("Cancel") }}</button>
+               <button class="btn btn-success pull-right" name="action" type="submit"
+                {% if mail_registered or mail_empty %}
+                  disabled value="disabled"
+                {% else %}
+                  value="accept"
+                {% endif %}>{{ _("Accept") }}</button>
+            </div>
+        </form>
+      </div>
       <div class="col-md-2"></div>
     </div>
 {% endblock %}

@@ -118,15 +118,6 @@ div#content-block {
   max-height: 110px;
 }
 
-
-div.falseform .uneditable-input {
-  color: #555;
-}
-
-body div.falseform {
-  width: 620px;
-}
-
 .nav-pills li.nav-separator {
   height: 34px;
   width: 0px;

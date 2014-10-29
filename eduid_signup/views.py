@@ -205,11 +205,20 @@ def review_fetched_info(context, request):
     present it to the user so she can review and accept it.
     '''
 
-    if not 'social_info' in request.session:
+    debug_mode = request.registry.settings.get('development', False)
+    if not 'social_info' in request.session and not debug_mode:
         raise HTTPBadRequest()
 
     social_info = request.session.get('social_info', {})
     email = social_info.get('email', None)
+
+    if debug_mode:
+        social_info = {
+            'email': 'dummy@eduid.se',
+            'screen_name': 'dummy',
+            'first_name': 'dummy',
+            'last_name': 'dummy',
+        }
 
     mail_registered = False
     if email:
