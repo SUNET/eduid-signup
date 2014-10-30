@@ -83,6 +83,14 @@ input#input-email-register {
 
 }
 
+input#verification-code-input {
+    max-width: 300px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
 .input-group .help-block {
     font-size: 14px;
 }
