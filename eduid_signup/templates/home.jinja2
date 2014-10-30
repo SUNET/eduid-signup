@@ -30,11 +30,10 @@
         <form role="form" class="form-horizontal" method="POST">
          <div class="form-group{% if email_error is defined %} has-error{% endif %}">
           <input type="email" name="email" id="input-email-register" class="form-control" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
-          <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
           {% endif %}
-
+          <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
          </div>
         </form>
       </div>
