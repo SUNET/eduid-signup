@@ -13,6 +13,8 @@ div#content-block {
 /* Main marketing message and sign up button */
 .jumbotron {
     background-color: #fff;
+    margin-bottom: 0px !important;
+    padding-top: 20px !important;
 }
 
 .jumbotron h1, .jumbotron p.lead {
