@@ -20,6 +20,9 @@ div#content-block {
 .jumbotron h1, .jumbotron p.lead {
     text-align: center;
 }
+
+@media only screen and (min-width: 992px) {
+
 .jumbotron h1 {
     font-size: 72px;
     line-height: 1;
@@ -28,6 +31,56 @@ div#content-block {
 
 .jumbotron .form-inline .form-group {
     margin: 30px;
+}
+
+}
+
+@media only screen and (max-width: 992px) and (min-width: 768px) {
+
+.jumbotron h1 {
+    font-size: 54px;
+    line-height: 1;
+    font-weight: 600;
+}
+
+.jumbotron .form-inline .form-group {
+    margin: 10px;
+}
+
+}
+
+@media only screen and (min-width: 768px) {
+
+#email-register-sm {
+    display: none;
+}
+
+}
+
+@media only screen and (max-width: 768px) {
+
+.jumbotron h1 {
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 400;
+}
+
+.jumbotron .form-inline .form-group {
+    margin: 10px;
+}
+
+#email-register-lg {
+    display: none;
+}
+
+input#input-email-register {
+    max-width: 300px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
 }
 
 .input-group .help-block {
