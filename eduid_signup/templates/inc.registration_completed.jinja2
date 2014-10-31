@@ -2,7 +2,7 @@
     <p class='lead'>{{ _("Write this password down and store it in a safe place.") }}</p>
     <pre class='text-center pre-big'>{{ password }}</pre>
     <p class="text-center">
-        <button id='gotit_btn' type="submit" class="btn btn-success btn-large profile-link"
+        <button id='gotit_btn' type="submit" class="btn btn-success btn-lg profile-link"
                 onclick="$('#instructions_div').removeClass('hide'); $('#gotit_btn').addClass('hide');">
             {{ _("OK, got it") }}</button>
     </p>
@@ -30,7 +30,7 @@
       <div class="row">
           <div class='span6'>
               {% if finish_url is defined %}
-                <a class="btn btn-primary btn-large" href="{{ finish_url }}">{{ _("Finish") }}</a>
+                <a class="btn btn-primary btn-lg" href="{{ finish_url }}">{{ _("Finish") }}</a>
               {% else %}
                   &nbsp;
               {% endif %}
@@ -43,7 +43,7 @@
                   <input type="hidden" name="nonce" value="{{ nonce }}"/>
                   <input type="hidden" name="ts" value="{{ timestamp }}"/>
                   <input type="hidden" name="token" value="{{ auth_token }}"/>
-                  <button type="submit" class="btn btn-success btn-large profile-link">{{ _("Confirm identity") }}</button>
+                  <button type="submit" class="btn btn-success btn-lg profile-link">{{ _("Confirm identity") }}</button>
                 </form>
               </p>
           </div>

@@ -9,22 +9,38 @@
   <p class="lead">{{ _("Create an account for use with Swedish Universities.") }}</p>
 
   <div class="row text-center">
-    <div id="email-register" class="span12">
-      <form class="form-inline" method="POST">
-       <div class="control-group{% if email_error is defined %} error{% endif %}">
-        <div class="input-append">
-          <input type="email" name="email" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
-          <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
+    <div id="email-register" class="col-md-12">
+      <div id="email-register-lg">
+        <form class="form-inline" role="form" method="POST">
+         <div class="form-group{% if email_error is defined %} has-error{% endif %}">
+          <div class="input-group">
+            <input type="email" name="email" class="form-control" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
+            <span class="input-group-btn">
+              <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
+            </span>
+          </div>
           {% if email_error is defined %}
             <p class="help-block">{{ email_error }}</p>
           {% endif %}
-        </div>
-       </div>
-      </form>
+
+         </div>
+        </form>
+      </div>
+      <div id="email-register-sm">
+        <form role="form" class="form-horizontal" method="POST">
+         <div class="form-group{% if email_error is defined %} has-error{% endif %}">
+          <input type="email" name="email" id="input-email-register" class="form-control" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
+          {% if email_error is defined %}
+            <p class="help-block">{{ email_error }}</p>
+          {% endif %}
+          <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
+         </div>
+        </form>
+      </div>
     </div>
   </div>
   <div class="row text-center">
-    <div id="social-register" class="span12">
+    <div id="social-register" class="col-md-12">
       {% if request.registry.settings.get('facebook_auth_enabled', False) %}
         <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
           <span class="btn-icon"></span>
@@ -47,12 +63,16 @@
   </div>
 </div>
 
-<div class="modal hide fade aup">
-    {% include "acceptable_use_policy-{0}.jinja2".format(request.locale) %}
-    <div class="modal-footer">
-        <a href="#reject" class="btn btn-danger">{{  _("Reject") }}</a>
-        <a href="#accept" class="btn btn-success">{{ _("Accept") }}</a>
+<div class="modal fade aup">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      {% include "acceptable_use_policy-{0}.jinja2".format(request.locale) %}
+      <div class="modal-footer">
+          <a href="#reject" class="btn btn-danger">{{  _("Reject") }}</a>
+          <a href="#accept" class="btn btn-success">{{ _("Accept") }}</a>
+      </div>
     </div>
+  </div>
 </div>
 
 
