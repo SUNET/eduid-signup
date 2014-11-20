@@ -25,12 +25,26 @@
        <a href="http://www.sunet.se/" target="_blank">
            <img src="{{'eduid_signup:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
        </a>
+       <div class="clear-right"></div>
      </div>
+
+     <div class="messages-wrapper">
+       <div class="messages">
+       {% for message in request.session.pop_flash() %}
+         <div class="alert">
+           <button type="button" class="close" data-dismiss="alert">&times;</button>
+           {{ message }}
+         </div>
+       {% endfor %}
+       </div>
+     </div>
+
      <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
      <div id="content-block">
-       {% block contents %}
 
-       {% endblock %}
+     {% block contents %}
+
+     {% endblock %}
      </div>
    </div>
    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
