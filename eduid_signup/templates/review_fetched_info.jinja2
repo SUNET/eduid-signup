@@ -83,15 +83,36 @@
         <form class="form-horizontal accept-cancel" method="POST">
             <div class="form-group">
                <button class="btn btn-danger" name="cancel" type="submit" value="cancel">{{ _("Cancel") }}</button>
-               <button class="btn btn-success pull-right" name="action" type="submit"
+               <button class="btn btn-success pull-right has-spinner"
+                       name="action"
+                       type="submit"
                 {% if mail_registered or mail_empty %}
-                  disabled value="disabled"
+                       disabled value="disabled"
                 {% else %}
-                  value="accept"
-                {% endif %}>{{ _("Accept") }}</button>
+                       id="do-review-button"
+                       value="accept"
+                {% endif %}>
+                    <span class="glyphicon glyphicon-refresh glyphicon-spin hidden"></span> {{ _("Accept") }}
+                </button>
             </div>
         </form>
       </div>
       <div class="col-md-2"></div>
     </div>
+{% endblock %}
+
+
+{% block extrajs %}
+  <script type="text/javascript">
+$(function () {
+    "use strict";
+
+    $(document).ready(function () {
+        $('#do-review-button').click(function (e) {
+            $(this).find('span').removeClass('hidden');
+        });
+    });
+
+}());
+  </script>
 {% endblock %}
