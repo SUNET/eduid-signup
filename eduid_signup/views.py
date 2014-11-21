@@ -305,7 +305,7 @@ def registered_completed(request, user, context=None):
                     'or contact the site administrators.')
         request.session.flash(message)
         url = request.route_path('home')
-        return HTTPFound(location=url)
+        raise HTTPFound(location=url)
 
     auth_token = generate_auth_token(secret, eppn, nonce, timestamp)
 
