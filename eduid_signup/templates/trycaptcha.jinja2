@@ -16,7 +16,7 @@
   </div>
 
     <div class="row">
-        <div class="span4 offset4">
+        <div class="col-xs-6 col-md-4 center-block">
             <form action="" method="post">
               <script type="text/javascript"
                  src="//www.google.com/recaptcha/api/challenge?k={{ recaptcha_public_key }}">
@@ -29,6 +29,8 @@
                  <input type="hidden" name="recaptcha_response_field"
                      value="manual_challenge">
               </noscript>
+              <button type="submit" class="btn btn-primary">{{ _("Submit") }}</button>
+              <a href="/" class="btn btn-default">{{ _("Cancel") }}</a>
             </form>
         </div>
     </div>
