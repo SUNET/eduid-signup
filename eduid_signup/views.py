@@ -15,8 +15,9 @@ from pyramid.response import FileResponse
 
 from wsgi_ratelimit import is_ratelimit_reached
 
-from eduid_am.tasks import update_attributes
+from eduid_am.tasks import update_attributes_keep_result
 
+from eduid_signup.i18n import TranslationString as _
 from eduid_signup.emails import send_verification_mail, send_credentials
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.sna_callbacks import create_or_update_sna
@@ -288,17 +289,23 @@ def registered_completed(request, user, context=None):
 
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    update_attributes.delay('eduid_signup', str(user_id))
+    result = update_attributes_keep_result.delay('eduid_signup', str(user_id))
 
     eppn = user.get('eduPersonPrincipalName')
     secret = request.registry.settings.get('auth_shared_secret')
     timestamp = '{:x}'.format(int(time.time()))
     nonce = os.urandom(16).encode('hex')
 
-    # TODO
-    # Should add spinner here to make sure we can read back the user using eduid_am
-    # before proceeding. If the attribute manager is not working allright the user will
-    # be sent to dashboard using auth_token link below, but dashboard won't find the user.
+    timeout = request.registry.settings.get("account_creation_timeout", 10)
+    try:
+        result.get(timeout=timeout)
+    except Exception, e:
+        message = _('There were problems with your submission. '
+                    'You may want to try again later, '
+                    'or contact the site administrators.')
+        request.session.flash(message)
+        url = request.route_path('home')
+        raise HTTPFound(location=url)
 
     auth_token = generate_auth_token(secret, eppn, nonce, timestamp)
 

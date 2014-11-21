@@ -25,7 +25,11 @@
       <form class="form-horizontal" method="POST">
         <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
             <input type="text" name="code" id="verification-code-input" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
-            <button class="btn btn-success" type="submit">{{ _("Verify account") }}</button>
+            <button class="btn btn-success has-spinner"
+                    id="verify-button"
+                    type="submit"">
+                    <span class="glyphicon glyphicon-refresh glyphicon-spin hidden"></span> {{ _("Verify account") }}
+            </button>
             {% if code_does_not_exists is defined %}
               <p class="help-block">{{ _("The provided code does not exist") }}</p>
             {% endif %}
@@ -42,3 +46,24 @@
 </div>
 
 {% endblock %}
+
+{% if email_already_verified is not defined and password is not defined %}
+
+  {% block extrajs %}
+  <script type="text/javascript">
+$(function () {
+    "use strict";
+
+    $(document).ready(function () {
+        $('#verify-button').click(function (e) {
+            if ($('#verification-code-input').val() !== '') {
+                $(this).find('span').removeClass('hidden');
+            }
+        });
+    });
+
+}());
+  </script>
+  {% endblock %}
+
+{% endif %}
