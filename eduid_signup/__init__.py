@@ -156,6 +156,10 @@ def main(global_config, **settings):
 
     settings['password_length'] = int(read_setting_from_env(settings, 'password_length', '10'))
 
+    settings['account_creation_timeout'] = int(read_setting_from_env(settings,
+                                                                     'account_creation_timeout',
+                                                                     '10'))
+
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
 
