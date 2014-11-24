@@ -27,6 +27,7 @@ def create_or_update_sna(request, social_info, signup_user):
             "givenName": social_info["first_name"],
             "sn": social_info["last_name"],
             "eduPersonPrincipalName": eppn,
+            "subject": "physical person",
         }, safe=True)
 
     else:

@@ -46,6 +46,7 @@ def send_verification_mail(request, email):
             'email': email,
         }, update={
             '$set': {
+                "subject": "physical person",
                 "eduPersonPrincipalName": eppn,
                 "email": email,
                 "created_ts": datetime.utcnow(),
