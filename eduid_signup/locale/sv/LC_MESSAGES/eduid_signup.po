@@ -4,16 +4,17 @@
 # project.
 #
 # Translators:
-# ft, 2013-2014
-# leifj <leifj@sunet.se>, 2013
-# Ratler <swold@sunet.se>, 2013
+# Fredrik Thulin, 2013-2014
+# Leif Johansson <leifj@sunet.se>, 2013
+# lundberg.johan <lundberg.johan@gmail.com>, 2014
+# Stefan Wold <swold@sunet.se>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-signup\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-12 14:21+0100\n"
-"PO-Revision-Date: 2014-03-12 13:26+0000\n"
-"Last-Translator: ft\n"
+"POT-Creation-Date: 2014-11-27 10:57+0100\n"
+"PO-Revision-Date: 2014-11-27 10:05+0000\n"
+"Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
 "signup/language/sv/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -26,7 +27,7 @@ msgstr ""
 msgid "eduid-signup verification email"
 msgstr "eduID registrering"
 
-#: eduid_signup/emails.py:76
+#: eduid_signup/emails.py:84
 msgid "eduid-signup credentials"
 msgstr "eduID inloggningsuppgifter"
 
@@ -37,6 +38,14 @@ msgstr "E-post adress måste anges"
 #: eduid_signup/validators.py:33
 msgid "Email is not valid"
 msgstr "Ogiltig e-postadress"
+
+#: eduid_signup/views.py:303
+msgid ""
+"There were problems with your submission. You may want to try again "
+"later, or contact the site administrators."
+msgstr ""
+"Det uppstod ett oväntat problem. Var god och försök igen senare eller "
+"kontakta supporten."
 
 #: eduid_signup/templates/account_created.jinja2:7
 #: eduid_signup/templates/account_created.jinja2:21
@@ -95,7 +104,7 @@ msgstr ""
 #: eduid_signup/templates/already_registered.jinja2:7
 #: eduid_signup/templates/already_registered.jinja2:10
 #: eduid_signup/templates/resend_email_verification.jinja2:6
-#: eduid_signup/templates/review_fetched_info.jinja2:47
+#: eduid_signup/templates/review_fetched_info.jinja2:50
 msgid "Email address already in use"
 msgstr "E-postadressen används redan"
 
@@ -111,13 +120,17 @@ msgstr "Nytt lösenord"
 msgid "Sign up"
 msgstr "Registrering"
 
-#: eduid_signup/templates/base.jinja2:20
+#: eduid_signup/templates/base.jinja2:21
 msgid "Home"
 msgstr "Hem"
 
-#: eduid_signup/templates/base.jinja2:21
+#: eduid_signup/templates/base.jinja2:22
 msgid "Help"
 msgstr "Hjälp"
+
+#: eduid_signup/templates/base.jinja2:42
+msgid "This Site depends on Javascript, so please enable it."
+msgstr "Den här sajten är behöver Javascript för att fungera."
 
 #: eduid_signup/templates/credentials_email.html.jinja2:1
 #, python-format
@@ -219,28 +232,28 @@ msgstr ""
 msgid "Create an account for use with Swedish Universities."
 msgstr "Skapa en identitet för svenska universitet och högskolor."
 
-#: eduid_signup/templates/home.jinja2:17
+#: eduid_signup/templates/home.jinja2:19 eduid_signup/templates/home.jinja2:36
 msgid "Sign up with your email address"
 msgstr "Registrering via e-post"
 
-#: eduid_signup/templates/home.jinja2:31
+#: eduid_signup/templates/home.jinja2:47
 msgid "Sign up with Facebook"
 msgstr "Registrering via Facebook"
 
-#: eduid_signup/templates/home.jinja2:37
+#: eduid_signup/templates/home.jinja2:53
 msgid "Sign up with Google"
 msgstr "Registrering via Google"
 
-#: eduid_signup/templates/home.jinja2:43
+#: eduid_signup/templates/home.jinja2:59
 msgid "Sign up with Microsoft Live Connect"
 msgstr "Registrering via Microsoft Live Connect"
 
-#: eduid_signup/templates/home.jinja2:53
+#: eduid_signup/templates/home.jinja2:71
 msgid "Reject"
 msgstr "Avbryt"
 
-#: eduid_signup/templates/home.jinja2:54
-#: eduid_signup/templates/review_fetched_info.jinja2:91
+#: eduid_signup/templates/home.jinja2:72
+#: eduid_signup/templates/review_fetched_info.jinja2:95
 msgid "Accept"
 msgstr "Godkänn"
 
@@ -299,7 +312,7 @@ msgstr "Skicka en ny verifikationslänk"
 msgid "Please review the data received from the social network"
 msgstr "Vänligen granska datat som mottogs från det sociala nätverket"
 
-#: eduid_signup/templates/review_fetched_info.jinja2:12
+#: eduid_signup/templates/review_fetched_info.jinja2:13
 msgid ""
 " No account has been created in eduID yet. If the data below is\n"
 "            correct, click the <strong>Accept</strong> button. Otherwise "
@@ -314,7 +327,7 @@ msgstr ""
 "<strong>Avbryt</strong> för att komma tillbaks till registreringssidan "
 "där du kan välja ett annat sätt att registrera dig i eduID."
 
-#: eduid_signup/templates/review_fetched_info.jinja2:19
+#: eduid_signup/templates/review_fetched_info.jinja2:20
 msgid ""
 "\n"
 "          <strong>The social network did not provide eduID with an e-mail"
@@ -331,7 +344,7 @@ msgstr ""
 "registreringssidan och välja ett annat alternativ för att registrera dig "
 "i eduID."
 
-#: eduid_signup/templates/review_fetched_info.jinja2:26
+#: eduid_signup/templates/review_fetched_info.jinja2:27
 #, python-format
 msgid ""
 "\n"
@@ -347,7 +360,7 @@ msgstr ""
 "Du kan återställa ditt lösenord genom att klicka <a "
 "href='%(reset_password_link)s'>här</a>."
 
-#: eduid_signup/templates/review_fetched_info.jinja2:33
+#: eduid_signup/templates/review_fetched_info.jinja2:34
 msgid ""
 "The data received from the social network cannot be edited here.\n"
 "            Click <strong>Cancel</strong> if it is not correct."
@@ -355,17 +368,17 @@ msgstr ""
 "Uppgifterna från det sociala nätverket kan inte ändras här.\n"
 "Klicka på <strong>Avbryt</strong> om de inte stämmer."
 
-#: eduid_signup/templates/review_fetched_info.jinja2:43
+#: eduid_signup/templates/review_fetched_info.jinja2:47
 msgid "Email"
 msgstr "E-post"
 
-#: eduid_signup/templates/review_fetched_info.jinja2:49
+#: eduid_signup/templates/review_fetched_info.jinja2:52
 msgid "Email address is required, but none was received from social network"
 msgstr ""
 "En e-postadress krävs för registrering, men någon sådan mottogs inte från"
 " det sociala nätverket"
 
-#: eduid_signup/templates/review_fetched_info.jinja2:56
+#: eduid_signup/templates/review_fetched_info.jinja2:58
 msgid "Display name"
 msgstr "Visningsnamn"
 
@@ -373,11 +386,12 @@ msgstr "Visningsnamn"
 msgid "First name"
 msgstr "Förnamn"
 
-#: eduid_signup/templates/review_fetched_info.jinja2:74
+#: eduid_signup/templates/review_fetched_info.jinja2:72
 msgid "Last name"
 msgstr "Efternamn"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:85
+#: eduid_signup/templates/trycaptcha.jinja2:33
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -417,19 +431,23 @@ msgstr "Bara en sak till!"
 msgid "eduID must verify that you are a human and not a machine."
 msgstr "eduID måste verifiera att du är en människa och inte en maskin."
 
+#: eduid_signup/templates/trycaptcha.jinja2:32
+msgid "Submit"
+msgstr "Skicka"
+
 #: eduid_signup/templates/verification_code_form.jinja2:22
 msgid "Put here the verification code sent to you by e-mail"
 msgstr "Ange bekräftelsekoden som skickats till din e-postadress"
 
-#: eduid_signup/templates/verification_code_form.jinja2:28
+#: eduid_signup/templates/verification_code_form.jinja2:27
 msgid "Paste here your code"
 msgstr "Ange din kod här"
 
-#: eduid_signup/templates/verification_code_form.jinja2:29
+#: eduid_signup/templates/verification_code_form.jinja2:31
 msgid "Verify account"
 msgstr "Bekräfta konto"
 
-#: eduid_signup/templates/verification_code_form.jinja2:31
+#: eduid_signup/templates/verification_code_form.jinja2:34
 msgid "The provided code does not exist"
 msgstr "Den angivna koden hittades inte"
 

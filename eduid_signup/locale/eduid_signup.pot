@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid_signup 0.2.0\n"
+"Project-Id-Version: eduid_signup 0.4.1-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-12 14:21+0100\n"
+"POT-Creation-Date: 2014-11-27 10:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "eduid-signup verification email"
 msgstr ""
 
-#: eduid_signup/emails.py:76
+#: eduid_signup/emails.py:84
 msgid "eduid-signup credentials"
 msgstr ""
 
@@ -31,6 +31,12 @@ msgstr ""
 
 #: eduid_signup/validators.py:33
 msgid "Email is not valid"
+msgstr ""
+
+#: eduid_signup/views.py:303
+msgid ""
+"There were problems with your submission. You may want to try again later, or"
+" contact the site administrators."
 msgstr ""
 
 #: eduid_signup/templates/account_created.jinja2:7
@@ -86,7 +92,7 @@ msgstr ""
 #: eduid_signup/templates/already_registered.jinja2:7
 #: eduid_signup/templates/already_registered.jinja2:10
 #: eduid_signup/templates/resend_email_verification.jinja2:6
-#: eduid_signup/templates/review_fetched_info.jinja2:47
+#: eduid_signup/templates/review_fetched_info.jinja2:50
 msgid "Email address already in use"
 msgstr ""
 
@@ -102,12 +108,16 @@ msgstr ""
 msgid "Sign up"
 msgstr ""
 
-#: eduid_signup/templates/base.jinja2:20
+#: eduid_signup/templates/base.jinja2:21
 msgid "Home"
 msgstr ""
 
-#: eduid_signup/templates/base.jinja2:21
+#: eduid_signup/templates/base.jinja2:22
 msgid "Help"
+msgstr ""
+
+#: eduid_signup/templates/base.jinja2:42
+msgid "This Site depends on Javascript, so please enable it."
 msgstr ""
 
 #: eduid_signup/templates/credentials_email.html.jinja2:1
@@ -175,28 +185,28 @@ msgstr ""
 msgid "Create an account for use with Swedish Universities."
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:17
+#: eduid_signup/templates/home.jinja2:19 eduid_signup/templates/home.jinja2:36
 msgid "Sign up with your email address"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:31
+#: eduid_signup/templates/home.jinja2:47
 msgid "Sign up with Facebook"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:37
+#: eduid_signup/templates/home.jinja2:53
 msgid "Sign up with Google"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:43
+#: eduid_signup/templates/home.jinja2:59
 msgid "Sign up with Microsoft Live Connect"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:53
+#: eduid_signup/templates/home.jinja2:71
 msgid "Reject"
 msgstr ""
 
-#: eduid_signup/templates/home.jinja2:54
-#: eduid_signup/templates/review_fetched_info.jinja2:91
+#: eduid_signup/templates/home.jinja2:72
+#: eduid_signup/templates/review_fetched_info.jinja2:95
 msgid "Accept"
 msgstr ""
 
@@ -250,7 +260,7 @@ msgstr ""
 msgid "Please review the data received from the social network"
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:12
+#: eduid_signup/templates/review_fetched_info.jinja2:13
 msgid ""
 " No account has been created in eduID yet. If the data below is\n"
 "            correct, click the <strong>Accept</strong> button. Otherwise "
@@ -261,7 +271,7 @@ msgid ""
 "          "
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:19
+#: eduid_signup/templates/review_fetched_info.jinja2:20
 msgid ""
 "\n"
 "          <strong>The social network did not provide eduID with an e-mail "
@@ -273,7 +283,7 @@ msgid ""
 "          "
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:26
+#: eduid_signup/templates/review_fetched_info.jinja2:27
 #, python-format
 msgid ""
 "\n"
@@ -284,21 +294,21 @@ msgid ""
 "           "
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:33
+#: eduid_signup/templates/review_fetched_info.jinja2:34
 msgid ""
 "The data received from the social network cannot be edited here.\n"
 "            Click <strong>Cancel</strong> if it is not correct."
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:43
+#: eduid_signup/templates/review_fetched_info.jinja2:47
 msgid "Email"
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:49
+#: eduid_signup/templates/review_fetched_info.jinja2:52
 msgid "Email address is required, but none was received from social network"
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:56
+#: eduid_signup/templates/review_fetched_info.jinja2:58
 msgid "Display name"
 msgstr ""
 
@@ -306,11 +316,12 @@ msgstr ""
 msgid "First name"
 msgstr ""
 
-#: eduid_signup/templates/review_fetched_info.jinja2:74
+#: eduid_signup/templates/review_fetched_info.jinja2:72
 msgid "Last name"
 msgstr ""
 
 #: eduid_signup/templates/review_fetched_info.jinja2:85
+#: eduid_signup/templates/trycaptcha.jinja2:33
 msgid "Cancel"
 msgstr ""
 
@@ -347,19 +358,23 @@ msgstr ""
 msgid "eduID must verify that you are a human and not a machine."
 msgstr ""
 
+#: eduid_signup/templates/trycaptcha.jinja2:32
+msgid "Submit"
+msgstr ""
+
 #: eduid_signup/templates/verification_code_form.jinja2:22
 msgid "Put here the verification code sent to you by e-mail"
 msgstr ""
 
-#: eduid_signup/templates/verification_code_form.jinja2:28
+#: eduid_signup/templates/verification_code_form.jinja2:27
 msgid "Paste here your code"
 msgstr ""
 
-#: eduid_signup/templates/verification_code_form.jinja2:29
+#: eduid_signup/templates/verification_code_form.jinja2:31
 msgid "Verify account"
 msgstr ""
 
-#: eduid_signup/templates/verification_code_form.jinja2:31
+#: eduid_signup/templates/verification_code_form.jinja2:34
 msgid "The provided code does not exist"
 msgstr ""
 
