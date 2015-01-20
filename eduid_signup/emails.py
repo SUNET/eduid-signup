@@ -9,6 +9,9 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.utils import generate_verification_link, generate_eppn
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def send_verification_mail(request, email):
     mailer = get_mailer(request)
@@ -57,7 +60,12 @@ def send_verification_mail(request, email):
 
     user_id = result.get("value", {}).get("_id")
 
-    mailer.send(message)
+    if request.registry.settings.get("development", '') != 'true':
+        mailer.send(message)
+    else:
+        # Development
+        logger.info("Confirmation e-mail:\nFrom: {!s}\nTo: {!s}\nSubject: {!s}\n\n{!s}".format(
+            message.sender, message.recipients, message.subject, message.body))
 
     # XXX REMOVE THIS? otherwise users appear in eduid_am without 'passwords'
     # so they can't log in but exceptions are logged in the IdP when they try
@@ -65,10 +73,6 @@ def send_verification_mail(request, email):
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
     update_attributes.delay('eduid_signup', str(user_id))
-    # Development
-    if request.registry.settings.get("development", '') == 'true':
-        for mail in mailer.outbox:
-            print mail.body
 
 
 def send_credentials(request, email, password):
@@ -95,8 +99,9 @@ def send_credentials(request, email, password):
             request,
         ),
     )
-    mailer.send(message)
-    # Development
-    if request.registry.settings.get("development", '') == 'true':
-        for mail in mailer.outbox:
-            print mail.body
+    if request.registry.settings.get("development", '') != 'true':
+        mailer.send(message)
+    else:
+        # Development
+        logger.info("Credentials e-mail:\nFrom: {!s}\nTo: {!s}\nSubject: {!s}\n\n{!s}".format(
+            message.sender, message.recipients, message.subject, message.body))

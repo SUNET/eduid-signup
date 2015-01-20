@@ -99,8 +99,7 @@ def home(request):
 @view_config(route_name='trycaptcha', renderer='templates/trycaptcha.jinja2')
 def trycaptcha(request):
     '''
-    After too many attempts to signup have been tried,
-    present a captcha before allowing any more attempts.
+    Kantara requires a check for humanness even at level AL1.
     '''
 
     if 'email' not in request.session:
@@ -109,13 +108,15 @@ def trycaptcha(request):
 
     settings = request.registry.settings
 
-    recaptcha_public_key = settings.get("recaptcha_public_key", ''),
+    remote_ip = request.environ.get("REMOTE_ADDR", '')
+    recaptcha_public_key = settings.get("recaptcha_public_key", '')
     if request.method == 'GET':
+        logger.debug("Presenting CAPTCHA to {!s}".format(remote_ip))
         return {
             'recaptcha_public_key': recaptcha_public_key
         }
 
-    elif request.method == 'POST':
+    if request.method == 'POST':
         challenge_field = request.POST.get('recaptcha_challenge_field', '')
         response_field = request.POST.get('recaptcha_response_field', '')
 
@@ -123,17 +124,19 @@ def trycaptcha(request):
             challenge_field,
             response_field,
             settings.get("recaptcha_private_key", ''),
-            request.environ.get("REMOTE_ADDRESS", ''),
+            remote_ip,
         )
 
-        if response.is_valid:
+        if response.is_valid or not recaptcha_public_key:
+            # recaptcha_public_key not set in development environment, just accept
             email = request.session['email']
             return get_url_from_email_status(request, email)
-        else:
-            return {
-                "error": True,
-                "recaptcha_public_key": recaptcha_public_key
-            }
+
+        logger.debug("Invalid CAPTCHA response from {!r}: {!r}".format(remote_ip, response.error_code))
+        return {
+            "error": True,
+            "recaptcha_public_key": recaptcha_public_key
+        }
 
     return HTTPMethodNotAllowed()
 
