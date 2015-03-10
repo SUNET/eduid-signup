@@ -60,11 +60,15 @@ def send_verification_mail(request, email):
 
     user_id = result.get("value", {}).get("_id")
 
+    logger.info("New user {!s}/{!s} created. e-mail pending confirmation: {!s}".format(
+        eppn, user_id, email,
+    ))
+
     if request.registry.settings.get("development", '') != 'true':
         mailer.send(message)
     else:
         # Development
-        logger.info("Confirmation e-mail:\nFrom: {!s}\nTo: {!s}\nSubject: {!s}\n\n{!s}".format(
+        logger.debug("Confirmation e-mail:\nFrom: {!s}\nTo: {!s}\nSubject: {!s}\n\n{!s}".format(
             message.sender, message.recipients, message.subject, message.body))
 
     # XXX REMOVE THIS? otherwise users appear in eduid_am without 'passwords'
@@ -99,9 +103,10 @@ def send_credentials(request, email, password):
             request,
         ),
     )
+    logger.info("Credentials e-mail sent to {!s}".format(email))
     if request.registry.settings.get("development", '') != 'true':
         mailer.send(message)
     else:
         # Development
-        logger.info("Credentials e-mail:\nFrom: {!s}\nTo: {!s}\nSubject: {!s}\n\n{!s}".format(
+        logger.debug("Credentials e-mail:\nFrom: {!s}\nTo: {!s}\nSubject: {!s}\n\n{!s}".format(
             message.sender, message.recipients, message.subject, message.body))
