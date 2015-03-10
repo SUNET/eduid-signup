@@ -38,7 +38,7 @@ EMAIL_STATUS_VIEWS = {
 
 
 def get_url_from_email_status(request, email):
-    '''
+    """
     Return a view depending on
     the verification status of the provided email.
 
@@ -48,8 +48,9 @@ def get_url_from_email_status(request, email):
     :type email: string
 
     :return: redirect response
-    '''
+    """
     status = check_email_status(request.userdb, email)
+    logger.debug("e-mail {!s} status: {!s}".format(email, status))
     if status == 'new':
         send_verification_mail(request, email)
         namedview = 'success'
@@ -70,14 +71,14 @@ def favicon_view(context, request):
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
-    '''
+    """
     Home view.
     If request.method is GET, 
     return the initial signup form.
     If request.method is POST, 
     validate the sent email and
     redirects as appropriate.
-    '''
+    """
     context = {}
     if request.method == 'POST':
         try:
@@ -90,6 +91,8 @@ def home(request):
             return context
 
         request.session['email'] = email
+        remote_ip = request.environ.get('REMOTE_ADDR', '')
+        logger.debug('Presenting CAPTCHA to {!s} (email {!s}) in home()'.format(remote_ip, email))
         trycaptcha_url = request.route_url("trycaptcha")
         return HTTPFound(location=trycaptcha_url)
 
@@ -98,9 +101,9 @@ def home(request):
 
 @view_config(route_name='trycaptcha', renderer='templates/trycaptcha.jinja2')
 def trycaptcha(request):
-    '''
+    """
     Kantara requires a check for humanness even at level AL1.
-    '''
+    """
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
@@ -111,7 +114,7 @@ def trycaptcha(request):
     remote_ip = request.environ.get("REMOTE_ADDR", '')
     recaptcha_public_key = settings.get("recaptcha_public_key", '')
     if request.method == 'GET':
-        logger.debug("Presenting CAPTCHA to {!s}".format(remote_ip))
+        logger.debug("Presenting CAPTCHA to {!s} (email {!s})".format(remote_ip, request.session['email']))
         return {
             'recaptcha_public_key': recaptcha_public_key
         }
@@ -158,6 +161,7 @@ def success(context, request):
     #nonce = os.urandom(16).encode('hex')
     #auth_token = generate_auth_token(secret, email, nonce, timestamp)
 
+    logger.debug("Successful signup for {!s}".format(email))
     return {
         #"profile_link": request.registry.settings.get("profile_link", "#"),
         "email": email,
@@ -170,12 +174,13 @@ def success(context, request):
 @view_config(route_name='resend_email_verification',
              renderer='templates/resend_email_verification.jinja2')
 def resend_email_verification(context, request):
-    '''
+    """
     The user has no yet verified the email address.
     Send a verification message to the address so it can be verified.
-    '''
+    """
     if request.method == 'POST':
         email = request.session.get('email', '')
+        logger.debug("Resend email confirmation to {!s}".format(email))
         if email:
             send_verification_mail(request, email)
             url = request.route_url('success')
@@ -188,10 +193,11 @@ def resend_email_verification(context, request):
 @view_config(route_name='email_already_registered',
              renderer='templates/already_registered.jinja2')
 def already_registered(context, request):
-    '''
+    """
     There is already an account with that address.
     Return a link to reset the password for that account.
-    '''
+    """
+    logger.debug("E-mail already registered: {!s}".format(request.session.get('email')))
     return {
         'reset_password_link': request.registry.settings.get(
             'reset_password_link', '#'),
@@ -201,10 +207,10 @@ def already_registered(context, request):
 @view_config(route_name='review_fetched_info',
              renderer='templates/review_fetched_info.jinja2')
 def review_fetched_info(context, request):
-    '''
+    """
     Once user info has been retrieved from a social network,
     present it to the user so she can review and accept it.
-    '''
+    """
 
     debug_mode = request.registry.settings.get('development', False)
     if not 'social_info' in request.session and not debug_mode:
@@ -260,14 +266,15 @@ def review_fetched_info(context, request):
 
 
 def registered_completed(request, user, context=None):
-    '''
+    """
     After a successful registration
     (through the mail or through a social network),
     generate a password,
     add it to the registration record in the registrations db,
     update the attribute manager db with the new account,
     and send the pertinent information to the user.
-    '''
+    """
+    logger.debug("Registration complete for user {!r}, updating signup db".format(user))
     if context is None:
         context = {}
     password_id = ObjectId()
@@ -290,6 +297,7 @@ def registered_completed(request, user, context=None):
 
     user_id = user.get("_id")
 
+    logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
     result = update_attributes_keep_result.delay('eduid_signup', str(user_id))
@@ -302,7 +310,8 @@ def registered_completed(request, user, context=None):
     timeout = request.registry.settings.get("account_creation_timeout", 10)
     try:
         result.get(timeout=timeout)
-    except Exception, e:
+    except Exception:
+        logger.exception("Failed Attribute Manager sync request")
         message = _('There were problems with your submission. '
                     'You may want to try again later, '
                     'or contact the site administrators.')
@@ -340,11 +349,12 @@ def registered_completed(request, user, context=None):
 @view_config(route_name='email_verification_link',
              renderer="templates/account_created.jinja2")
 def email_verification_link(context, request):
-    '''
+    """
     View for the link sent to the user's mail
     so that she can verify the address she has provided.
-    '''
+    """
 
+    logger.debug("Trying to confirm e-mail using confirmation link")
     try:
         verify_email_code(request.db.registered, context.code)
     except AlreadyVerifiedException:
@@ -369,9 +379,9 @@ def email_verification_link(context, request):
 @view_config(route_name='verification_code_form',
              renderer="templates/verification_code_form.jinja2")
 def verification_code_form(context, request):
-    '''
+    """
     form to enter the verification code
-    '''
+    """
     context = {}
     if request.method == 'POST':
         try:
