@@ -300,7 +300,8 @@ def registered_completed(request, user, context=None):
     logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    result = update_attributes_keep_result.delay('eduid_signup', str(user_id))
+    result = update_attributes_keep_result.delay('eduid_signup', str(user_id),
+                                                 serializer = 'json')
 
     eppn = user.get('eduPersonPrincipalName')
     secret = request.registry.settings.get('auth_shared_secret')
