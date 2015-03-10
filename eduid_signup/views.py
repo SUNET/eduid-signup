@@ -348,15 +348,16 @@ def registered_completed(request, user, context=None):
 
 @view_config(route_name='email_verification_link',
              renderer="templates/account_created.jinja2")
-def email_verification_link(context, request):
+def email_verification_link(request):
     """
     View for the link sent to the user's mail
     so that she can verify the address she has provided.
     """
 
     logger.debug("Trying to confirm e-mail using confirmation link")
+    code = request.matchdict['code']
     try:
-        verify_email_code(request.db.registered, context.code)
+        verify_email_code(request.db.registered, code)
     except AlreadyVerifiedException:
         return {
             'email_already_verified': True,
@@ -370,7 +371,7 @@ def email_verification_link(context, request):
         }
 
     user = request.db.registered.find_one({
-        'code': context.code
+        'code': code,
     })
 
     return registered_completed(request, user, {'from_email': True})
