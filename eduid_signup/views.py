@@ -300,7 +300,6 @@ def registered_completed(request, user, context=None):
     logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    update_attributes_keep_result.serializer = 'json'
     result = update_attributes_keep_result.delay('eduid_signup', str(user_id))
 
     eppn = user.get('eduPersonPrincipalName')
