@@ -91,8 +91,6 @@ def home(request):
             return context
 
         request.session['email'] = email
-        remote_ip = request.environ.get('REMOTE_ADDR', '')
-        logger.debug('Presenting CAPTCHA to {!s} (email {!s}) in home()'.format(remote_ip, email))
         trycaptcha_url = request.route_url("trycaptcha")
         return HTTPFound(location=trycaptcha_url)
 
@@ -131,6 +129,8 @@ def trycaptcha(request):
         )
 
         if response.is_valid or not recaptcha_public_key:
+            logger.debug("Valid CAPTCHA response (or CAPTCHA disabled) from {!r}".format(remote_ip))
+
             # recaptcha_public_key not set in development environment, just accept
             email = request.session['email']
             return get_url_from_email_status(request, email)
@@ -300,7 +300,7 @@ def registered_completed(request, user, context=None):
     logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    result = update_attributes_keep_result.delay('eduid_signup', str(user_id))
+    rtask = update_attributes_keep_result.delay('eduid_signup', str(user_id))
 
     eppn = user.get('eduPersonPrincipalName')
     secret = request.registry.settings.get('auth_shared_secret')
@@ -309,7 +309,8 @@ def registered_completed(request, user, context=None):
 
     timeout = request.registry.settings.get("account_creation_timeout", 10)
     try:
-        result.get(timeout=timeout)
+        result = rtask.get(timeout=timeout)
+        logger.debug("Attribute Manager sync result: {!r}".format(result))
     except Exception:
         logger.exception("Failed Attribute Manager sync request")
         message = _('There were problems with your submission. '
@@ -343,6 +344,7 @@ def registered_completed(request, user, context=None):
 
     record_tou(request, user_id, 'signup')
 
+    logger.info("Signup process for new user {!r}/{!r} complete".format(user_id, eppn))
     return context
 
 
