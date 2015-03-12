@@ -22,11 +22,11 @@ def generate_password(settings, credential_id, user):
     user_id = str(user['_id'])
     password = pwgen(settings.get('password_length'), no_capitalize = True, no_symbols = True)
     factor = vccs_client.VCCSPasswordFactor(password, credential_id)
-    logger.debug("Adding VCCS password factor for user {!r}: {!r}".format(user_id, factor))
+    logger.debug("Adding VCCS password factor for user {!r}, credential_id {!r}".format(user_id, credential_id))
 
     vccs = vccs_client.VCCSClient(base_url = settings.get('vccs_url'))
     result = vccs.add_credentials(user_id, [factor])
-    logger.debug("VCCS password creation result: {!r}".format(result))
+    logger.debug("VCCS password (id {!r}) creation result: {!r}".format(credential_id, result))
 
     return _human_readable(password), factor.salt
 

@@ -274,7 +274,12 @@ def registered_completed(request, user, context=None):
     update the attribute manager db with the new account,
     and send the pertinent information to the user.
     """
-    logger.debug("Registration complete for user {!r}, updating signup db".format(user))
+    user_id = user.get("_id")
+    eppn = user.get('eduPersonPrincipalName')
+
+    logger.info("Completing registration for user {!s}/{!s} (first created: {!s})".format(
+        user_id, eppn, user.get('created_ts')))
+
     if context is None:
         context = {}
     password_id = ObjectId()
@@ -283,7 +288,7 @@ def registered_completed(request, user, context=None):
                                          )
     request.db.registered.update(
         {
-            'eduPersonPrincipalName': user.get('eduPersonPrincipalName'),
+            'eduPersonPrincipalName': eppn,
         }, {
             '$push': {
                 'passwords': {
@@ -294,8 +299,6 @@ def registered_completed(request, user, context=None):
                 }
             },
         }, safe=True)
-
-    user_id = user.get("_id")
 
     logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
@@ -344,7 +347,7 @@ def registered_completed(request, user, context=None):
 
     record_tou(request, user_id, 'signup')
 
-    logger.info("Signup process for new user {!r}/{!r} complete".format(user_id, eppn))
+    logger.info("Signup process for new user {!s}/{!s} complete".format(user_id, eppn))
     return context
 
 
