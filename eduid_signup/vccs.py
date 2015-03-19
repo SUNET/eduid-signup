@@ -3,6 +3,9 @@ from re import findall
 
 import vccs_client
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def generate_password(settings, credential_id, user):
     """
@@ -16,10 +19,14 @@ def generate_password(settings, credential_id, user):
     :param user: user data as dict
     :return: (password, salt) both strings
     """
+    user_id = str(user['_id'])
     password = pwgen(settings.get('password_length'), no_capitalize = True, no_symbols = True)
     factor = vccs_client.VCCSPasswordFactor(password, credential_id)
+    logger.debug("Adding VCCS password factor for user {!r}, credential_id {!r}".format(user_id, credential_id))
+
     vccs = vccs_client.VCCSClient(base_url = settings.get('vccs_url'))
-    vccs.add_credentials(str(user['_id']), [factor])
+    result = vccs.add_credentials(user_id, [factor])
+    logger.debug("VCCS password (id {!r}) creation result: {!r}".format(credential_id, result))
 
     return _human_readable(password), factor.salt
 

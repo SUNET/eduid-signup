@@ -131,6 +131,8 @@ def trycaptcha(request):
         )
 
         if response.is_valid or not recaptcha_public_key:
+            logger.debug("Valid CAPTCHA response (or CAPTCHA disabled) from {!r}".format(remote_ip))
+
             # recaptcha_public_key not set in development environment, just accept
             email = request.session['email']
             return get_url_from_email_status(request, email)
@@ -145,11 +147,11 @@ def trycaptcha(request):
 
 
 @view_config(route_name='success', renderer="templates/success.jinja2")
-def success(context, request):
-    '''
+def success(request):
+    """
     After a successful operation with no
     immediate follow up on the web.
-    '''
+    """
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
@@ -173,7 +175,7 @@ def success(context, request):
 
 @view_config(route_name='resend_email_verification',
              renderer='templates/resend_email_verification.jinja2')
-def resend_email_verification(context, request):
+def resend_email_verification(request):
     """
     The user has no yet verified the email address.
     Send a verification message to the address so it can be verified.
@@ -192,7 +194,7 @@ def resend_email_verification(context, request):
 
 @view_config(route_name='email_already_registered',
              renderer='templates/already_registered.jinja2')
-def already_registered(context, request):
+def already_registered(request):
     """
     There is already an account with that address.
     Return a link to reset the password for that account.
@@ -206,7 +208,7 @@ def already_registered(context, request):
 
 @view_config(route_name='review_fetched_info',
              renderer='templates/review_fetched_info.jinja2')
-def review_fetched_info(context, request):
+def review_fetched_info(request):
     """
     Once user info has been retrieved from a social network,
     present it to the user so she can review and accept it.
@@ -274,7 +276,12 @@ def registered_completed(request, user, context=None):
     update the attribute manager db with the new account,
     and send the pertinent information to the user.
     """
-    logger.debug("Registration complete for user {!r}, updating signup db".format(user))
+    user_id = user.get("_id")
+    eppn = user.get('eduPersonPrincipalName')
+
+    logger.info("Completing registration for user {!s}/{!s} (first created: {!s})".format(
+        user_id, eppn, user.get('created_ts')))
+
     if context is None:
         context = {}
     password_id = ObjectId()
@@ -283,7 +290,7 @@ def registered_completed(request, user, context=None):
                                          )
     request.db.registered.update(
         {
-            'eduPersonPrincipalName': user.get('eduPersonPrincipalName'),
+            'eduPersonPrincipalName': eppn,
         }, {
             '$push': {
                 'passwords': {
@@ -295,12 +302,10 @@ def registered_completed(request, user, context=None):
             },
         }, safe=True)
 
-    user_id = user.get("_id")
-
     logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    result = update_attributes_keep_result.delay('eduid_signup', str(user_id))
+    rtask = update_attributes_keep_result.delay('eduid_signup', str(user_id))
 
     eppn = user.get('eduPersonPrincipalName')
     secret = request.registry.settings.get('auth_shared_secret')
@@ -309,7 +314,8 @@ def registered_completed(request, user, context=None):
 
     timeout = request.registry.settings.get("account_creation_timeout", 10)
     try:
-        result.get(timeout=timeout)
+        result = rtask.get(timeout=timeout)
+        logger.debug("Attribute Manager sync result: {!r}".format(result))
     except Exception:
         logger.exception("Failed Attribute Manager sync request")
         message = _('There were problems with your submission. '
@@ -343,20 +349,22 @@ def registered_completed(request, user, context=None):
 
     record_tou(request, user_id, 'signup')
 
+    logger.info("Signup process for new user {!s}/{!s} complete".format(user_id, eppn))
     return context
 
 
 @view_config(route_name='email_verification_link',
              renderer="templates/account_created.jinja2")
-def email_verification_link(context, request):
+def email_verification_link(request):
     """
     View for the link sent to the user's mail
     so that she can verify the address she has provided.
     """
 
     logger.debug("Trying to confirm e-mail using confirmation link")
+    code = request.matchdict['code']
     try:
-        verify_email_code(request.db.registered, context.code)
+        verify_email_code(request.db.registered, code)
     except AlreadyVerifiedException:
         return {
             'email_already_verified': True,
@@ -370,7 +378,7 @@ def email_verification_link(context, request):
         }
 
     user = request.db.registered.find_one({
-        'code': context.code
+        'code': code,
     })
 
     return registered_completed(request, user, {'from_email': True})
@@ -378,7 +386,7 @@ def email_verification_link(context, request):
 
 @view_config(route_name='verification_code_form',
              renderer="templates/verification_code_form.jinja2")
-def verification_code_form(context, request):
+def verification_code_form(request):
     """
     form to enter the verification code
     """
@@ -414,11 +422,11 @@ def verification_code_form(context, request):
 
 @view_config(route_name='sna_account_created',
              renderer="templates/account_created.jinja2")
-def account_created_from_sna(context, request):
-    '''
+def account_created_from_sna(request):
+    """
     View where the registration from a social network is completed,
     after the user has reviewed the information fetched from the s.n.
-    '''
+    """
 
     user = request.db.registered.find_one({
         'email': request.session.get('email')
@@ -429,9 +437,9 @@ def account_created_from_sna(context, request):
 
 @view_config(route_name='help')
 def help(request):
-    '''
+    """
     help view
-    '''
+    """
     # We don't want to mess up the gettext .po file
     # with a lot of strings which don't belong to the
     # application interface.
@@ -449,7 +457,7 @@ def help(request):
 
 
 @view_config(route_name='error500test')
-def error500view(context, request):
+def error500view(request):
     raise Exception()
 
 
@@ -464,13 +472,13 @@ def exception_view(context, request):
 
 
 @view_config(route_name='error404', renderer='templates/error404.jinja2')
-def not_found_view(context, request):
+def not_found_view(request):
     request.response.status = 404
     return {}
 
 
 @view_config(route_name='set_language', request_method='GET')
-def set_language(context, request):
+def set_language(request):
     settings = request.registry.settings
     lang = request.GET.get('lang', 'en')
     if lang not in settings['available_languages']:
