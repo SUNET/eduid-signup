@@ -91,6 +91,8 @@ def home(request):
             return context
 
         request.session['email'] = email
+        remote_ip = request.environ.get('REMOTE_ADDR', '')
+        logger.debug('Presenting CAPTCHA to {!s} (email {!s}) in home()'.format(remote_ip, email))
         trycaptcha_url = request.route_url("trycaptcha")
         return HTTPFound(location=trycaptcha_url)
 
