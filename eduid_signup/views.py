@@ -82,7 +82,7 @@ def home(request):
     context = {}
     if request.method == 'POST':
         try:
-            email = validate_email(request.db, request.POST)
+            email = validate_email(request.POST)
         except ValidationError as error:
             context.update({
                 'email_error': error.msg,
@@ -231,13 +231,11 @@ def review_fetched_info(request):
 
     mail_registered = False
     if email:
-        signup_user = request.db.registered.find_one({
-            "email": email,
-            "verified": True
-        })
+        signup_user = request.db.get_user_by_mail(email)
 
         try:
-            am_user = request.userdb.get_user_by_email(email)
+            am_user = request.userdb.get_user_by_mail(email)
+            logger.info("Found user {!s} using email address {!s}".format(am_user, email))
         except request.userdb.exceptions.UserDoesNotExist:
             pass
         else:

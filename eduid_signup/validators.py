@@ -21,7 +21,7 @@ def validate_email_format(email):
     return RFC2822_email.match(email)
 
 
-def validate_email(db, data):
+def validate_email(data):
     """Validate that a valid email address exist in the data dictionary"""
     try:
         email = data['email']

@@ -33,15 +33,13 @@ class ValidateEmailTests(DBTests):
     clean_collections = ('registered', )
 
     def test_no_email(self):
-        self.assertRaises(ValidationError, validate_email,
-                          self.db, {})
+        self.assertRaises(ValidationError, validate_email, {})
 
     def test_bad_format(self):
-        self.assertRaises(ValidationError, validate_email,
-                          self.db, {'email': 'a@com'})
+        self.assertRaises(ValidationError, validate_email, {'email': 'a@com'})
 
     def test_good_email(self):
-        if not self.db:
+        if not self.signup_userdb:
             raise unittest.SkipTest("requires accessible MongoDB server")
         self.assertEqual('bar@example.com',
-                         validate_email(self.db, {'email': 'bar@example.com'}))
+                         validate_email({'email': 'bar@example.com'}))

@@ -24,15 +24,15 @@ class DBTests(unittest.TestCase):
     def setUp(self):
         try:
             mongodb = MongoDB(MONGO_URI_TEST)
-            self.db = mongodb.get_database()
+            self.signup_userdb = mongodb.get_database()
         except pymongo.errors.ConnectionFailure:
-            self.db = None
+            self.signup_userdb = None
 
     def tearDown(self):
-        if not self.db:
+        if not self.signup_userdb:
             return None
         for collection in self.clean_collections:
-            self.db.drop_collection(collection)
+            self.signup_userdb.drop_collection(collection)
 
 
 SETTINGS = {
@@ -71,7 +71,7 @@ class FunctionalTests(DBTests):
         try:
             app = main({}, **SETTINGS)
             self.testapp = TestApp(app)
-            self.db = app.registry.settings['mongodb'].get_database()
+            self.signup_userdb = app.registry.settings['signup_userdb']
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
 

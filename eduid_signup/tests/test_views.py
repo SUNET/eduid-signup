@@ -101,17 +101,17 @@ class SNATests(MongoTestCase):
         try:
             app = main({}, **SETTINGS)
             self.testapp = TestApp(app)
-            self.db = app.registry.settings['mongodb'].get_database()
+            self.signup_userdb = app.registry.settings['signup_userdb']
             self.toudb = app.registry.settings['mongodb_tou'].get_database()
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
-        self.db.registered.drop()
+        self.signup_userdb._coll.drop()
         self.toudb.consent.drop()
 
     def tearDown(self):
         super(SNATests, self).tearDown()
         self.testapp.reset()
-        self.db.registered.drop()
+        self.signup_userdb._coll.drop()
         self.toudb.consent.drop()
 
     def _google_callback(self, state, user):
@@ -144,16 +144,16 @@ class SNATests(MongoTestCase):
         self._google_callback(state, NEW_USER)
 
         res = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.db.registered.find({}).count(), 0)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
-        self.assertEqual(self.db.registered.find({}).count(), 1)
-        from eduid_am.db import MongoDB
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+        from eduid_userdb import MongoDB
         with patch.object(MongoDB, 'get_database', clear=True):
-            MongoDB.get_database.return_value = self.db
+            MongoDB.get_database.return_value = self.signup_userdb
             res = self.testapp.get(res.location)
             time.sleep(0.1)
-            self.assertEqual(self.db.registered.find({}).count(), 0)
+            self.assertEqual(self.signup_userdb.db_count(), 0)
 
     def test_google_tou(self):
         # call the login to fill the session
@@ -187,11 +187,11 @@ class SNATests(MongoTestCase):
         self._google_callback(state, EXISTING_USER)
 
         res = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.db.registered.find({}).count(), 0)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
         #res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/email_already_registered/')
-        self.assertEqual(self.db.registered.find({}).count(), 0)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
 
     def test_google_retry(self):
         # call the login to fill the session
@@ -210,7 +210,7 @@ class SNATests(MongoTestCase):
         self._google_callback(state, NEW_USER)
 
         res = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.db.registered.find({}).count(), 0)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
-        self.assertEqual(self.db.registered.find({}).count(), 1)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
