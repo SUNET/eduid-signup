@@ -1,59 +1,71 @@
-import datetime
-
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
 from eduid_am.tasks import update_attributes
 from eduid_signup.utils import generate_eppn, normalize_email
 
+from eduid_signup.user import SignupUser
+import eduid_userdb
+
+import logging
+logger = logging.getLogger(__name__)
+
 
 def create_or_update_sna(request, social_info, signup_user):
+    """
 
+    :param request:
+    :param social_info:
+    :param signup_user: Signup user, if already in the Signup applications database
+
+    :type signup_user: SignupUser
+    :return:
+    """
     provider = request.session['provider']
     provider_user_id = request.session['provider_user_id']
-    provider_key = '%s_id' % provider
-    email = social_info['email']
+
+    logging.debug("create_or_update_sna called for {!r}+{!r} (signup user {!s})".format(
+        provider, provider_user_id, signup_user
+    ))
 
     if signup_user is None:
-        # The user is new, is not registered in signup or am either
-        # then, register as usual
-        eppn = generate_eppn(request)
-        user_id = request.db.registered.save({
-            provider_key: provider_user_id,
-            "email": email,
-            "date": datetime.datetime.utcnow(),
-            "verified": True,
-            "displayName": social_info["screen_name"],
-            "givenName": social_info["first_name"],
-            "sn": social_info["last_name"],
-            "eduPersonPrincipalName": eppn,
-            "subject": "physical person",
-        }, safe=True)
-
+        # The user doesn't exist at all in the signup_userdb. Create based on
+        # data from social network.
+        #mailaddress = eduid_userdb.mail.new(email, 'signup', verified=True)
+        mailaddress = eduid_userdb.mail.MailAddress(email=social_info['email'],
+                                                    application='signup',
+                                                    verified=True,
+                                                    primary=True,
+                                                    )
+        signup_user = SignupUser(eppn = generate_eppn(request))
+        signup_user.mail_addresses.add(mailaddress)
     else:
         # If the user is registered in signup but was not propagated to
-        # eduid_am
-        # Then, update local attributes and continue as new user
+        # eduid_am, update local attributes and continue as new user
         #
-        request.db.registered.find_and_modify({
-            "email": email,
-        }, {
-            "$set": {
-                provider_key: provider_user_id,
-                "verified": True,
-                "displayName": social_info["screen_name"],
-                "givenName": social_info["first_name"],
-                "sn": social_info["last_name"],
-            }
-        })
-        user_id = signup_user['_id']
+        assert isinstance(signup_user, SignupUser)
+        signup_user.mail_addresses.primary = social_info['email']
+
+    signup_user.display_name = social_info['screen_name']
+    signup_user.given_name = social_info['first_name']
+    signup_user.surname = social_info['last_name']
+    signup_user.subject = 'physical person'
+    #
+    signup_user.social_network = provider
+    signup_user.social_network_id = provider_user_id
+
+    logging.debug("Saving social signed up user {!s} (e-mail {!s}) to signup userdb".format(
+        signup_user, signup_user.mail_addresses.primary.email))
+    res = request.db.save(signup_user)
+    logging.debug("Save result: {!r}".format(res))
+
     # Send the signal to the attribute manager so it can update
-    # this user's attributes in the IdP
-    update_attributes.delay('eduid_signup', user_id)
+    # this user's attributes in the central eduID UserDB
+    update_attributes.delay('eduid_signup', signup_user.user_id)
 
     # Create an authenticated session and send the user to the
-    # success screeen
-    request.session["email"] = email
+    # success screeen (use sanitized address)
+    request.session['email'] = signup_user.mail_addresses.primary.email
 
 
 def save_data_in_session(request, provider, provider_user_id, attributes):

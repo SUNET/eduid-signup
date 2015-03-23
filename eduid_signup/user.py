@@ -32,28 +32,62 @@
 
 __author__ = 'ft'
 
-from eduid_userdb.userdb import UserDB
+import copy
+import bson
+
+from eduid_userdb.user import User
 
 
-class SignupUserDB(UserDB):
+class SignupUser(User):
+    """
+    Subclass of eduid_userdb.User with eduid Signup application specific data.
+    """
 
-    def __init__(self, db_uri, collection='registered'):
-        UserDB.__init__(self, db_uri, collection)
+    def __init__(self, userid = None, eppn = None, subject = 'physical person', data = None):
+        data_in = data
+        data = copy.copy(data_in)  # to not modify callers data
 
-    def db_count(self):
+        if data is None:
+            if userid is None:
+                userid = bson.ObjectId()
+            data = dict(_id = userid,
+                        eduPersonPrincipalName = eppn,
+                        subject = subject,
+                        )
+        User.__init__(self, data = data)
+
+    # -----------------------------------------------------------------
+    @property
+    def social_network(self):
         """
-        Return number of entries in the database.
+        Get the user's social_network.
 
-        Used in eduid-signup test cases.
-        :return: User count
-        :rtype: int
+        :rtype: str
         """
-        return self._coll.find({}).count()
+        return self._data.get('social_network', '')
 
-    def drop_collection(self):
+    @social_network.setter
+    def social_network(self, value):
         """
-        Drop the collection. Used in eduid-signup test cases.
+        :param value: Set the name of the social_network used to do SNA signup.
+        :type value: str | unicode
+        """
+        self._data['social_network'] = value
 
-        :return:
+    # -----------------------------------------------------------------
+    @property
+    def social_network_id(self):
         """
-        return self._coll.drop()
+        Get the user's social network id.
+
+        :rtype: str
+        """
+        return self._data.get('social_network_id', '')
+
+    @social_network_id.setter
+    def social_network_id(self, value):
+        """
+        :param value: Set the user's social network id.
+        :type value: str | unicode
+        """
+        self._data['social_network_id'] = value

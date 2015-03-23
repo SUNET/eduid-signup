@@ -102,7 +102,7 @@ def generate_eppn(request):
         eppn_int = struct.unpack('I', os.urandom(4))[0]
         eppn = proquint.from_int(eppn_int)
         try:
-            request.userdb.get_user_by_attr('eduPersonPrincipalName', eppn)
+            request.userdb.get_user_by_eppn(eppn)
         except request.userdb.exceptions.UserDoesNotExist:
             return eppn
     raise HTTPServerError()

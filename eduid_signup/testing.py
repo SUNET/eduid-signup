@@ -7,8 +7,10 @@ from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
 from pyramid.testing import DummyRequest
 
-from eduid_am.db import MongoDB
 from eduid_signup import main
+
+from eduid_userdb import MongoDB, UserDB
+from eduid_signup.userdb import SignupUserDB
 
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
@@ -19,20 +21,19 @@ MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
 class DBTests(unittest.TestCase):
     """Base TestCase for those tests that need a db configured"""
 
-    clean_collections = tuple()
+    clean_dbs = dict()
 
     def setUp(self):
         try:
-            mongodb = MongoDB(MONGO_URI_TEST)
-            self.signup_userdb = mongodb.get_database()
+            self.signup_userdb = SignupUserDB(db_uri = MONGO_URI_TEST)
         except pymongo.errors.ConnectionFailure:
             self.signup_userdb = None
 
     def tearDown(self):
         if not self.signup_userdb:
             return None
-        for collection in self.clean_collections:
-            self.signup_userdb.drop_collection(collection)
+        if 'signup_userdb' in self.clean_dbs:
+            self.signup_userdb.drop_collection()
 
 
 SETTINGS = {

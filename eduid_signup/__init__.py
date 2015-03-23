@@ -10,10 +10,10 @@ from pyramid.interfaces import IStaticURLInfo
 from pyramid.config.views import StaticURLInfo
 
 from eduid_am.celery import celery
-from eduid_userdb import MongoDB, UserDB
 #from eduid_am.userdb import UserDB
 from eduid_am.config import read_setting_from_env, read_mapping
 from eduid_signup.i18n import locale_negotiator
+from eduid_userdb import MongoDB, UserDB
 from eduid_signup.userdb import SignupUserDB
 
 

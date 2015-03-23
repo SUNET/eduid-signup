@@ -105,13 +105,13 @@ class SNATests(MongoTestCase):
             self.toudb = app.registry.settings['mongodb_tou'].get_database()
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
-        self.signup_userdb._coll.drop()
+        self.signup_userdb.drop_collection()
         self.toudb.consent.drop()
 
     def tearDown(self):
         super(SNATests, self).tearDown()
         self.testapp.reset()
-        self.signup_userdb._coll.drop()
+        self.signup_userdb.drop_collection()
         self.toudb.consent.drop()
 
     def _google_callback(self, state, user):

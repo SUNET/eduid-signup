@@ -231,22 +231,20 @@ def review_fetched_info(request):
 
     mail_registered = False
     if email:
-        signup_user = request.db.get_user_by_mail(email)
-
         try:
-            am_user = request.userdb.get_user_by_mail(email)
-            logger.info("Found user {!s} using email address {!s}".format(am_user, email))
+            am_user = request.userdb.get_user_by_mail(email, raise_on_missing=True)
+            logger.info("User {!s} found using email {!s}".format(am_user, email))
         except request.userdb.exceptions.UserDoesNotExist:
             pass
         else:
             raise HTTPFound(location=request.route_url('email_already_registered'))
 
-        mail_registered = signup_user
+        signup_user = request.db.get_user_by_mail(email)
 
     if request.method == 'GET':
         return {
             'social_info': social_info,
-            'mail_registered': bool(mail_registered),
+            'mail_registered': bool(signup_user),
             'mail_empty': not email,
             'reset_password_link': request.registry.settings['reset_password_link'],
         }
@@ -425,10 +423,10 @@ def account_created_from_sna(request):
     View where the registration from a social network is completed,
     after the user has reviewed the information fetched from the s.n.
     """
-
-    user = request.db.registered.find_one({
-        'email': request.session.get('email')
-    })
+    user = request.db.get_user_by_mail(request.session.get('email'),
+                                       raise_on_missing=True,
+                                       include_unconfirmed=True,
+                                       )
 
     return registered_completed(request, user)
 

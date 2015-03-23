@@ -30,7 +30,7 @@ class EmailFormatTests(unittest.TestCase):
 
 class ValidateEmailTests(DBTests):
 
-    clean_collections = ('registered', )
+    clean_dbs = dict(signup_userdb = True)
 
     def test_no_email(self):
         self.assertRaises(ValidationError, validate_email, {})
