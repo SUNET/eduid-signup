@@ -88,15 +88,13 @@ class HelpViewTests(FunctionalTests):
 class SNATests(MongoTestCase):
 
     def setUp(self):
-        # Don't call DBTests.setUp because we are getting the
-        # db in a different way
         super(SNATests, self).setUp()
         # get the mongo URI for the temporary mongo instance that was just started in MongoTestCase.setup()
         mongo_settings = {
-            'mongo_uri': self.am_settings['MONGO_URI'],
-            'mongo_uri_tou': self.am_settings['MONGO_URI'] + 'tou',
+            'mongo_uri': self.mongodb_uri(),
+            'mongo_uri_tou': self.mongodb_uri('tou'),
             'tou_version': '2014-v1',
-        }   
+        }
 
         if getattr(self, 'settings', None) is None:
             self.settings = SETTINGS

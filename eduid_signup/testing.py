@@ -9,6 +9,7 @@ from pyramid.testing import DummyRequest
 
 from eduid_signup import main
 from eduid_signup.userdb import SignupUserDB
+from eduid_userdb.testing import MongoTemporaryInstance
 
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
@@ -51,7 +52,6 @@ class DBTests(unittest.TestCase):
     def setUp(self):
         try:
             self.signup_userdb = SignupUserDB(SETTINGS['mongo_uri'])
-
         except pymongo.errors.ConnectionFailure:
             self.signup_userdb = None
 
@@ -66,10 +66,20 @@ class FunctionalTests(DBTests):
     """Base TestCase for those tests that need a full environment setup"""
 
     def setUp(self):
+        super(DBTests, self).setUp()
+        self.tmp_db = MongoTemporaryInstance.get_instance()
+
+        _settings = SETTINGS
+        _settings.update({
+            'mongo_uri': self.tmp_db.get_uri('eduid_signup_test'),
+            'mongo_uri_am': self.tmp_db.get_uri('eduid_am_test'),
+            'mongo_uri_tou': self.tmp_db.get_uri('eduid_tou_test'),
+            })
+
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
         try:
-            app = main({}, **SETTINGS)
+            app = main({}, **_settings)
             self.testapp = TestApp(app)
             self.signup_userdb = app.registry.settings['signup_userdb']
         except pymongo.errors.ConnectionFailure:
