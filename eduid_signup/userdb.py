@@ -34,6 +34,7 @@ __author__ = 'ft'
 
 from eduid_userdb.userdb import UserDB
 from eduid_signup.user import SignupUser
+from eduid_userdb.exceptions import MultipleUsersReturned
 
 class SignupUserDB(UserDB):
 
@@ -49,3 +50,26 @@ class SignupUserDB(UserDB):
         :return:
         """
         return self._coll.drop()
+
+    def get_user_by_mail_verification_code(self, code):
+        docs = self._coll.find({'pending_mail_address.verification_code': code})
+        #docs = self._coll.find({'mailAliases': {'$elemMatch': {'verification_code': code}}})
+        users = []
+        if docs.count() > 0:
+            users = list(docs)
+        if not users:
+            return None
+        elif len(users) > 1:
+            raise MultipleUsersReturned("Multiple matching users for code {!r}".format(code))
+        return self.UserClass(data=users[0])
+
+    def get_user_by_pending_mail_address(self, mail):
+        docs = self._coll.find({'pending_mail_address.email': mail})
+        users = []
+        if docs.count() > 0:
+            users = list(docs)
+        if not users:
+            return None
+        elif len(users) > 1:
+            raise MultipleUsersReturned("Multiple matching users for pending_mail_address {!r}".format(mail))
+        return self.UserClass(data=users[0])

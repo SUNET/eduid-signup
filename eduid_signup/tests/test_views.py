@@ -10,6 +10,7 @@ from eduid_userdb.testing import MongoTestCase
 from eduid_signup import main
 from eduid_signup.testing import FunctionalTests, SETTINGS
 
+import pprint
 import logging
 logger = logging.getLogger(__name__)
 
@@ -85,10 +86,10 @@ class HelpViewTests(FunctionalTests):
         res.mustcontain('Help')
 
 
-class SNATests(MongoTestCase):
+class SignupAppTest(MongoTestCase):
 
     def setUp(self):
-        super(SNATests, self).setUp()
+        super(SignupAppTest, self).setUp()
         # get the mongo URI for the temporary mongo instance that was just started in MongoTestCase.setup()
         mongo_settings = {
             'mongo_uri': self.mongodb_uri(),
@@ -115,11 +116,21 @@ class SNATests(MongoTestCase):
         self.signup_userdb.drop_collection()
         self.toudb.consent.drop()
 
+        # Tell the Celery task where to find the SignupUserDb
+        import eduid_am.tasks
+        eduid_am.tasks.USERDBS['eduid_signup'] = self.signup_userdb
+
     def tearDown(self):
-        super(SNATests, self).tearDown()
+        super(SignupAppTest, self).tearDown()
         self.testapp.reset()
         self.signup_userdb.drop_collection()
         self.toudb.consent.drop()
+
+
+class SNATests(SignupAppTest):
+    """
+    Tests of the complete signup process using Social Network site
+    """
 
     def _google_callback(self, state, user):
 
@@ -157,9 +168,6 @@ class SNATests(MongoTestCase):
         self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 0)
 
-        # Tell the Celery task where to find the SignupUserDb
-        import eduid_am.tasks
-        eduid_am.tasks.USERDBS['eduid_signup'] = self.signup_userdb
         res2 = self.testapp.get('/review_fetched_info/')
         self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 0)
@@ -264,3 +272,41 @@ class SNATests(MongoTestCase):
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(self.signup_userdb.db_count(), 1)
+
+
+class SignupEmailTests(SignupAppTest):
+    """
+    Test of the complete signup process using an e-mail address
+    """
+
+    def test_sign_up_with_good_email(self):
+        res = self.testapp.post('/', {'email': 'foo@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        res2 = self.testapp.get('/trycaptcha/')
+        res3 = res2.form.submit('foo')
+
+        # Should be one user in the signup_userdb now
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        user = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
+        if not user:
+            self.fail("User could not be found using pending mail address")
+        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
+            pprint.pformat(user.to_dict())
+        ))
+
+        from vccs_client import VCCSClient
+        with patch.object(VCCSClient, 'add_credentials', clear=True):
+            VCCSClient.add_credentials.return_value = 'faked while testing'
+
+            # Visit the confirmation page to confirm the e-mail address
+            verify_link = "/email_verification/{code!s}/".format(code = user.pending_mail_address.verification_code)
+            res4 = self.testapp.get(verify_link)
+            self.assertEqual(res4.status, '200 OK')

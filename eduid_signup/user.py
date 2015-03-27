@@ -36,6 +36,8 @@ import copy
 import bson
 
 from eduid_userdb.user import User
+from eduid_userdb.element import ElementList
+from eduid_userdb.mail import MailAddress
 
 
 class SignupUser(User):
@@ -56,11 +58,23 @@ class SignupUser(User):
                         )
         _social_network = data.pop('social_network', None)
         _social_network_id = data.pop('social_network_id', None)
+        _pending_mail_address = data.pop('pending_mail_address', None)
+        if _pending_mail_address:
+            _pending_mail_address = MailAddress(data=_pending_mail_address)
+        self._pending_mail_address = None
+
         User.__init__(self, data = data)
+
         # now self._data exists so we can call our setters
         self.social_network = _social_network
         self.social_network_id = _social_network_id
+        self.pending_mail_address = _pending_mail_address
 
+    def to_dict(self, old_userdb_format=False):
+        res = User.to_dict(self, old_userdb_format=old_userdb_format)
+        if self._pending_mail_address is not None:
+            res['pending_mail_address'] = self._pending_mail_address.to_dict()
+        return res
 
     # -----------------------------------------------------------------
     @property
@@ -99,3 +113,27 @@ class SignupUser(User):
         """
         if value is not None:
             self._data['social_network_id'] = value
+
+    # -----------------------------------------------------------------
+    @property
+    def pending_mail_address(self):
+        """
+        Get the user's pending (unconfirmed) mail address.
+
+        In the userdb, the mail_addresses attribute requires a primary e-mail address,
+        and it has to be verified already. Signup is really the special case, so
+        we have a special attribute for it.
+
+        :rtype: eduid_userdb.mail.MailAddress
+        """
+        return self._pending_mail_address
+
+    @pending_mail_address.setter
+    def pending_mail_address(self, value):
+        """
+        :param value: Set the user's pending (unconfirmed) mail address.
+        :type value: eduid_userdb.mail.MailAddress | None
+        """
+        if value is not None and not isinstance(value, MailAddress):
+            raise ValueError('Must be eduid_userdb.mail.MailAddress')
+        self._pending_mail_address = value

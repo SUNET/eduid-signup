@@ -33,7 +33,7 @@ def create_or_update_sna(request, social_info, signup_user):
         # data from social network.
         #mailaddress = eduid_userdb.mail.new(email, 'signup', verified=True)
         mailaddress = eduid_userdb.mail.MailAddress(email=social_info['email'],
-                                                    application='signup',
+                                                    application='signup (using {!s})'.format(provider),
                                                     verified=True,
                                                     primary=True,
                                                     )

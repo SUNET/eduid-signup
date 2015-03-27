@@ -349,7 +349,7 @@ def email_verification_link(request):
     logger.debug("Trying to confirm e-mail using confirmation link")
     code = request.matchdict['code']
     try:
-        verify_email_code(request.db.registered, code)
+        user = verify_email_code(request.db, code)
     except AlreadyVerifiedException:
         return {
             'email_already_verified': True,
@@ -361,10 +361,6 @@ def email_verification_link(request):
             "code_form": request.route_path('verification_code_form'),
             "signup_link": request.route_path('home'),
         }
-
-    user = request.db.registered.find_one({
-        'code': code,
-    })
 
     return registered_completed(request, user, {'from_email': True})
 
@@ -380,7 +376,7 @@ def verification_code_form(request):
         try:
             try:
                 code = request.POST['code']
-                verify_email_code(request.db.registered, code)
+                _signup_user = verify_email_code(request.db, code)
                 user = request.db.registered.find_one({
                     'code': code
                 })

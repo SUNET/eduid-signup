@@ -9,6 +9,9 @@ from eduid_am.tasks import update_attributes
 
 from eduid_signup.utils import generate_verification_link, generate_eppn
 
+from eduid_signup.user import SignupUser
+import eduid_userdb
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -43,26 +46,23 @@ def send_verification_mail(request, email):
         ),
     )
 
-    eppn = generate_eppn(request)
-    result = request.db.registered.find_and_modify(
-        query={
-            'email': email,
-        }, update={
-            '$set': {
-                "subject": "physical person",
-                "eduPersonPrincipalName": eppn,
-                "email": email,
-                "created_ts": datetime.utcnow(),
-                "code": code,
-                "verified": False,
-            },
-        }, upsert=True, full_response=True, new=True, safe=True)
-
-    user_id = result.get("value", {}).get("_id")
-
-    logger.info("New user {!s}/{!s} created. e-mail pending confirmation: {!s}".format(
-        eppn, user_id, email,
-    ))
+    signup_user = request.db.get_user_by_pending_mail_address(email)
+    if not signup_user:
+        mailaddress = eduid_userdb.mail.MailAddress(email = email,
+                                                    application = 'signup',
+                                                    verified = False,
+                                                    primary = True,
+                                                    verification_code = code,
+                                                    )
+        signup_user = SignupUser(eppn = generate_eppn(request))
+        signup_user.pending_mail_address = mailaddress
+        request.db.save(signup_user)
+        logger.info("New user {!s}/{!s} created. e-mail is pending confirmation.".format(signup_user, email))
+    else:
+        # update mailaddress on existing user with new code
+        signup_user.pending_mail_addresses.verification_code = code
+        request.db.save(signup_user)
+        logger.info("User {!s}/{!s} updated with new e-mail confirmation code".format(signup_user, email))
 
     if request.registry.settings.get("development", '') != 'true':
         mailer.send(message)
@@ -70,13 +70,6 @@ def send_verification_mail(request, email):
         # Development
         logger.debug("Confirmation e-mail:\nFrom: {!s}\nTo: {!s}\nSubject: {!s}\n\n{!s}".format(
             message.sender, message.recipients, message.subject, message.body))
-
-    # XXX REMOVE THIS? otherwise users appear in eduid_am without 'passwords'
-    # so they can't log in but exceptions are logged in the IdP when they try
-
-    # Send the signal to the attribute manager so it can update
-    # this user's attributes in the IdP
-    update_attributes.delay('eduid_signup', str(user_id))
 
 
 def send_credentials(request, email, password):

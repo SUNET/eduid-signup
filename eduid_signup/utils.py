@@ -26,35 +26,41 @@ def generate_verification_link(request):
     return (link, code)
 
 
-def verify_email_code(collection, code):
-    status = collection.find_one({
-        'code': code,
-    })
+def verify_email_code(userdb, code):
+    """
+    Look up a user in the signup userdb using an e-mail verification code.
 
-    if status is None:
+    Mark the e-mail address as confirmed, save the user and return the user object.
+
+    :param userdb: Signup user database
+    :param code: Code as received from user
+    :type userdb: SignupUserDb
+    :type code: str | unicode
+
+    :return: Signup user object
+    :rtype: SignupUser
+    """
+    signup_user = userdb.get_user_by_mail_verification_code(code)
+
+    if not signup_user:
         logger.debug("Code {!r} not found in database".format(code))
         raise CodeDoesNotExists()
-    else:
-        if status.get('verified'):
-            logger.debug("Code {!r} already verified".format(code))
-            raise AlreadyVerifiedException()
 
-    result = collection.update(
-        {
-            "code": code,
-            "verified": False
-        }, {
-            "$set": {
-                "verified": True,
-                "verified_ts": datetime.datetime.utcnow(),
-            }
-        },
-        new=True,
-        safe=True
-    )
+    mail = signup_user.pending_mail_address
+    if mail.is_verified:
+        logger.debug("Code {!r} already verified ({!s})".format(code, mail))
+        raise AlreadyVerifiedException()
 
-    logger.debug("Code {!r} verified : {!r}".format(code, result))
-    return True
+    mail.is_verified = True
+    mail.verified_ts = True
+    mail.verified_by = 'signup'
+    mail.is_primary = True
+    signup_user.pending_mail_address = None
+    signup_user.mail_addresses.add(mail)
+    result = userdb.save(signup_user)
+
+    logger.debug("Code {!r} verified and user {!s} saved: {!r}".format(code, signup_user, result))
+    return signup_user
 
 
 def check_email_status(userdb, email):
@@ -68,13 +74,14 @@ def check_email_status(userdb, email):
         If exists and it has been verified before, then return 'verified'.
     """
     try:
-        am_user = userdb.get_user_by_email(email)
+        am_user = userdb.get_user_by_mail(email, raise_on_missing=True)
+        logger.debug("Found user {!s} with email {!s}".format(am_user, email))
     except userdb.exceptions.UserDoesNotExist:
+        logger.debug("No user found with email {!s}".format(email))
         return 'new'
-    emails = am_user.get_mail_aliases()
-    for mail in emails:
-        if mail.get('email', '') == email and mail.get('verified', False):
-            return 'verified'
+    this = am_user.mail_addresses.find(email)
+    if this and this.verified:
+        return 'verified'
     return 'not_verified'
 
 
