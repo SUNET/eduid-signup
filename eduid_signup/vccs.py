@@ -19,7 +19,7 @@ def generate_password(settings, credential_id, user):
     :param user: user data as dict
     :return: (password, salt) both strings
     """
-    user_id = str(user['_id'])
+    user_id = str(user.user_id)
     password = pwgen(settings.get('password_length'), no_capitalize = True, no_symbols = True)
     factor = vccs_client.VCCSPasswordFactor(password, credential_id)
     logger.debug("Adding VCCS password factor for user {!r}, credential_id {!r}".format(user_id, credential_id))

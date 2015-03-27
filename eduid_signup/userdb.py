@@ -33,22 +33,14 @@
 __author__ = 'ft'
 
 from eduid_userdb.userdb import UserDB
-
+from eduid_signup.user import SignupUser
 
 class SignupUserDB(UserDB):
 
+    UserClass = SignupUser
+
     def __init__(self, db_uri, collection='registered'):
         UserDB.__init__(self, db_uri, collection)
-
-    def db_count(self):
-        """
-        Return number of entries in the database.
-
-        Used in eduid-signup test cases.
-        :return: User count
-        :rtype: int
-        """
-        return self._coll.find({}).count()
 
     def drop_collection(self):
         """

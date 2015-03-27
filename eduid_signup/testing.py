@@ -8,32 +8,12 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest
 
 from eduid_signup import main
-
-from eduid_userdb import MongoDB, UserDB
 from eduid_signup.userdb import SignupUserDB
 
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
 MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
 MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
-
-
-class DBTests(unittest.TestCase):
-    """Base TestCase for those tests that need a db configured"""
-
-    clean_dbs = dict()
-
-    def setUp(self):
-        try:
-            self.signup_userdb = SignupUserDB(db_uri = MONGO_URI_TEST)
-        except pymongo.errors.ConnectionFailure:
-            self.signup_userdb = None
-
-    def tearDown(self):
-        if not self.signup_userdb:
-            return None
-        if 'signup_userdb' in self.clean_dbs:
-            self.signup_userdb.drop_collection()
 
 
 SETTINGS = {
@@ -61,6 +41,25 @@ static_url = pyramid_jinja2.filters:static_url_filter
     'facebook_app_id': '456',
     'facebook_app_secret': 'def',
 }
+
+
+class DBTests(unittest.TestCase):
+    """Base TestCase for those tests that need a db configured"""
+
+    clean_dbs = dict()
+
+    def setUp(self):
+        try:
+            self.signup_userdb = SignupUserDB(SETTINGS['mongo_uri'])
+
+        except pymongo.errors.ConnectionFailure:
+            self.signup_userdb = None
+
+    def tearDown(self):
+        if not self.signup_userdb:
+            return None
+        if 'signup_userdb' in self.clean_dbs:
+            self.signup_userdb.drop_collection()
 
 
 class FunctionalTests(DBTests):

@@ -11,7 +11,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 version = '0.4.2-dev'
 
 requires = [
-    'eduid_am>=0.5.1',
+    'eduid_am',
     'vccs_client>=0.4.1',
     'wsgi_ratelimit>=0.1',
     'eduid_userdb >= 0.0.1',

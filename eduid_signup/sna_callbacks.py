@@ -61,7 +61,7 @@ def create_or_update_sna(request, social_info, signup_user):
 
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the central eduID UserDB
-    update_attributes.delay('eduid_signup', signup_user.user_id)
+    #update_attributes.delay('eduid_signup', signup_user.user_id)
 
     # Create an authenticated session and send the user to the
     # success screeen (use sanitized address)

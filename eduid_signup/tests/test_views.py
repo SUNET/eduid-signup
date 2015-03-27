@@ -6,9 +6,29 @@ from pyramid_sna.compat import urlparse
 
 from webtest import TestApp
 
-from eduid_am.testing import MongoTestCase
+from eduid_userdb.testing import MongoTestCase
 from eduid_signup import main
 from eduid_signup.testing import FunctionalTests, SETTINGS
+
+import logging
+logger = logging.getLogger(__name__)
+
+
+EXISTING_USER = {
+    'id': '789',
+    'name': 'John Smith',
+    'given_name': 'John',
+    'family_name': 'Smith',
+    'email': 'johnsmith@example.com',
+    }
+
+NEW_USER = {
+    'id': '789',
+    'name': 'John Brown',
+    'given_name': 'John',
+    'family_name': 'Brown',
+    'email': 'johnbrown@example.com',
+    }
 
 
 class HomeViewTests(FunctionalTests):
@@ -65,44 +85,33 @@ class HelpViewTests(FunctionalTests):
         res.mustcontain('Help')
 
 
-EXISTING_USER = {
-                    'id': '789',
-                    'name': 'John Smith',
-                    'given_name': 'John',
-                    'family_name': 'Smith',
-                    'email': 'johnsmith@example.com',
-                }
-
-NEW_USER = {
-                    'id': '789',
-                    'name': 'John Brown',
-                    'given_name': 'John',
-                    'family_name': 'Brown',
-                    'email': 'johnbrown@example.com',
-                }
-
-
-
 class SNATests(MongoTestCase):
 
     def setUp(self):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
         super(SNATests, self).setUp()
+        # get the mongo URI for the temporary mongo instance that was just started in MongoTestCase.setup()
         mongo_settings = {
+            'mongo_uri': self.am_settings['MONGO_URI'],
             'mongo_uri_tou': self.am_settings['MONGO_URI'] + 'tou',
             'tou_version': '2014-v1',
         }   
 
         if getattr(self, 'settings', None) is None:
-            self.settings = mongo_settings
-        else:
-            self.settings.update(mongo_settings)
+            self.settings = SETTINGS
+
+        self.settings.update(mongo_settings)
         try:
-            app = main({}, **SETTINGS)
+            _settings = SETTINGS
+            _settings.update(self.settings)
+            app = main({}, **_settings)
             self.testapp = TestApp(app)
             self.signup_userdb = app.registry.settings['signup_userdb']
             self.toudb = app.registry.settings['mongodb_tou'].get_database()
+            logger.info("Unit tests self.signup_userdb: {!s} / {!s}".format(
+                self.signup_userdb, self.signup_userdb._coll))
+            logger.info("Unit tests self.toudb: {!s}".format(self.toudb))
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
         self.signup_userdb.drop_collection()
@@ -133,46 +142,89 @@ class SNATests(MongoTestCase):
 
     def test_google(self):
         # call the login to fill the session
-        res = self.testapp.get('/google/login', {
+        res1 = self.testapp.get('/google/login', {
             'next_url': 'https://localhost/foo/bar',
         })
-        self.assertEqual(res.status, '302 Found')
-        url = urlparse.urlparse(res.location)
+        #
+        # Check that the result was a redirect to Google OAUTH endpoint
+        self.assertEqual(res1.status, '302 Found')
+        self.assertRegexpMatches(res1.location, '^https://accounts.google.com/o/oauth2/auth?')
+        url = urlparse.urlparse(res1.location)
         query = urlparse.parse_qs(url.query)
         state = query['state'][0]
 
         self._google_callback(state, NEW_USER)
 
-        res = self.testapp.get('/review_fetched_info/')
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 0)
-        res = res.form.submit('action')
-        self.assertEqual(res.status, '302 Found')
+
+        # Tell the Celery task where to find the SignupUserDb
+        import eduid_am.tasks
+        eduid_am.tasks.USERDBS['eduid_signup'] = self.signup_userdb
+        res2 = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        res3 = res2.form.submit('action')
+
+        # Check that the result was a redirect to XXX
+        self.assertEqual(res3.status, '302 Found')
+        self.assertRegexpMatches(res3.location, '/sna_account_created/')
+
+        # Verify there is now one user in the signup userdb
+        self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 1)
-        from eduid_userdb import MongoDB
-        with patch.object(MongoDB, 'get_database', clear=True):
-            MongoDB.get_database.return_value = self.signup_userdb
-            res = self.testapp.get(res.location)
-            time.sleep(0.1)
-            self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        from vccs_client import VCCSClient
+        with patch.object(VCCSClient, 'add_credentials', clear=True):
+            VCCSClient.add_credentials.return_value = 'faked while testing'
+            res4 = self.testapp.get(res3.location)
+            for retry in range(3):
+                time.sleep(0.1)
+                if self.signup_userdb.db_count() == 0:
+                    # User was removed from SignupUserDB by attribute manager plugin after
+                    # the new user was properly synced to the central UserDB - all done
+                    break
+            if self.signup_userdb.db_count():
+                self.fail('SignupUserDB user count never went back to zero')
+
+        # Verify there is now one more user in the central eduid user database
+        self.assertEqual(self.amdb.db_count(), 3)
 
     def test_google_tou(self):
         # call the login to fill the session
-        res = self.testapp.get('/google/login', {
+        res1 = self.testapp.get('/google/login', {
             'next_url': 'https://localhost/foo/bar',
         })
-        self.assertEqual(res.status, '302 Found')
-        url = urlparse.urlparse(res.location)
+        #
+        # Check that the result was a redirect to Google OAUTH endpoint
+        self.assertEqual(res1.status, '302 Found')
+        url = urlparse.urlparse(res1.location)
+        self.assertRegexpMatches(res1.location, '^https://accounts.google.com/o/oauth2/auth?')
         query = urlparse.parse_qs(url.query)
         state = query['state'][0]
 
+        # Fake Google OAUTH response
         self._google_callback(state, NEW_USER)
 
-        res = self.testapp.get('/review_fetched_info/')
+        # The user reviews the information eduid got from Google
+        res2 = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(res2.status, '200 OK')
+
+        # Verify known starting point (empty ToU database)
         self.assertEqual(self.toudb.consent.find({}).count(), 0)
-        res = res.form.submit('action')
-        self.assertEqual(res.status, '302 Found')
-        self.testapp.get(res.location)
-        self.assertEqual(self.toudb.consent.find({}).count(), 1)
+
+        from vccs_client import VCCSClient
+        with patch.object(VCCSClient, 'add_credentials', clear=True):
+            VCCSClient.add_credentials.return_value = 'faked while testing'
+            # The user presses OK and a new eduid user should be created
+            res3 = res2.form.submit('action')
+            self.assertEqual(res3.status, '302 Found')
+            self.assertRegexpMatches(res3.location, '/sna_account_created/')
+            self.testapp.get(res3.location)
+            #
+            # Verify the users consent of the ToU is registered
+            self.assertEqual(self.toudb.consent.find({}).count(), 1)
 
     def test_google_existing_user(self):
         # call the login to fill the session

@@ -54,7 +54,13 @@ class SignupUser(User):
                         eduPersonPrincipalName = eppn,
                         subject = subject,
                         )
+        _social_network = data.pop('social_network', None)
+        _social_network_id = data.pop('social_network_id', None)
         User.__init__(self, data = data)
+        # now self._data exists so we can call our setters
+        self.social_network = _social_network
+        self.social_network_id = _social_network_id
+
 
     # -----------------------------------------------------------------
     @property
@@ -72,7 +78,8 @@ class SignupUser(User):
         :param value: Set the name of the social_network used to do SNA signup.
         :type value: str | unicode
         """
-        self._data['social_network'] = value
+        if value is not None:
+            self._data['social_network'] = value
 
     # -----------------------------------------------------------------
     @property
@@ -90,4 +97,5 @@ class SignupUser(User):
         :param value: Set the user's social network id.
         :type value: str | unicode
         """
-        self._data['social_network_id'] = value
+        if value is not None:
+            self._data['social_network_id'] = value

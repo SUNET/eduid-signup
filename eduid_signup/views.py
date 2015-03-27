@@ -25,6 +25,8 @@ from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
                                 CodeDoesNotExists, record_tou)
 from eduid_signup.vccs import generate_password
+from eduid_signup.user import SignupUser
+from eduid_userdb.password import Password
 
 import logging
 logger = logging.getLogger(__name__)
@@ -229,7 +231,6 @@ def review_fetched_info(request):
             'last_name': 'dummy',
         }
 
-    mail_registered = False
     if email:
         try:
             am_user = request.userdb.get_user_by_mail(email, raise_on_missing=True)
@@ -271,12 +272,11 @@ def registered_completed(request, user, context=None):
     add it to the registration record in the registrations db,
     update the attribute manager db with the new account,
     and send the pertinent information to the user.
-    """
-    user_id = user.get("_id")
-    eppn = user.get('eduPersonPrincipalName')
 
-    logger.info("Completing registration for user {!s}/{!s} (first created: {!s})".format(
-        user_id, eppn, user.get('created_ts')))
+    :param user: User instance
+    :type user: SignupUser
+    """
+    logger.info("Completing registration for user {!s}/{!s}".format(user.user_id, user.eppn))
 
     if context is None:
         context = {}
@@ -284,26 +284,15 @@ def registered_completed(request, user, context=None):
     (password, salt) = generate_password(request.registry.settings,
                                          str(password_id), user,
                                          )
-    request.db.registered.update(
-        {
-            'eduPersonPrincipalName': eppn,
-        }, {
-            '$push': {
-                'passwords': {
-                    'id': password_id,
-                    'salt': salt,
-                    'source': 'signup',
-                    'created_ts': datetime.datetime.utcnow(),
-                }
-            },
-        }, safe=True)
+    credential = Password(credential_id=password_id, salt=salt, application='signup')
+    user.passwords.add(credential)
+    request.db.save(user)
 
-    logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    rtask = update_attributes_keep_result.delay('eduid_signup', str(user_id))
+    logger.debug("Asking for sync of {!r} by Attribute Manager".format(str(user.user_id)))
+    rtask = update_attributes_keep_result.delay('eduid_signup', str(user.user_id))
 
-    eppn = user.get('eduPersonPrincipalName')
     secret = request.registry.settings.get('auth_shared_secret')
     timestamp = '{:x}'.format(int(time.time()))
     nonce = os.urandom(16).encode('hex')
@@ -321,13 +310,13 @@ def registered_completed(request, user, context=None):
         url = request.route_path('home')
         raise HTTPFound(location=url)
 
-    auth_token = generate_auth_token(secret, eppn, nonce, timestamp)
+    auth_token = generate_auth_token(secret, user.eppn, nonce, timestamp)
 
     context.update({
         "profile_link": request.registry.settings.get("profile_link", "#"),
         "password": password,
-        "email": user.get('email'),
-        "eppn": eppn,
+        "email": user.mail_addresses.primary.email,
+        "eppn": user.eppn,
         "nonce": nonce,
         "timestamp": timestamp,
         "auth_token": auth_token,
@@ -339,13 +328,13 @@ def registered_completed(request, user, context=None):
     logger.debug("Context Finish URL : {!r}".format(context.get('finish_url')))
 
     if request.registry.settings.get("email_credentials", False):
-        send_credentials(request, eppn, password)
+        send_credentials(request, user.eppn, password)
 
     # Record the acceptance of the terms of use
 
-    record_tou(request, user_id, 'signup')
+    record_tou(request, user.user_id, 'signup')
 
-    logger.info("Signup process for new user {!s}/{!s} complete".format(user_id, eppn))
+    logger.info("Signup process for new user {!s}/{!s} complete".format(user.user_id, user.eppn))
     return context
 
 
@@ -427,6 +416,8 @@ def account_created_from_sna(request):
                                        raise_on_missing=True,
                                        include_unconfirmed=True,
                                        )
+
+    assert isinstance(user, SignupUser)
 
     return registered_completed(request, user)
 
