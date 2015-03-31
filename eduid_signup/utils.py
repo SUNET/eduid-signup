@@ -48,6 +48,8 @@ def verify_email_code(userdb, code):
 
     mail = signup_user.pending_mail_address
     if mail.is_verified:
+        # There really should be no way to get here. is_verified is set when
+        # the MailAddress is moved from pending_mail_address to mail_addresses.
         logger.debug("Code {!r} already verified ({!s})".format(code, mail))
         raise AlreadyVerifiedException()
 
@@ -63,26 +65,40 @@ def verify_email_code(userdb, code):
     return signup_user
 
 
-def check_email_status(userdb, email):
+def check_email_status(userdb, signup_db, email):
     """
-        Check the email registration status.
+    Check the email registration status.
 
-        If the email doesn't exist in database, then return 'new'.
+    If the email doesn't exist in database, then return 'new'.
 
-        If exists and it hasn't been verified, then return 'not_verified'.
+    If exists and it hasn't been verified, then return 'not_verified'.
 
-        If exists and it has been verified before, then return 'verified'.
+    If exists and it has been verified before, then return 'verified'.
+
+    :param userdb: eduID central userdb
+    :param signup_db: Signup userdb
+    :param email: Address to look for
+
+    :type userdb: eduid_userdb.UserDb
+    :type signup_db: eduid_signup.userdb.SignupUserDB
+    :type email: str | unicode
     """
     try:
-        am_user = userdb.get_user_by_mail(email, raise_on_missing=True)
+        am_user = userdb.get_user_by_mail(email, raise_on_missing=True, include_unconfirmed=False)
         logger.debug("Found user {!s} with email {!s}".format(am_user, email))
-    except userdb.exceptions.UserDoesNotExist:
-        logger.debug("No user found with email {!s}".format(email))
-        return 'new'
-    this = am_user.mail_addresses.find(email)
-    if this and this.verified:
         return 'verified'
-    return 'not_verified'
+    except userdb.exceptions.UserDoesNotExist:
+        logger.debug("No user found with email {!s} in eduid userdb".format(email))
+
+    try:
+        signup_user = signup_db.get_user_by_pending_mail_address(email)
+        if signup_user:
+            logger.debug("Found user {!s} with pending email {!s} in signup db".format(signup_user, email))
+            return 'not_verified'
+    except userdb.exceptions.UserDoesNotExist:
+        logger.debug("No user found with email {!s} in signup db either".format(email))
+
+    return 'new'
 
 
 def generate_auth_token(shared_key, email, nonce, timestamp, generator=sha256):

@@ -32,17 +32,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-EMAIL_STATUS_VIEWS = {
-    'new': None,
-    'not_verified': 'resend_email_verification',
-    'verified': 'email_already_registered'
-}
-
-
 def get_url_from_email_status(request, email):
     """
-    Return a view depending on
-    the verification status of the provided email.
+    Return a view depending on the verification status of the provided email.
+
+    If a user with this (verified) e-mail address exist in the central eduid userdb,
+    return view 'email_already_registered'.
+
+    Otherwise, send a verification e-mail.
 
     :param request: the request
     :type request: WebOb Request
@@ -51,14 +48,19 @@ def get_url_from_email_status(request, email):
 
     :return: redirect response
     """
-    status = check_email_status(request.userdb, email)
+    status = check_email_status(request.userdb, request.db, email)
     logger.debug("e-mail {!s} status: {!s}".format(email, status))
     if status == 'new':
         send_verification_mail(request, email)
         namedview = 'success'
-    else:
+    elif status == 'not_verified':
         request.session['email'] = email
-        namedview = EMAIL_STATUS_VIEWS[status]
+        namedview = 'resend_email_verification'
+    elif status == 'verified':
+        request.session['email'] = email
+        namedview = 'email_already_registered'
+    else:
+        raise NotImplementedError('Unknown e-mail status: {!r}'.format(status))
     url = request.route_url(namedview)
 
     return HTTPFound(location=url)
@@ -231,6 +233,7 @@ def review_fetched_info(request):
             'last_name': 'dummy',
         }
 
+    signup_user = False
     if email:
         try:
             am_user = request.userdb.get_user_by_mail(email, raise_on_missing=True)
@@ -348,9 +351,40 @@ def email_verification_link(request):
 
     logger.debug("Trying to confirm e-mail using confirmation link")
     code = request.matchdict['code']
+    return _verify_code(request, code)
+
+
+@view_config(route_name='verification_code_form',
+             renderer="templates/verification_code_form.jinja2")
+def verification_code_form(request):
+    """
+    form to enter the verification code
+    """
+    if request.method == 'POST':
+        code = request.POST['code']
+        return _verify_code(request, code)
+    return {}
+
+
+def _verify_code(request, code):
+    """
+    Common code for the link- and form-based code verification.
+
+    :param request:
+    :param code: Code given by the user
+    :return:
+    """
     try:
-        user = verify_email_code(request.db, code)
+        signup_user = verify_email_code(request.db, code)
+        # XXX at this stage the confirmation code is marked as 'used' but no
+        # credential have been created yet. If that fails (done beyond registered_completed),
+        # the user will get an error and when retrying will get a message saying the email
+        # address has already been verified. The user *is* given the possibility to reset
+        # the password at that point, but it would be less surprising if the code was only
+        # marked as 'used' when everything worked as expected.
     except AlreadyVerifiedException:
+        # Should not be able to get here. Raise exception instead?
+        logger.error("The pending MailAddress was verified already. Should not happen!")
         return {
             'email_already_verified': True,
             "reset_password_link": request.registry.settings.get("reset_password_link", "#"),
@@ -362,43 +396,7 @@ def email_verification_link(request):
             "signup_link": request.route_path('home'),
         }
 
-    return registered_completed(request, user, {'from_email': True})
-
-
-@view_config(route_name='verification_code_form',
-             renderer="templates/verification_code_form.jinja2")
-def verification_code_form(request):
-    """
-    form to enter the verification code
-    """
-    context = {}
-    if request.method == 'POST':
-        try:
-            try:
-                code = request.POST['code']
-                _signup_user = verify_email_code(request.db, code)
-                user = request.db.registered.find_one({
-                    'code': code
-                })
-                # XXX at this stage the confirmation code is marked as 'used' but no
-                # credential have been created yet. If that fails (done beyond registered_completed),
-                # the user will get an error and when retrying will get a message saying the email
-                # address has already been verified. The user *is* given the possibility to reset
-                # the password at that point, but it would be less surprising if the code was only
-                # marked as 'used' when everything worked as expected.
-                return registered_completed(request, user, {'from_email': True})
-            except AlreadyVerifiedException:
-                context = {
-                    'email_already_verified': True,
-                    'reset_password_link': request.registry.settings.get('reset_password_link', '#'),
-                }
-        except CodeDoesNotExists:
-            context = {
-                'code_does_not_exists': True,
-                'code_form': request.route_path('verification_code_form'),
-                'signup_link': request.route_path('home'),
-            }
-    return context
+    return registered_completed(request, signup_user, {'from_email': True})
 
 
 @view_config(route_name='sna_account_created',

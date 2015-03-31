@@ -279,7 +279,7 @@ class SignupEmailTests(SignupAppTest):
     Test of the complete signup process using an e-mail address
     """
 
-    def test_sign_up_with_good_email(self):
+    def test_signup_with_good_email(self):
         res = self.testapp.post('/', {'email': 'foo@example.com'})
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/trycaptcha/')
@@ -290,6 +290,8 @@ class SignupEmailTests(SignupAppTest):
 
         res2 = self.testapp.get('/trycaptcha/')
         res3 = res2.form.submit('foo')
+        self.assertEqual(res3.status, '302 Found')
+        self.assertEqual(res3.location, 'http://localhost/success/')
 
         # Should be one user in the signup_userdb now
         self.assertEqual(self.amdb.db_count(), 2)
@@ -306,7 +308,162 @@ class SignupEmailTests(SignupAppTest):
         with patch.object(VCCSClient, 'add_credentials', clear=True):
             VCCSClient.add_credentials.return_value = 'faked while testing'
 
-            # Visit the confirmation page to confirm the e-mail address
+            # Visit the confirmation LINK to confirm the e-mail address
             verify_link = "/email_verification/{code!s}/".format(code = user.pending_mail_address.verification_code)
             res4 = self.testapp.get(verify_link)
             self.assertEqual(res4.status, '200 OK')
+            res4.mustcontain('You can now log in')
+
+    def test_signup_with_existing_email(self):
+        res = self.testapp.post('/', {'email': 'johnsmith@example.org'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        res2 = self.testapp.get('/trycaptcha/')
+        res3 = res2.form.submit('')
+
+        self.assertEqual(res3.status, '302 Found')
+        self.assertEqual(res3.location, 'http://localhost/email_already_registered/')
+
+        # Should NOT have created any new user
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        res4 = self.testapp.get(res3.location)
+        self.assertEqual(res4.status, '200 OK')
+        res4.mustcontain('Email address already in use')
+
+    def test_signup_with_good_email_twice(self):
+        res = self.testapp.post('/', {'email': 'foo@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        res2 = self.testapp.get('/trycaptcha/')
+        res3 = res2.form.submit('foo')
+
+        self.assertEqual(res3.status, '302 Found')
+        self.assertEqual(res3.location, 'http://localhost/success/')
+
+        res4 = self.testapp.get(res3.location)
+        self.assertEqual(res4.status, '200 OK')
+        res4.mustcontain('Account created successfully')
+
+        # Should be one user in the signup_userdb now
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        user1 = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
+        if not user1:
+            self.fail("User could not be found using pending mail address")
+        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
+            pprint.pformat(user1.to_dict())
+        ))
+
+        logger.debug("\n\nSignup AGAIN\n\n")
+
+        # Sign up again, with same e-mail
+        res = self.testapp.post('/', {'email': 'foo@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+
+        # Should be same number of users in the signup_userdb now
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        res2 = self.testapp.get('/trycaptcha/')
+        res3 = res2.form.submit('')
+
+        self.assertEqual(res3.status, '302 Found')
+        self.assertEqual(res3.location, 'http://localhost/resend_email_verification/')
+
+        res4 = self.testapp.get(res3.location)
+        self.assertEqual(res4.status, '200 OK')
+        res4.mustcontain('Email address already in use')
+
+        res5 = res4.form.submit('foo')
+        self.assertEqual(res5.status, '302 Found')
+        self.assertEqual(res5.location, 'http://localhost/success/')
+
+        # Check that users pending mail address has been updated with a new verification code
+        user2 = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
+        self.assertEqual(user1.user_id, user2.user_id)
+        self.assertEqual(user1.pending_mail_address.email, user2.pending_mail_address.email)
+        self.assertNotEqual(user1.pending_mail_address.verification_code, user2.pending_mail_address.verification_code)
+
+    def test_signup_with_good_email_and_wrong_code(self):
+        res = self.testapp.post('/', {'email': 'foo@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        res2 = self.testapp.get('/trycaptcha/')
+        res3 = res2.form.submit('foo')
+
+        # Should be one user in the signup_userdb now
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        # Visit the confirmation page to confirm the e-mail address
+        verify_link = "/email_verification/{code!s}/".format(code = 'not-the-right-code-in-link')
+        res4 = self.testapp.get(verify_link)
+        self.assertEqual(res4.status, '200 OK')
+        res4.mustcontain('/verification_code_form/')
+
+        res5 = self.testapp.get('/verification_code_form/')
+        self.assertEqual(res5.status, '200 OK')
+        res5.mustcontain('verification-code-input')
+
+        res5.form['code'] = 'not-the-right-code-in-form'
+        res6 = res5.form.submit('foo')
+        self.assertEqual(res6.status, '200 OK')
+        logger.debug("BODY:\n{!s}".format(res6.body))
+
+    def test_signup_confirm_using_form(self):
+        res = self.testapp.post('/', {'email': 'foo@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        res2 = self.testapp.get('/trycaptcha/')
+        res3 = res2.form.submit('foo')
+        self.assertEqual(res3.status, '302 Found')
+        self.assertEqual(res3.location, 'http://localhost/success/')
+
+        # Should be one user in the signup_userdb now
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        user = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
+        if not user:
+            self.fail("User could not be found using pending mail address")
+        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
+            pprint.pformat(user.to_dict())
+        ))
+
+        from vccs_client import VCCSClient
+        with patch.object(VCCSClient, 'add_credentials', clear=True):
+            VCCSClient.add_credentials.return_value = 'faked while testing'
+
+            # Visit the confirmation FORM to confirm the e-mail address
+            res5 = self.testapp.get('/verification_code_form/')
+            self.assertEqual(res5.status, '200 OK')
+            res5.mustcontain('verification-code-input')
+
+            res5.form['code'] = user.pending_mail_address.verification_code
+            res6 = res5.form.submit('foo')
+            self.assertEqual(res6.status, '200 OK')
+            res6.mustcontain('You can now log in')

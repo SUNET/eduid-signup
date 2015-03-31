@@ -60,7 +60,7 @@ def send_verification_mail(request, email):
         logger.info("New user {!s}/{!s} created. e-mail is pending confirmation.".format(signup_user, email))
     else:
         # update mailaddress on existing user with new code
-        signup_user.pending_mail_addresses.verification_code = code
+        signup_user.pending_mail_address.verification_code = code
         request.db.save(signup_user)
         logger.info("User {!s}/{!s} updated with new e-mail confirmation code".format(signup_user, email))
 
