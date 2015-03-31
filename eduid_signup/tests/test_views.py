@@ -126,11 +126,129 @@ class SignupAppTest(MongoTestCase):
         self.signup_userdb.drop_collection()
         self.toudb.consent.drop()
 
+    def _start_and_solve_captcha(self, email, check_captcha_post_result=True,
+                                 userdb_count=2, signup_userdb_count=0):
+        home_post = self.testapp.post('/', {'email': email})
+        self.assertEqual(home_post.status, '302 Found')
+        self.assertEqual(home_post.location, 'http://localhost/trycaptcha/')
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), signup_userdb_count)
+
+        captcha_get = self.testapp.get('/trycaptcha/')
+        captcha_post = captcha_get.form.submit('foo')
+        if check_captcha_post_result:
+            self.assertEqual(captcha_post.status, '302 Found')
+            self.assertEqual(captcha_post.location, 'http://localhost/success/')
+
+        return captcha_post
+
+    def _get_new_signup_user(self, email):
+        signup_user = self.signup_userdb.get_user_by_pending_mail_address(email)
+        if not signup_user:
+            self.fail("User could not be found using pending mail address")
+        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
+            pprint.pformat(signup_user.to_dict())
+        ))
+
+        return signup_user
+
+    def _create_account(self, captcha_post):
+        res4 = self.testapp.get(captcha_post.location)
+        self.assertEqual(res4.status, '200 OK')
+        res4.mustcontain('Account created successfully')
+
+        # Should be one user in the signup_userdb now
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
 
 class SNATests(SignupAppTest):
     """
     Tests of the complete signup process using Social Network site
     """
+
+    def test_google_signup(self):
+        # Verify known starting point (empty ToU database)
+        self.assertEqual(self.toudb.consent.find({}).count(), 0)
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        self._google_login(NEW_USER)
+
+        rfi_post = self._review_fetched_info()
+
+        # Verify there is now one user in the signup userdb
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        self._complete_registration(rfi_post)
+
+        # Verify there is now one more user in the central eduid user database
+        self.assertEqual(self.amdb.db_count(), 3)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        self.assertEqual(self.toudb.consent.find({}).count(), 1)
+
+    def test_google_existing_user(self):
+        self._google_login(EXISTING_USER)
+
+        rfi_get = self._review_fetched_info_get()
+
+        self.assertEqual(rfi_get.location, 'http://localhost/email_already_registered/')
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+    def test_google_retry(self):
+        # call the login to fill the session
+        res1 = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        # now, retry
+        self._google_login(NEW_USER)
+
+        self._review_fetched_info()
+
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+    def test_signup_with_good_email_and_then_google(self):
+        captcha_post = self._start_and_solve_captcha(NEW_USER['email'].upper())
+
+        self._create_account(captcha_post)
+
+        self._get_new_signup_user(NEW_USER['email'])
+
+        # Now, verify the signup process can be completed by the user
+        # switching to the Social Network (google) track instead
+        logger.debug("\n\nUser switching to Social signup instead\n\n")
+
+        self._google_login(NEW_USER)
+
+        rfi_post = self._review_fetched_info(userdb_count=2, signup_userdb_count=1)
+
+        # Verify there is still one user in the signup userdb
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        self._complete_registration(rfi_post)
+
+        # Verify there is now one more user in the central eduid user database
+        self.assertEqual(self.amdb.db_count(), 3)
+
+    def test_google_abort(self):
+        self._google_login(NEW_USER)
+
+        rfi_get = self._review_fetched_info_get()
+
+        # Simulate clicking the Cancel button
+        rfi_post = rfi_get.form.submit('cancel')
+
+        # Check that the result was a redirect to /
+        self.assertEqual(rfi_post.status, '302 Found')
+        self.assertRegexpMatches(rfi_post.location, 'http://localhost/')
+
+        # Verify no user has been created
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
 
     def _google_callback(self, state, user):
 
@@ -149,195 +267,6 @@ class SNATests(SignupAppTest):
                     'state': state,
                 })
 
-    def test_google(self):
-        # call the login to fill the session
-        res1 = self.testapp.get('/google/login', {
-            'next_url': 'https://localhost/foo/bar',
-        })
-        #
-        # Check that the result was a redirect to Google OAUTH endpoint
-        self.assertEqual(res1.status, '302 Found')
-        self.assertRegexpMatches(res1.location, '^https://accounts.google.com/o/oauth2/auth?')
-        url = urlparse.urlparse(res1.location)
-        query = urlparse.parse_qs(url.query)
-        state = query['state'][0]
-
-        self._google_callback(state, NEW_USER)
-
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-
-        res2 = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-        res3 = res2.form.submit('action')
-
-        # Check that the result was a redirect to XXX
-        self.assertEqual(res3.status, '302 Found')
-        self.assertRegexpMatches(res3.location, '/sna_account_created/')
-
-        # Verify there is now one user in the signup userdb
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-        from vccs_client import VCCSClient
-        with patch.object(VCCSClient, 'add_credentials', clear=True):
-            VCCSClient.add_credentials.return_value = 'faked while testing'
-            res4 = self.testapp.get(res3.location)
-            for retry in range(3):
-                time.sleep(0.1)
-                if self.signup_userdb.db_count() == 0:
-                    # User was removed from SignupUserDB by attribute manager plugin after
-                    # the new user was properly synced to the central UserDB - all done
-                    break
-            if self.signup_userdb.db_count():
-                self.fail('SignupUserDB user count never went back to zero')
-
-        # Verify there is now one more user in the central eduid user database
-        self.assertEqual(self.amdb.db_count(), 3)
-
-    def test_google_tou(self):
-        # call the login to fill the session
-        res1 = self.testapp.get('/google/login', {
-            'next_url': 'https://localhost/foo/bar',
-        })
-        #
-        # Check that the result was a redirect to Google OAUTH endpoint
-        self.assertEqual(res1.status, '302 Found')
-        url = urlparse.urlparse(res1.location)
-        self.assertRegexpMatches(res1.location, '^https://accounts.google.com/o/oauth2/auth?')
-        query = urlparse.parse_qs(url.query)
-        state = query['state'][0]
-
-        # Fake Google OAUTH response
-        self._google_callback(state, NEW_USER)
-
-        # The user reviews the information eduid got from Google
-        res2 = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(res2.status, '200 OK')
-
-        # Verify known starting point (empty ToU database)
-        self.assertEqual(self.toudb.consent.find({}).count(), 0)
-
-        from vccs_client import VCCSClient
-        with patch.object(VCCSClient, 'add_credentials', clear=True):
-            VCCSClient.add_credentials.return_value = 'faked while testing'
-            # The user presses OK and a new eduid user should be created
-            res3 = res2.form.submit('action')
-            self.assertEqual(res3.status, '302 Found')
-            self.assertRegexpMatches(res3.location, '/sna_account_created/')
-            self.testapp.get(res3.location)
-            #
-            # Verify the users consent of the ToU is registered
-            self.assertEqual(self.toudb.consent.find({}).count(), 1)
-
-    def test_google_existing_user(self):
-        # call the login to fill the session
-        res = self.testapp.get('/google/login', {
-            'next_url': 'https://localhost/foo/bar',
-        })
-        self.assertEqual(res.status, '302 Found')
-        url = urlparse.urlparse(res.location)
-        query = urlparse.parse_qs(url.query)
-        state = query['state'][0]
-
-        self._google_callback(state, EXISTING_USER)
-
-        res = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-        #res = res.form.submit('action')
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/email_already_registered/')
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-
-    def test_google_retry(self):
-        # call the login to fill the session
-        res = self.testapp.get('/google/login', {
-            'next_url': 'https://localhost/foo/bar',
-        })
-        self.assertEqual(res.status, '302 Found')
-        res = self.testapp.get('/google/login', {
-            'next_url': 'https://localhost/foo/bar',
-        })
-        self.assertEqual(res.status, '302 Found')
-        url = urlparse.urlparse(res.location)
-        query = urlparse.parse_qs(url.query)
-        state = query['state'][0]
-
-        self._google_callback(state, NEW_USER)
-
-        res = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-        res = res.form.submit('action')
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-    def test_signup_with_good_email_and_then_google(self):
-        res = self.testapp.post('/', {'email': 'johnBROWN@example.com'})  # e-mail matching NEW_USER
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
-
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-
-        res2 = self.testapp.get('/trycaptcha/')
-        res3 = res2.form.submit('foo')
-        self.assertEqual(res3.status, '302 Found')
-        self.assertEqual(res3.location, 'http://localhost/success/')
-
-        # Should be one user in the signup_userdb now
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-        user = self.signup_userdb.get_user_by_pending_mail_address('JOHNbrown@example.com')
-        if not user:
-            self.fail("User could not be found using pending mail address")
-        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
-            pprint.pformat(user.to_dict())
-        ))
-
-        # Now, verify the signup process can be completed by the user
-        # switching to the Google track instead
-        logger.debug("\n\nUser switching to Social signup instead\n\n")
-
-        self._google_login(NEW_USER)
-
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)  # one user in there, from e-mail signup above
-
-        res2 = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-        res3 = res2.form.submit('action')
-
-        # Check that the result was a redirect to /sna_account_created/
-        self.assertEqual(res3.status, '302 Found')
-        self.assertRegexpMatches(res3.location, '/sna_account_created/')
-
-        # Verify there is still one user in the signup userdb
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-        from vccs_client import VCCSClient
-        with patch.object(VCCSClient, 'add_credentials', clear=True):
-            VCCSClient.add_credentials.return_value = 'faked while testing'
-            res4 = self.testapp.get(res3.location)
-            logger.debug("RES4 LOC {!r}".format(res4.location))
-            for retry in range(3):
-                time.sleep(0.1)
-                if self.signup_userdb.db_count() == 0:
-                    # User was removed from SignupUserDB by attribute manager plugin after
-                    # the new user was properly synced to the central UserDB - all done
-                    break
-            if self.signup_userdb.db_count():
-                self.fail('SignupUserDB user count never went back to zero')
-
-        # Verify there is now one more user in the central eduid user database
-        self.assertEqual(self.amdb.db_count(), 3)
-
     def _google_login(self, userdata):
         # call the login to fill the session
         res1 = self.testapp.get('/google/login', {
@@ -353,6 +282,47 @@ class SNATests(SignupAppTest):
 
         self._google_callback(state, userdata)
 
+    def _review_fetched_info(self, userdb_count=2, signup_userdb_count=0):
+        """
+        Perform both the GET and subsequent POST steps of `review_fetched_info'.
+        """
+        rfi_get = self._review_fetched_info_get(userdb_count=userdb_count,
+                                                signup_userdb_count=signup_userdb_count)
+        return self._review_fetched_info_post(rfi_get)
+
+    def _review_fetched_info_get(self, userdb_count=2, signup_userdb_count=0):
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), userdb_count)
+        self.assertEqual(self.signup_userdb.db_count(), signup_userdb_count)
+        rfi_get = self.testapp.get('/review_fetched_info/')
+
+        self.assertEqual(self.amdb.db_count(), userdb_count)
+        self.assertEqual(self.signup_userdb.db_count(), signup_userdb_count)
+        return rfi_get
+
+    def _review_fetched_info_post(self, rfi_get):
+        rfi_post = rfi_get.form.submit('action')
+
+        # Check that the result was a redirect to /sna_account_created/
+        self.assertEqual(rfi_post.status, '302 Found')
+        self.assertRegexpMatches(rfi_post.location, '/sna_account_created/')
+        return rfi_post
+
+    def _complete_registration(self, rfi_post):
+        from vccs_client import VCCSClient
+        with patch.object(VCCSClient, 'add_credentials', clear=True):
+            VCCSClient.add_credentials.return_value = 'faked while testing'
+            res = self.testapp.get(rfi_post.location)
+            res.mustcontain('You can now log in')
+            for retry in range(3):
+                time.sleep(0.1)
+                if self.signup_userdb.db_count() == 0:
+                    # User was removed from SignupUserDB by attribute manager plugin after
+                    # the new user was properly synced to the central UserDB - all done
+                    break
+            if self.signup_userdb.db_count():
+                self.fail('SignupUserDB user count never went back to zero')
+        return res
 
 
 class SignupEmailTests(SignupAppTest):
@@ -361,29 +331,13 @@ class SignupEmailTests(SignupAppTest):
     """
 
     def test_signup_with_good_email(self):
-        res = self.testapp.post('/', {'email': 'foo@example.com'})
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
-
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-
-        res2 = self.testapp.get('/trycaptcha/')
-        res3 = res2.form.submit('foo')
-        self.assertEqual(res3.status, '302 Found')
-        self.assertEqual(res3.location, 'http://localhost/success/')
+        self._start_and_solve_captcha(NEW_USER['email'].upper())
 
         # Should be one user in the signup_userdb now
         self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 1)
 
-        user = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
-        if not user:
-            self.fail("User could not be found using pending mail address")
-        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
-            pprint.pformat(user.to_dict())
-        ))
+        user = self._get_new_signup_user(NEW_USER['email'])
 
         from vccs_client import VCCSClient
         with patch.object(VCCSClient, 'add_credentials', clear=True):
@@ -396,76 +350,36 @@ class SignupEmailTests(SignupAppTest):
             res4.mustcontain('You can now log in')
 
     def test_signup_with_existing_email(self):
-        res = self.testapp.post('/', {'email': 'johnsmith@example.org'})
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        captcha_post = self._start_and_solve_captcha(EXISTING_USER['email'], check_captcha_post_result=False)
 
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
-
-        res2 = self.testapp.get('/trycaptcha/')
-        res3 = res2.form.submit('')
-
-        self.assertEqual(res3.status, '302 Found')
-        self.assertEqual(res3.location, 'http://localhost/email_already_registered/')
+        self.assertEqual(captcha_post.status, '302 Found')
+        self.assertEqual(captcha_post.location, 'http://localhost/email_already_registered/')
 
         # Should NOT have created any new user
         self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 0)
 
-        res4 = self.testapp.get(res3.location)
-        self.assertEqual(res4.status, '200 OK')
-        res4.mustcontain('Email address already in use')
+        res = self.testapp.get(captcha_post.location)
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Email address already in use')
 
     def test_signup_with_good_email_twice(self):
-        res = self.testapp.post('/', {'email': 'foo@example.com'})
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        captcha_post = self._start_and_solve_captcha('foo@example.com')
 
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
+        self._create_account(captcha_post)
 
-        res2 = self.testapp.get('/trycaptcha/')
-        res3 = res2.form.submit('foo')
-
-        self.assertEqual(res3.status, '302 Found')
-        self.assertEqual(res3.location, 'http://localhost/success/')
-
-        res4 = self.testapp.get(res3.location)
-        self.assertEqual(res4.status, '200 OK')
-        res4.mustcontain('Account created successfully')
-
-        # Should be one user in the signup_userdb now
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-        user1 = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
-        if not user1:
-            self.fail("User could not be found using pending mail address")
-        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
-            pprint.pformat(user1.to_dict())
-        ))
+        user1 = self._get_new_signup_user('foo@example.com')
 
         logger.debug("\n\nSignup AGAIN\n\n")
 
         # Sign up again, with same e-mail
-        res = self.testapp.post('/', {'email': 'foo@example.com'})
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        captcha_post2 = self._start_and_solve_captcha('foo@EXAMPLE.COM',
+                                                      check_captcha_post_result=False,
+                                                      userdb_count=2,
+                                                      signup_userdb_count=1,
+                                                      )
 
-        # Should be same number of users in the signup_userdb now
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-        res2 = self.testapp.get('/trycaptcha/')
-        res3 = res2.form.submit('')
-
-        self.assertEqual(res3.status, '302 Found')
-        self.assertEqual(res3.location, 'http://localhost/resend_email_verification/')
-
-        res4 = self.testapp.get(res3.location)
+        res4 = self.testapp.get(captcha_post2.location)
         self.assertEqual(res4.status, '200 OK')
         res4.mustcontain('Email address already in use')
 
@@ -474,28 +388,17 @@ class SignupEmailTests(SignupAppTest):
         self.assertEqual(res5.location, 'http://localhost/success/')
 
         # Check that users pending mail address has been updated with a new verification code
-        user2 = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
+        user2 = self._get_new_signup_user('foo@example.com')
         self.assertEqual(user1.user_id, user2.user_id)
         self.assertEqual(user1.pending_mail_address.email, user2.pending_mail_address.email)
         self.assertNotEqual(user1.pending_mail_address.verification_code, user2.pending_mail_address.verification_code)
 
     def test_signup_with_good_email_and_wrong_code(self):
-        res = self.testapp.post('/', {'email': 'foo@example.com'})
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        captcha_post = self._start_and_solve_captcha('foo@example.com')
 
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
+        self._create_account(captcha_post)
 
-        res2 = self.testapp.get('/trycaptcha/')
-        res3 = res2.form.submit('foo')
-
-        # Should be one user in the signup_userdb now
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-        # Visit the confirmation page to confirm the e-mail address
+        # Visit the confirmation LINK to confirm the e-mail address
         verify_link = "/email_verification/{code!s}/".format(code = 'not-the-right-code-in-link')
         res4 = self.testapp.get(verify_link)
         self.assertEqual(res4.status, '200 OK')
@@ -511,29 +414,11 @@ class SignupEmailTests(SignupAppTest):
         logger.debug("BODY:\n{!s}".format(res6.body))
 
     def test_signup_confirm_using_form(self):
-        res = self.testapp.post('/', {'email': 'foo@example.com'})
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        captcha_post = self._start_and_solve_captcha('foo@example.com')
 
-        # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 0)
+        self._create_account(captcha_post)
 
-        res2 = self.testapp.get('/trycaptcha/')
-        res3 = res2.form.submit('foo')
-        self.assertEqual(res3.status, '302 Found')
-        self.assertEqual(res3.location, 'http://localhost/success/')
-
-        # Should be one user in the signup_userdb now
-        self.assertEqual(self.amdb.db_count(), 2)
-        self.assertEqual(self.signup_userdb.db_count(), 1)
-
-        user = self.signup_userdb.get_user_by_pending_mail_address('foo@example.com')
-        if not user:
-            self.fail("User could not be found using pending mail address")
-        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
-            pprint.pformat(user.to_dict())
-        ))
+        user = self._get_new_signup_user('foo@example.com')
 
         from vccs_client import VCCSClient
         with patch.object(VCCSClient, 'add_credentials', clear=True):
