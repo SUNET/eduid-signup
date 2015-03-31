@@ -11,46 +11,44 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def create_or_update_sna(request, social_info, signup_user):
+def create_or_update_sna(request, social_info):
     """
 
     :param request:
-    :param social_info:
-    :param signup_user: Signup user, if already in the Signup applications database
+    :param social_info: Information from Social network login provider
 
-    :type signup_user: SignupUser
+    :type social_info: dict
     :return:
     """
     provider = request.session['provider']
     provider_user_id = request.session['provider_user_id']
 
-    logging.debug("create_or_update_sna called for {!r}+{!r} (signup user {!s})".format(
-        provider, provider_user_id, signup_user
-    ))
+    logging.debug("create_or_update_sna called for {!r}+{!r}".format(provider, provider_user_id))
+
+    signup_user = request.db.get_user_by_pending_mail_address(social_info['email'])
+    logger.debug("Signup user from pending e-mail address {!r}: {!r}".format(social_info['email'], signup_user))
 
     if signup_user is None:
-        # The user doesn't exist at all in the signup_userdb. Create based on
-        # data from social network.
-        #mailaddress = eduid_userdb.mail.new(email, 'signup', verified=True)
-        mailaddress = eduid_userdb.mail.MailAddress(email=social_info['email'],
-                                                    application='signup (using {!s})'.format(provider),
-                                                    verified=True,
-                                                    primary=True,
-                                                    )
+        # The user doesn't exist at all in the signup_userdb.
         signup_user = SignupUser(eppn = generate_eppn(request))
-        signup_user.mail_addresses.add(mailaddress)
     else:
         # If the user is registered in signup but was not propagated to
-        # eduid_am, update local attributes and continue as new user
-        #
+        # eduid_am, update with data from the Social network (below)
         assert isinstance(signup_user, SignupUser)
-        signup_user.mail_addresses.primary = social_info['email']
+        signup_user.pending_mail_address = None
+
+    mailaddress = eduid_userdb.mail.MailAddress(email=social_info['email'],
+                                                application='signup (using {!s})'.format(provider),
+                                                verified=True,
+                                                primary=True,
+                                                )
+    signup_user.mail_addresses.add(mailaddress)
 
     signup_user.display_name = social_info['screen_name']
     signup_user.given_name = social_info['first_name']
     signup_user.surname = social_info['last_name']
     signup_user.subject = 'physical person'
-    #
+
     signup_user.social_network = provider
     signup_user.social_network_id = provider_user_id
 

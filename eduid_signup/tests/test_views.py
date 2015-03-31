@@ -273,6 +273,87 @@ class SNATests(SignupAppTest):
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(self.signup_userdb.db_count(), 1)
 
+    def test_signup_with_good_email_and_then_google(self):
+        res = self.testapp.post('/', {'email': 'johnBROWN@example.com'})  # e-mail matching NEW_USER
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+        res2 = self.testapp.get('/trycaptcha/')
+        res3 = res2.form.submit('foo')
+        self.assertEqual(res3.status, '302 Found')
+        self.assertEqual(res3.location, 'http://localhost/success/')
+
+        # Should be one user in the signup_userdb now
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        user = self.signup_userdb.get_user_by_pending_mail_address('JOHNbrown@example.com')
+        if not user:
+            self.fail("User could not be found using pending mail address")
+        logger.debug("User in database after e-mail would have been sent:\n{!s}".format(
+            pprint.pformat(user.to_dict())
+        ))
+
+        # Now, verify the signup process can be completed by the user
+        # switching to the Google track instead
+        logger.debug("\n\nUser switching to Social signup instead\n\n")
+
+        self._google_login(NEW_USER)
+
+        # ensure known starting point
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)  # one user in there, from e-mail signup above
+
+        res2 = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+        res3 = res2.form.submit('action')
+
+        # Check that the result was a redirect to /sna_account_created/
+        self.assertEqual(res3.status, '302 Found')
+        self.assertRegexpMatches(res3.location, '/sna_account_created/')
+
+        # Verify there is still one user in the signup userdb
+        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+
+        from vccs_client import VCCSClient
+        with patch.object(VCCSClient, 'add_credentials', clear=True):
+            VCCSClient.add_credentials.return_value = 'faked while testing'
+            res4 = self.testapp.get(res3.location)
+            logger.debug("RES4 LOC {!r}".format(res4.location))
+            for retry in range(3):
+                time.sleep(0.1)
+                if self.signup_userdb.db_count() == 0:
+                    # User was removed from SignupUserDB by attribute manager plugin after
+                    # the new user was properly synced to the central UserDB - all done
+                    break
+            if self.signup_userdb.db_count():
+                self.fail('SignupUserDB user count never went back to zero')
+
+        # Verify there is now one more user in the central eduid user database
+        self.assertEqual(self.amdb.db_count(), 3)
+
+    def _google_login(self, userdata):
+        # call the login to fill the session
+        res1 = self.testapp.get('/google/login', {
+            'next_url': 'https://localhost/foo/bar',
+        })
+        #
+        # Check that the result was a redirect to Google OAUTH endpoint
+        self.assertEqual(res1.status, '302 Found')
+        self.assertRegexpMatches(res1.location, '^https://accounts.google.com/o/oauth2/auth?')
+        url = urlparse.urlparse(res1.location)
+        query = urlparse.parse_qs(url.query)
+        state = query['state'][0]
+
+        self._google_callback(state, userdata)
+
+
 
 class SignupEmailTests(SignupAppTest):
     """

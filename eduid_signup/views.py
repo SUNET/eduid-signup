@@ -216,8 +216,12 @@ def review_fetched_info(request):
     """
     Once user info has been retrieved from a social network,
     present it to the user so she can review and accept it.
+
+    First, a GET renders the information for the user to review, then
+    a POST is used to accept the information shown, or abort the signup.
     """
 
+    logger.debug("View review_fetched_info ({!s})".format(request.method))
     debug_mode = request.registry.settings.get('development', False)
     if not 'social_info' in request.session and not debug_mode:
         raise HTTPBadRequest()
@@ -233,31 +237,37 @@ def review_fetched_info(request):
             'last_name': 'dummy',
         }
 
-    signup_user = False
+    am_user = False
     if email:
         try:
             am_user = request.userdb.get_user_by_mail(email, raise_on_missing=True)
             logger.info("User {!s} found using email {!s}".format(am_user, email))
+            raise HTTPFound(location=request.route_url('email_already_registered'))
         except request.userdb.exceptions.UserDoesNotExist:
             pass
-        else:
-            raise HTTPFound(location=request.route_url('email_already_registered'))
-
-        signup_user = request.db.get_user_by_mail(email)
 
     if request.method == 'GET':
-        return {
+        # If `mail_registered' is true, the user is told the address already exists and they
+        # are given the option to do a password reset.
+        #
+        # If `mail_empty' is true, the user is told the Social network did not provide an e-mail
+        # address and they need to press 'cancel' and choose another Signup method.
+        res = {
             'social_info': social_info,
-            'mail_registered': bool(signup_user),
+            'mail_registered': bool(am_user),
             'mail_empty': not email,
             'reset_password_link': request.registry.settings['reset_password_link'],
         }
+        logger.debug("Rendering review form: {!r}".format(res))
+        return res
 
-    elif email:
-        if request.POST.get('action', 'cancel') == 'accept':
-            create_or_update_sna(request, social_info, signup_user)
+    if request.method == 'POST' and email and not am_user:
+        if request.POST.get('action') == 'accept':
+            logger.debug("Proceeding with social signup of {!r}: {!r}")
+            create_or_update_sna(request, social_info)
             raise HTTPFound(location=request.route_url('sna_account_created'))
         else:
+            logger.debug("Social signup aborted")
             if request.session is not None:
                 request.session.delete()
             headers = forget(request)

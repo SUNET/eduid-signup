@@ -64,6 +64,7 @@ class SignupUserDB(UserDB):
         return self.UserClass(data=users[0])
 
     def get_user_by_pending_mail_address(self, mail):
+        mail = mail.lower()
         docs = self._coll.find({'pending_mail_address.email': mail})
         users = []
         if docs.count() > 0:
