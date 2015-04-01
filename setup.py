@@ -14,7 +14,7 @@ requires = [
     'eduid_am',
     'vccs_client>=0.4.1',
     'wsgi_ratelimit>=0.1',
-    'eduid_userdb >= 0.0.1',
+    'eduid_userdb',
 
     'pymongo >= 2.6.3',
     'pyramid == 1.5.4',
