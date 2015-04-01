@@ -10,6 +10,8 @@ from eduid_userdb.testing import MongoTestCase
 from eduid_signup import main
 from eduid_signup.testing import FunctionalTests, SETTINGS
 
+from eduid_am.celery import celery, get_attribute_manager
+
 import pprint
 import logging
 logger = logging.getLogger(__name__)
@@ -89,7 +91,7 @@ class HelpViewTests(FunctionalTests):
 class SignupAppTest(MongoTestCase):
 
     def setUp(self):
-        super(SignupAppTest, self).setUp()
+        super(SignupAppTest, self).setUp(celery, get_attribute_manager)
         # get the mongo URI for the temporary mongo instance that was just started in MongoTestCase.setup()
         mongo_settings = {
             'mongo_uri': self.mongodb_uri(),
