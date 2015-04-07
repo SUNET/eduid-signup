@@ -135,7 +135,7 @@ class SignupAppTest(MongoTestCase):
         self.assertEqual(home_post.location, 'http://localhost/trycaptcha/')
 
         # ensure known starting point
-        self.assertEqual(self.amdb.db_count(), 2)
+        self.assertEqual(self.amdb.db_count(), userdb_count)
         self.assertEqual(self.signup_userdb.db_count(), signup_userdb_count)
 
         captcha_get = self.testapp.get('/trycaptcha/')
