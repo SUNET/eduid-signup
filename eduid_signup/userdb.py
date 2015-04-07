@@ -36,6 +36,7 @@ from eduid_userdb.userdb import UserDB
 from eduid_signup.user import SignupUser
 from eduid_userdb.exceptions import MultipleUsersReturned
 
+
 class SignupUserDB(UserDB):
 
     UserClass = SignupUser
@@ -43,17 +44,8 @@ class SignupUserDB(UserDB):
     def __init__(self, db_uri, collection='registered'):
         UserDB.__init__(self, db_uri, collection)
 
-    def drop_collection(self):
-        """
-        Drop the collection. Used in eduid-signup test cases.
-
-        :return:
-        """
-        return self._coll.drop()
-
     def get_user_by_mail_verification_code(self, code):
         docs = self._coll.find({'pending_mail_address.verification_code': code})
-        #docs = self._coll.find({'mailAliases': {'$elemMatch': {'verification_code': code}}})
         users = []
         if docs.count() > 0:
             users = list(docs)

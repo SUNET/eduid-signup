@@ -115,7 +115,7 @@ class SignupAppTest(MongoTestCase):
             logger.info("Unit tests self.toudb: {!s}".format(self.toudb))
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
-        self.signup_userdb.drop_collection()
+        self.signup_userdb.drop_whole_collection()
         self.toudb.consent.drop()
 
         # Tell the Celery task where to find the SignupUserDb
@@ -125,7 +125,7 @@ class SignupAppTest(MongoTestCase):
     def tearDown(self):
         super(SignupAppTest, self).tearDown()
         self.testapp.reset()
-        self.signup_userdb.drop_collection()
+        self.signup_userdb.drop_whole_collection()
         self.toudb.consent.drop()
 
     def _start_and_solve_captcha(self, email, check_captcha_post_result=True,

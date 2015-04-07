@@ -59,7 +59,7 @@ class DBTests(unittest.TestCase):
         if not self.signup_userdb:
             return None
         if 'signup_userdb' in self.clean_dbs:
-            self.signup_userdb.drop_collection()
+            self.signup_userdb.drop_whole_collection()
 
 
 class FunctionalTests(DBTests):
