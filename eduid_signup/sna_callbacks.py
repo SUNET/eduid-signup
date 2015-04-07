@@ -25,7 +25,7 @@ def create_or_update_sna(request, social_info):
 
     logging.debug("create_or_update_sna called for {!r}+{!r}".format(provider, provider_user_id))
 
-    signup_user = request.db.get_user_by_pending_mail_address(social_info['email'])
+    signup_user = request.signup_db.get_user_by_pending_mail_address(social_info['email'])
     logger.debug("Signup user from pending e-mail address {!r}: {!r}".format(social_info['email'], signup_user))
 
     if signup_user is None:
@@ -54,7 +54,7 @@ def create_or_update_sna(request, social_info):
 
     logging.debug("Saving social signed up user {!s} (e-mail {!s}) to signup userdb".format(
         signup_user, signup_user.mail_addresses.primary.email))
-    res = request.db.save(signup_user)
+    res = request.signup_db.save(signup_user)
     logging.debug("Save result: {!r}".format(res))
 
     # Send the signal to the attribute manager so it can update

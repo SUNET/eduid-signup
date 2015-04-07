@@ -31,12 +31,12 @@ def includeme(config):
     # DB setup
     _mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'])
     _userdb = UserDB(config.registry.settings['mongo_uri_am'])
-    _signup_userdb = SignupUserDB(config.registry.settings['mongo_uri'])
+    _signup_db = SignupUserDB(config.registry.settings['mongo_uri'])
 
     # Create mongodb client instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
-    config.registry.settings['signup_userdb'] = _signup_userdb
-    config.add_request_method(lambda x: x.registry.settings['signup_userdb'], 'db', reify=True)
+    config.registry.settings['signup_db'] = _signup_db
+    config.add_request_method(lambda x: x.registry.settings['signup_db'], 'signup_db', reify=True)
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it (will be available as 'request.userdb')

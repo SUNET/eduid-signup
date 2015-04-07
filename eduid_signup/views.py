@@ -48,7 +48,7 @@ def get_url_from_email_status(request, email):
 
     :return: redirect response
     """
-    status = check_email_status(request.userdb, request.db, email)
+    status = check_email_status(request.userdb, request.signup_db, email)
     logger.debug("e-mail {!s} status: {!s}".format(email, status))
     if status == 'new':
         send_verification_mail(request, email)
@@ -277,7 +277,7 @@ def review_fetched_info(request):
         raise HTTPBadRequest()
 
 
-def registered_completed(request, user, context=None):
+def registered_completed(request, signup_user, context=None):
     """
     After a successful registration
     (through the mail or through a social network),
@@ -286,25 +286,25 @@ def registered_completed(request, user, context=None):
     update the attribute manager db with the new account,
     and send the pertinent information to the user.
 
-    :param user: User instance
-    :type user: SignupUser
+    :param signup_user: SignupUser instance
+    :type signup_user: SignupUser
     """
-    logger.info("Completing registration for user {!s}/{!s}".format(user.user_id, user.eppn))
+    logger.info("Completing registration for user {!s}/{!s}".format(signup_user.user_id, signup_user.eppn))
 
     if context is None:
         context = {}
     password_id = ObjectId()
     (password, salt) = generate_password(request.registry.settings,
-                                         str(password_id), user,
+                                         str(password_id), signup_user,
                                          )
     credential = Password(credential_id=password_id, salt=salt, application='signup')
-    user.passwords.add(credential)
-    request.db.save(user)
+    signup_user.passwords.add(credential)
+    request.signup_db.save(signup_user)
 
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    logger.debug("Asking for sync of {!r} by Attribute Manager".format(str(user.user_id)))
-    rtask = update_attributes_keep_result.delay('eduid_signup', str(user.user_id))
+    logger.debug("Asking for sync of {!r} by Attribute Manager".format(str(signup_user.user_id)))
+    rtask = update_attributes_keep_result.delay('eduid_signup', str(signup_user.user_id))
     timeout = request.registry.settings.get("account_creation_timeout", 10)
     try:
         result = rtask.get(timeout=timeout)
@@ -321,13 +321,13 @@ def registered_completed(request, user, context=None):
     secret = request.registry.settings.get('auth_shared_secret')
     timestamp = '{:x}'.format(int(time.time()))
     nonce = os.urandom(16).encode('hex')
-    auth_token = generate_auth_token(secret, user.eppn, nonce, timestamp)
+    auth_token = generate_auth_token(secret, signup_user.eppn, nonce, timestamp)
 
     context.update({
         "profile_link": request.registry.settings.get("profile_link", "#"),
         "password": password,
-        "email": user.mail_addresses.primary.email,
-        "eppn": user.eppn,
+        "email": signup_user.mail_addresses.primary.email,
+        "eppn": signup_user.eppn,
         "nonce": nonce,
         "timestamp": timestamp,
         "auth_token": auth_token,
@@ -339,12 +339,12 @@ def registered_completed(request, user, context=None):
     logger.debug("Context Finish URL : {!r}".format(context.get('finish_url')))
 
     if request.registry.settings.get("email_credentials", False):
-        send_credentials(request, user.eppn, password)
+        send_credentials(request, signup_user.eppn, password)
 
     # Record the acceptance of the terms of use
-    record_tou(request, user.user_id, 'signup')
+    record_tou(request, signup_user.user_id, 'signup')
 
-    logger.info("Signup process for new user {!s}/{!s} complete".format(user.user_id, user.eppn))
+    logger.info("Signup process for new user {!s}/{!s} complete".format(signup_user.user_id, signup_user.eppn))
     return context
 
 
@@ -382,7 +382,7 @@ def _verify_code(request, code):
     :return:
     """
     try:
-        signup_user = verify_email_code(request.db, code)
+        signup_user = verify_email_code(request.signup_db, code)
         # XXX at this stage the confirmation code is marked as 'used' but no
         # credential have been created yet. If that fails (done beyond registered_completed),
         # the user will get an error and when retrying will get a message saying the email
@@ -413,10 +413,10 @@ def account_created_from_sna(request):
     View where the registration from a social network is completed,
     after the user has reviewed the information fetched from the s.n.
     """
-    user = request.db.get_user_by_mail(request.session.get('email'),
-                                       raise_on_missing=True,
-                                       include_unconfirmed=True,
-                                       )
+    user = request.signup_db.get_user_by_mail(request.session.get('email'),
+                                              raise_on_missing=True,
+                                              include_unconfirmed=True,
+                                              )
 
     assert isinstance(user, SignupUser)
 

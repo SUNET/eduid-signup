@@ -81,7 +81,7 @@ class FunctionalTests(DBTests):
         try:
             app = main({}, **_settings)
             self.testapp = TestApp(app)
-            self.signup_userdb = app.registry.settings['signup_userdb']
+            self.signup_userdb = app.registry.settings['signup_db']
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
 

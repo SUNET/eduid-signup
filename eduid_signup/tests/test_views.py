@@ -108,7 +108,7 @@ class SignupAppTest(MongoTestCase):
             _settings.update(self.settings)
             app = main({}, **_settings)
             self.testapp = TestApp(app)
-            self.signup_userdb = app.registry.settings['signup_userdb']
+            self.signup_userdb = app.registry.settings['signup_db']
             self.toudb = app.registry.settings['mongodb_tou'].get_database()
             logger.info("Unit tests self.signup_userdb: {!s} / {!s}".format(
                 self.signup_userdb, self.signup_userdb._coll))

@@ -46,7 +46,7 @@ def send_verification_mail(request, email):
         ),
     )
 
-    signup_user = request.db.get_user_by_pending_mail_address(email)
+    signup_user = request.signup_db.get_user_by_pending_mail_address(email)
     if not signup_user:
         mailaddress = eduid_userdb.mail.MailAddress(email = email,
                                                     application = 'signup',
@@ -56,12 +56,12 @@ def send_verification_mail(request, email):
                                                     )
         signup_user = SignupUser(eppn = generate_eppn(request))
         signup_user.pending_mail_address = mailaddress
-        request.db.save(signup_user)
+        request.signup_db.save(signup_user)
         logger.info("New user {!s}/{!s} created. e-mail is pending confirmation.".format(signup_user, email))
     else:
         # update mailaddress on existing user with new code
         signup_user.pending_mail_address.verification_code = code
-        request.db.save(signup_user)
+        request.signup_db.save(signup_user)
         logger.info("User {!s}/{!s} updated with new e-mail confirmation code".format(signup_user, email))
 
     if request.registry.settings.get("development", '') != 'true':
