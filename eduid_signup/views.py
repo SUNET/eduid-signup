@@ -305,11 +305,6 @@ def registered_completed(request, user, context=None):
     # this user's attributes in the IdP
     logger.debug("Asking for sync of {!r} by Attribute Manager".format(str(user.user_id)))
     rtask = update_attributes_keep_result.delay('eduid_signup', str(user.user_id))
-
-    secret = request.registry.settings.get('auth_shared_secret')
-    timestamp = '{:x}'.format(int(time.time()))
-    nonce = os.urandom(16).encode('hex')
-
     timeout = request.registry.settings.get("account_creation_timeout", 10)
     try:
         result = rtask.get(timeout=timeout)
@@ -323,6 +318,9 @@ def registered_completed(request, user, context=None):
         url = request.route_path('home')
         raise HTTPFound(location=url)
 
+    secret = request.registry.settings.get('auth_shared_secret')
+    timestamp = '{:x}'.format(int(time.time()))
+    nonce = os.urandom(16).encode('hex')
     auth_token = generate_auth_token(secret, user.eppn, nonce, timestamp)
 
     context.update({
@@ -344,7 +342,6 @@ def registered_completed(request, user, context=None):
         send_credentials(request, user.eppn, password)
 
     # Record the acceptance of the terms of use
-
     record_tou(request, user.user_id, 'signup')
 
     logger.info("Signup process for new user {!s}/{!s} complete".format(user.user_id, user.eppn))

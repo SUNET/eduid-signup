@@ -26,21 +26,21 @@ def generate_verification_link(request):
     return (link, code)
 
 
-def verify_email_code(userdb, code):
+def verify_email_code(signup_db, code):
     """
     Look up a user in the signup userdb using an e-mail verification code.
 
     Mark the e-mail address as confirmed, save the user and return the user object.
 
-    :param userdb: Signup user database
+    :param signup_db: Signup user database
     :param code: Code as received from user
-    :type userdb: SignupUserDb
+    :type signup_db: SignupUserDb
     :type code: str | unicode
 
     :return: Signup user object
     :rtype: SignupUser
     """
-    signup_user = userdb.get_user_by_mail_verification_code(code)
+    signup_user = signup_db.get_user_by_mail_verification_code(code)
 
     if not signup_user:
         logger.debug("Code {!r} not found in database".format(code))
@@ -59,7 +59,7 @@ def verify_email_code(userdb, code):
     mail.is_primary = True
     signup_user.pending_mail_address = None
     signup_user.mail_addresses.add(mail)
-    result = userdb.save(signup_user)
+    result = signup_db.save(signup_user)
 
     logger.debug("Code {!r} verified and user {!s} saved: {!r}".format(code, signup_user, result))
     return signup_user
