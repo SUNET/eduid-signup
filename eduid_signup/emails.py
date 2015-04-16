@@ -1,15 +1,11 @@
-from datetime import datetime
-
 from pyramid.renderers import render
 
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 
-from eduid_am.tasks import update_attributes
-
 from eduid_signup.utils import generate_verification_link, generate_eppn
 
-from eduid_signup.user import SignupUser
+from eduid_userdb.signup import SignupUser
 import eduid_userdb
 
 import logging

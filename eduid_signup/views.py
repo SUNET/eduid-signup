@@ -1,6 +1,5 @@
 import os
 import time
-import datetime
 from recaptcha.client import captcha
 from bson import ObjectId
 
@@ -25,7 +24,7 @@ from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
                                 CodeDoesNotExists, record_tou)
 from eduid_signup.vccs import generate_password
-from eduid_signup.user import SignupUser
+from eduid_userdb.signup import SignupUser
 from eduid_userdb.password import Password
 
 import logging

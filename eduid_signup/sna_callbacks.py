@@ -1,10 +1,9 @@
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
-from eduid_am.tasks import update_attributes
 from eduid_signup.utils import generate_eppn, normalize_email
 
-from eduid_signup.user import SignupUser
+from eduid_userdb.signup import SignupUser
 import eduid_userdb
 
 import logging

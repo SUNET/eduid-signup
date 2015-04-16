@@ -8,7 +8,7 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest
 
 from eduid_signup import main
-from eduid_signup.userdb import SignupUserDB
+from eduid_userdb.signup import SignupUserDB
 from eduid_userdb.testing import MongoTemporaryInstance
 
 
