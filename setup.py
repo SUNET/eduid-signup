@@ -15,7 +15,7 @@ requires = [
     'vccs_client>=0.4.1',
     'wsgi_ratelimit>=0.1',
 
-    'pymongo >= 2.6.3',
+    'pymongo>=2.8,<3',
     'pyramid == 1.5.4',
     'pyramid_beaker == 0.8',
     'pyramid_debugtoolbar == 2.3',
