@@ -17,7 +17,8 @@
       </div>
   </div>
 
-{% elif password is not defined %}
+{% else %}
+{% if password is not defined %}
 
   <p class="lead">{{ _("Put here the verification code sent to you by e-mail") }}</p>
 
@@ -61,7 +62,20 @@
   {% include "inc.registration_completed.jinja2" %}
 
 {% endif %}
+{% endif %}
 
 </div>
 
 {% endblock %}
+
+{% if email_already_verified is not defined %}
+
+{% block extrajs %}
+    {% if password is not defined %}
+    <script type="text/javascript" src="{{'eduid_signup:static/js/verification_code_form.js'|static_url}}"></script>
+    {% else %}
+    <script type="text/javascript" src="{{'eduid_signup:static/js/verification_code_form2.js'|static_url}}"></script>
+    {% endif %}
+{% endblock %}
+
+{% endif %}
