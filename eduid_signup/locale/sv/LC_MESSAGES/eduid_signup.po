@@ -1,5 +1,5 @@
 # Swedish translations for eduid_signup.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the eduid_signup
 # project.
 #
@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-signup\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-11-27 10:57+0100\n"
+"POT-Creation-Date: 2015-06-29 15:11+0200\n"
 "PO-Revision-Date: 2014-11-27 10:05+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
@@ -23,11 +23,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: eduid_signup/emails.py:28
+#: eduid_signup/emails.py:31
 msgid "eduid-signup verification email"
 msgstr "eduID registrering"
 
-#: eduid_signup/emails.py:84
+#: eduid_signup/emails.py:92
 msgid "eduid-signup credentials"
 msgstr "eduID inloggningsuppgifter"
 
@@ -39,7 +39,7 @@ msgstr "E-post adress måste anges"
 msgid "Email is not valid"
 msgstr "Ogiltig e-postadress"
 
-#: eduid_signup/views.py:303
+#: eduid_signup/views.py:321
 msgid ""
 "There were problems with your submission. You may want to try again "
 "later, or contact the site administrators."
