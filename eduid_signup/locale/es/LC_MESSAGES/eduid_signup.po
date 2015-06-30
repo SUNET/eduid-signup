@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid_signup 0.1dev\n"
 "Report-Msgid-Bugs-To: lgs@yaco.es\n"
-"POT-Creation-Date: 2014-11-27 10:57+0100\n"
+"POT-Creation-Date: 2015-06-29 15:11+0200\n"
 "PO-Revision-Date: 2013-04-30 18:47+0200\n"
 "Last-Translator: Lorenzo Gil <lgs@yaco.es>\n"
 "Language-Team: es <ES@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: eduid_signup/emails.py:28
+#: eduid_signup/emails.py:31
 msgid "eduid-signup verification email"
 msgstr ""
 
-#: eduid_signup/emails.py:84
+#: eduid_signup/emails.py:92
 msgid "eduid-signup credentials"
 msgstr ""
 
@@ -34,7 +34,7 @@ msgstr "Email es requerido"
 msgid "Email is not valid"
 msgstr "Email no válido"
 
-#: eduid_signup/views.py:303
+#: eduid_signup/views.py:321
 msgid ""
 "There were problems with your submission. You may want to try again "
 "later, or contact the site administrators."

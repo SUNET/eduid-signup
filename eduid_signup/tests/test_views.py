@@ -57,6 +57,13 @@ class HelpViewTests(FunctionalTests):
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Help')
 
+    def test_help_in_swedish(self):
+        res = self.testapp.get('/help/', headers={
+            'Accept-Language': 'sv',
+        })
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Hem')
+
     def test_help_in_unknown_language(self):
         res = self.testapp.get('/help/', headers={
             'Accept-Language': 'xx',
