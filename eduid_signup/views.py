@@ -479,14 +479,30 @@ def not_found_view(request):
 
 @view_config(route_name='set_language', request_method='GET')
 def set_language(request):
+    import re
+
     settings = request.registry.settings
     lang = request.GET.get('lang', 'en')
     if lang not in settings['available_languages']:
         return HTTPNotFound()
 
     url = request.environ.get('HTTP_REFERER', None)
-    if url is None:
-        url = request.route_path('home')
+    host = request.environ.get('HTTP_HOST', None)
+
+    signup_hostname = settings.get('signup_hostname')
+    signup_baseurl = settings.get('signup_baseurl')
+
+    # To avoid malicious redirects, using header injection, we only
+    # allow the client to be redirected to an URL that is within the
+    # predefined scope of the application.
+    allowed_url = re.compile('^(http|https)://' + signup_hostname + '[:]{0,1}\d{0,5}($|/)')
+    allowed_host = re.compile('^' + signup_hostname + '[:]{0,1}\d{0,5}$')
+
+    if url is None or not allowed_url.match(url):
+        url = signup_baseurl
+    elif host is None or not allowed_host.match(host):
+        url = signup_baseurl
+
     response = HTTPFound(location=url)
 
     cookie_domain = settings.get('lang_cookie_domain', None)

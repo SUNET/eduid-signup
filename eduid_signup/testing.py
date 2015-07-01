@@ -39,6 +39,8 @@ SETTINGS = {
     'profile_link': 'http://profiles.example.com/edit',
     'reset_password_link': ' http://profiles.example.com/reset_password',
     'site.name': 'Test Site',
+    'signup_hostname': 'signup.example.com',
+    'signup_baseurl': 'http://signup.example.com',
     'auth_tk_secret': '123456',
     'auth_shared_secret': '123123',
     'session.cookie_expires': '3600',
