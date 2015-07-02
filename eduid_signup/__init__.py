@@ -116,6 +116,8 @@ def main(global_config, **settings):
         'mongo_uri_tou',
         'profile_link',
         'site.name',
+        'signup_hostname',
+        'signup_baseurl',
         'reset_password_link',
         'vccs_url',
         'auth_shared_secret',
@@ -189,7 +191,7 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_translation_dirs('eduid_signup:locale/')
 
-    # eudid specific configuration
+    # eduid specific configuration
     includeme(config)
 
     config.scan(ignore=[re.compile('.*tests.*').search, '.testing'])
