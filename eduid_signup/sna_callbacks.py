@@ -49,7 +49,7 @@ def create_or_update_sna(request, social_info, signup_user):
         user_id = signup_user['_id']
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    update_attributes.delay('eduid_signup', user_id)
+    update_attributes.delay('eduid_signup', str(user_id))
 
     # Create an authenticated session and send the user to the
     # success screeen
