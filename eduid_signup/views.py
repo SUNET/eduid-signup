@@ -104,6 +104,7 @@ def trycaptcha(request):
     """
     Kantara requires a check for humanness even at level AL1.
     """
+    from urllib2 import URLError
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
@@ -123,12 +124,23 @@ def trycaptcha(request):
         challenge_field = request.POST.get('recaptcha_challenge_field', '')
         response_field = request.POST.get('recaptcha_response_field', '')
 
-        response = captcha.submit(
-            challenge_field,
-            response_field,
-            settings.get("recaptcha_private_key", ''),
-            remote_ip,
-        )
+        for i in range(0,3):
+            try:
+                response = captcha.submit(
+                    challenge_field,
+                    response_field,
+                    settings.get("recaptcha_private_key", ''),
+                    remote_ip,
+                )
+                logger.debug("Sent the CAPTCHA with the user's response to google")
+                break
+            except URLError:
+                if i < 2:
+                    logger.debug("Caught URLError while sending recaptcha, trying again.")
+                    time.sleep(0.5)
+                else:
+                    logger.debug("Caught URLError while sending recaptcha, giving up.")
+                    raise
 
         if response.is_valid or not recaptcha_public_key:
             logger.debug("Valid CAPTCHA response (or CAPTCHA disabled) from {!r}".format(remote_ip))
