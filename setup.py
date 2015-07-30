@@ -20,7 +20,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-version = '0.4.4.1b0'
+version = '0.4.4.1'
 
 requires = [
     'eduid_am>=0.5.3,<0.5.9',
