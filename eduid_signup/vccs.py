@@ -41,4 +41,4 @@ def _human_readable(password):
     """
     regexp = '.{,4}'
     parts = findall(regexp, password)
-    return ' '.join(parts)
+    return ' '.join(parts).rstrip()
