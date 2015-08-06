@@ -6,7 +6,7 @@ import pymongo
 from webtest import TestApp, TestRequest
 from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
-from pyramid.testing import DummyRequest
+from pyramid.testing import DummyRequest, DummyResource
 
 from eduid_am.db import MongoDB
 from eduid_am import testing as am
@@ -49,6 +49,7 @@ SETTINGS = {
     'auth_tk_secret': '123456',
     'auth_shared_secret': '123123',
     'session.cookie_expires': '3600',
+    'session.key': 'session',
     'mongo_uri': MONGO_URI_TEST,
     'mongo_uri_am': MONGO_URI_TEST_AM,
     'mongo_uri_tou': MONGO_URI_TEST_TOU,
@@ -85,9 +86,9 @@ class FunctionalTests(DBTests):
         self.tmp_db = am.MongoTemporaryInstance.get_instance()
         self.conn = self.tmp_db.conn
         self.port = self.tmp_db.port
-        settings = get_settings(self.port)
+        self.settings = get_settings(self.port)
         try:
-            app = main({}, **settings)
+            app = main({}, **(self.settings))
             self.testapp = TestApp(app)
             self.db = app.registry.settings['mongodb'].get_database()
         except pymongo.errors.ConnectionFailure:
@@ -102,14 +103,21 @@ class FunctionalTests(DBTests):
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
+
+    def dummy_request(self, cookies={}):
+        request = DummyRequest()
+        request.context = DummyResource()
+        request.db = self.db
+        request.registry.settings = self.settings
+        return request
 
     def add_to_session(self, data):
         queryUtility = self.testapp.app.registry.queryUtility
         session_factory = queryUtility(ISessionFactory)
-        request = DummyRequest()
+        request = self.dummy_request()
         session = session_factory(request)
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.set_cookie(session_factory._options.get('key'), session._sess.id)

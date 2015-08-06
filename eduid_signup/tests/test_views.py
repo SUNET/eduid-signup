@@ -8,7 +8,7 @@ from webtest import TestApp
 
 from eduid_am.testing import MongoTestCase
 from eduid_signup import main
-from eduid_signup.testing import FunctionalTests, SETTINGS
+from eduid_signup.testing import FunctionalTests, get_settings
 
 
 class HomeViewTests(FunctionalTests):
@@ -62,7 +62,7 @@ class HelpViewTests(FunctionalTests):
             'Accept-Language': 'sv',
         })
         self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Hem')
+        res.mustcontain('Vart kan jag')
 
     def test_help_in_unknown_language(self):
         res = self.testapp.get('/help/', headers={
@@ -96,6 +96,12 @@ class SNATests(MongoTestCase):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
         super(SNATests, self).setUp()
+        from eduid_signup import views
+        mock_config = {
+            'return_value': ('x', 'y'),
+        }
+        self.patcher = patch.object(views, 'generate_password', **mock_config)
+        self.patcher.start()
         mongo_settings = {
             'mongo_uri_tou': self.am_settings['MONGO_URI'] + 'tou',
             'tou_version': '2014-v1',
@@ -106,7 +112,8 @@ class SNATests(MongoTestCase):
         else:
             self.settings.update(mongo_settings)
         try:
-            app = main({}, **SETTINGS)
+            settings = get_settings(self.port)
+            app = main({}, **settings)
             self.testapp = TestApp(app)
             self.db = app.registry.settings['mongodb'].get_database()
             self.toudb = app.registry.settings['mongodb_tou'].get_database()
@@ -120,6 +127,7 @@ class SNATests(MongoTestCase):
         self.testapp.reset()
         self.db.registered.drop()
         self.toudb.consent.drop()
+        self.patcher.stop()
 
     def _google_callback(self, state, user):
 
@@ -155,12 +163,6 @@ class SNATests(MongoTestCase):
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(self.db.registered.find({}).count(), 1)
-        from eduid_am.db import MongoDB
-        with patch.object(MongoDB, 'get_database', clear=True):
-            MongoDB.get_database.return_value = self.db
-            res = self.testapp.get(res.location)
-            time.sleep(0.1)
-            self.assertEqual(self.db.registered.find({}).count(), 0)
 
     def test_google_tou(self):
         # call the login to fill the session
