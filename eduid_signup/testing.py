@@ -1,4 +1,5 @@
 import unittest
+from copy import deepcopy
 
 import pymongo
 
@@ -8,12 +9,13 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest
 
 from eduid_am.db import MongoDB
+from eduid_am import testing as am
 from eduid_signup import main
 
 
-MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
-MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
-MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
+MONGO_URI_TEST = 'mongodb://localhost:%d/signup'
+MONGO_URI_TEST_AM = 'mongodb://localhost:%d/am'
+MONGO_URI_TEST_TOU = 'mongodb://localhost:%d/tou'
 
 
 class DBTests(unittest.TestCase):
@@ -22,8 +24,11 @@ class DBTests(unittest.TestCase):
     clean_collections = tuple()
 
     def setUp(self):
+        self.tmp_db = am.MongoTemporaryInstance.get_instance()
+        self.conn = self.tmp_db.conn
+        self.port = self.tmp_db.port
         try:
-            mongodb = MongoDB(MONGO_URI_TEST)
+            mongodb = MongoDB(MONGO_URI_TEST % self.port)
             self.db = mongodb.get_database()
         except pymongo.errors.ConnectionFailure:
             self.db = None
@@ -63,6 +68,13 @@ static_url = pyramid_jinja2.filters:static_url_filter
     'facebook_app_secret': 'def',
 }
 
+def get_settings(port):
+    settings = deepcopy(SETTINGS)
+    settings['mongo_uri'] = settings['mongo_uri'] % port
+    settings['mongo_uri_am'] = settings['mongo_uri_am'] % port
+    settings['mongo_uri_tou'] = settings['mongo_uri_tou'] % port
+    return settings
+
 
 class FunctionalTests(DBTests):
     """Base TestCase for those tests that need a full environment setup"""
@@ -70,8 +82,12 @@ class FunctionalTests(DBTests):
     def setUp(self):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
+        self.tmp_db = am.MongoTemporaryInstance.get_instance()
+        self.conn = self.tmp_db.conn
+        self.port = self.tmp_db.port
+        settings = get_settings(self.port)
         try:
-            app = main({}, **SETTINGS)
+            app = main({}, **settings)
             self.testapp = TestApp(app)
             self.db = app.registry.settings['mongodb'].get_database()
         except pymongo.errors.ConnectionFailure:
