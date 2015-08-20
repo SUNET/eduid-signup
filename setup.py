@@ -3,12 +3,24 @@ import sys
 
 from setuptools import setup, find_packages
 
+try:
+    from babel.messages import frontend as babel
+except ImportError:
+    print "Babel is not installed, you can't localize this package"
+    cmdclass = {}
+else:
+    cmdclass = {
+        'compile_catalog': babel.compile_catalog,
+        'extract_messages': babel.extract_messages,
+        'init_catalog': babel.init_catalog,
+        'update_catalog': babel.update_catalog
+    }
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-version = '0.4.2-dev'
+version = '0.4.5b0'
 
 requires = [
     'eduid_am >= 0.6.0-dev, < 0.7.0',
@@ -39,7 +51,7 @@ if sys.version_info[0] < 3:
 test_requires = [
     'WebTest==1.4.3',
     'mock==1.0.1',
-    'eduid_signup_amp>=0.2.7',
+    'eduid_signup_amp==0.2.8',
 ]
 
 

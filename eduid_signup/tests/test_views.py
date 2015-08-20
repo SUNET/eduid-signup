@@ -80,6 +80,13 @@ class HelpViewTests(FunctionalTests):
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Help')
 
+    def test_help_in_swedish(self):
+        res = self.testapp.get('/help/', headers={
+            'Accept-Language': 'sv',
+        })
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Vart kan jag')
+
     def test_help_in_unknown_language(self):
         res = self.testapp.get('/help/', headers={
             'Accept-Language': 'xx',
@@ -101,6 +108,13 @@ class SignupAppTest(MongoTestCase):
 
         if getattr(self, 'settings', None) is None:
             self.settings = SETTINGS
+
+        from eduid_signup import views
+        mock_config = {
+            'return_value': ('x', 'y'),
+        }
+        self.patcher = patch.object(views, 'generate_password', **mock_config)
+        self.patcher.start()
 
         self.settings.update(mongo_settings)
         try:
@@ -127,6 +141,7 @@ class SignupAppTest(MongoTestCase):
         self.testapp.reset()
         self.signup_userdb._drop_whole_collection()
         self.toudb.consent.drop()
+        self.patcher.stop()
 
     def _start_and_solve_captcha(self, email, check_captcha_post_result=True,
                                  userdb_count=2, signup_userdb_count=0):
