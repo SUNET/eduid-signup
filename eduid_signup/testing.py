@@ -9,12 +9,9 @@ from pyramid.testing import DummyRequest
 
 from eduid_signup import main
 from eduid_userdb.signup import SignupUserDB
-from eduid_userdb.testing import MongoTemporaryInstance
+from eduid_userdb.testing import MongoTemporaryInstance, MongoTestCase
 
-
-MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
-MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
-MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
+from eduid_am.celery import celery, get_attribute_manager
 
 
 SETTINGS = {
@@ -24,9 +21,6 @@ SETTINGS = {
     'auth_tk_secret': '123456',
     'auth_shared_secret': '123123',
     'session.cookie_expires': '3600',
-    'mongo_uri': MONGO_URI_TEST,
-    'mongo_uri_am': MONGO_URI_TEST_AM,
-    'mongo_uri_tou': MONGO_URI_TEST_TOU,
     'tou_version': '2014-v1',
     'testing': True,
     'jinja2.directories': 'eduid_signup:templates',
@@ -46,29 +40,11 @@ static_url = pyramid_jinja2.filters:static_url_filter
 }
 
 
-class DBTests(unittest.TestCase):
-    """Base TestCase for those tests that need a db configured"""
-
-    clean_dbs = dict()
-
-    def setUp(self):
-        try:
-            self.signup_userdb = SignupUserDB(SETTINGS['mongo_uri'])
-        except pymongo.errors.ConnectionFailure:
-            self.signup_userdb = None
-
-    def tearDown(self):
-        if not self.signup_userdb:
-            return None
-        if 'signup_userdb' in self.clean_dbs:
-            self.signup_userdb._drop_whole_collection()
-
-
-class FunctionalTests(DBTests):
+class FunctionalTests(MongoTestCase):
     """Base TestCase for those tests that need a full environment setup"""
 
     def setUp(self):
-        super(DBTests, self).setUp()
+        super(FunctionalTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
         self.tmp_db = MongoTemporaryInstance.get_instance()
 
         _settings = SETTINGS
@@ -78,8 +54,8 @@ class FunctionalTests(DBTests):
             'mongo_uri_tou': self.tmp_db.get_uri('eduid_tou_test'),
             })
 
-        # Don't call DBTests.setUp because we are getting the
-        # db in a different way
+        self.signup_userdb = SignupUserDB(_settings['mongo_uri'])
+
         try:
             app = main({}, **_settings)
             self.testapp = TestApp(app)
@@ -89,6 +65,9 @@ class FunctionalTests(DBTests):
 
     def tearDown(self):
         super(FunctionalTests, self).tearDown()
+        if not self.signup_userdb:
+            return None
+        self.signup_userdb._drop_whole_collection()
         self.testapp.reset()
 
     def set_user_cookie(self, user_id):

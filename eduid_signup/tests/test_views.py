@@ -101,8 +101,8 @@ class SignupAppTest(MongoTestCase):
         super(SignupAppTest, self).setUp(celery, get_attribute_manager)
         # get the mongo URI for the temporary mongo instance that was just started in MongoTestCase.setup()
         mongo_settings = {
-            'mongo_uri': self.mongodb_uri(),
-            'mongo_uri_tou': self.mongodb_uri('tou'),
+            'mongo_uri': self.mongodb_uri('eduid_signup_test'),
+            'mongo_uri_tou': self.mongodb_uri('eduid_tou_test'),
             'tou_version': '2014-v1',
         }
 
