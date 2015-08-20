@@ -5,7 +5,7 @@ import unittest
 from eduid_signup.validators import validate_email_format
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.utils import normalize_email
-from eduid_signup.testing import DBTests
+from eduid_signup.testing import FunctionalTests
 
 
 class EmailFormatTests(unittest.TestCase):
@@ -28,20 +28,16 @@ class EmailFormatTests(unittest.TestCase):
             self.assertFalse(validate_email_format(normalize_email(email)))
 
 
-class ValidateEmailTests(DBTests):
+class ValidateEmailTests(FunctionalTests):
 
-    clean_collections = ('registered', )
+    clean_dbs = dict(signup_userdb = True)
 
     def test_no_email(self):
-        self.assertRaises(ValidationError, validate_email,
-                          self.db, {})
+        self.assertRaises(ValidationError, validate_email, {})
 
     def test_bad_format(self):
-        self.assertRaises(ValidationError, validate_email,
-                          self.db, {'email': 'a@com'})
+        self.assertRaises(ValidationError, validate_email, {'email': 'a@com'})
 
     def test_good_email(self):
-        if not self.db:
-            raise unittest.SkipTest("requires accessible MongoDB server")
         self.assertEqual('bar@example.com',
-                         validate_email(self.db, {'email': 'bar@example.com'}))
+                         validate_email({'email': 'bar@example.com'}))

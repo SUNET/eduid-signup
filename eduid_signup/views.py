@@ -1,6 +1,5 @@
 import os
 import time
-import datetime
 from recaptcha.client import captcha
 from bson import ObjectId
 
@@ -25,22 +24,21 @@ from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
                                 CodeDoesNotExists, record_tou)
 from eduid_signup.vccs import generate_password
+from eduid_userdb.signup import SignupUser
+from eduid_userdb.password import Password
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-EMAIL_STATUS_VIEWS = {
-    'new': None,
-    'not_verified': 'resend_email_verification',
-    'verified': 'email_already_registered'
-}
-
-
 def get_url_from_email_status(request, email):
     """
-    Return a view depending on
-    the verification status of the provided email.
+    Return a view depending on the verification status of the provided email.
+
+    If a user with this (verified) e-mail address exist in the central eduid userdb,
+    return view 'email_already_registered'.
+
+    Otherwise, send a verification e-mail.
 
     :param request: the request
     :type request: WebOb Request
@@ -49,14 +47,19 @@ def get_url_from_email_status(request, email):
 
     :return: redirect response
     """
-    status = check_email_status(request.userdb, email)
+    status = check_email_status(request.userdb, request.signup_db, email)
     logger.debug("e-mail {!s} status: {!s}".format(email, status))
     if status == 'new':
         send_verification_mail(request, email)
         namedview = 'success'
-    else:
+    elif status == 'not_verified':
         request.session['email'] = email
-        namedview = EMAIL_STATUS_VIEWS[status]
+        namedview = 'resend_email_verification'
+    elif status == 'verified':
+        request.session['email'] = email
+        namedview = 'email_already_registered'
+    else:
+        raise NotImplementedError('Unknown e-mail status: {!r}'.format(status))
     url = request.route_url(namedview)
 
     return HTTPFound(location=url)
@@ -82,7 +85,7 @@ def home(request):
     context = {}
     if request.method == 'POST':
         try:
-            email = validate_email(request.db, request.POST)
+            email = validate_email(request.POST)
         except ValidationError as error:
             context.update({
                 'email_error': error.msg,
@@ -224,8 +227,12 @@ def review_fetched_info(request):
     """
     Once user info has been retrieved from a social network,
     present it to the user so she can review and accept it.
+
+    First, a GET renders the information for the user to review, then
+    a POST is used to accept the information shown, or abort the signup.
     """
 
+    logger.debug("View review_fetched_info ({!s})".format(request.method))
     debug_mode = request.registry.settings.get('development', False)
     if not 'social_info' in request.session and not debug_mode:
         raise HTTPBadRequest()
@@ -241,35 +248,37 @@ def review_fetched_info(request):
             'last_name': 'dummy',
         }
 
-    mail_registered = False
+    am_user = False
     if email:
-        signup_user = request.db.registered.find_one({
-            "email": email,
-            "verified": True
-        })
-
         try:
-            am_user = request.userdb.get_user_by_email(email)
+            am_user = request.userdb.get_user_by_mail(email, raise_on_missing=True)
+            logger.info("User {!s} found using email {!s}".format(am_user, email))
+            raise HTTPFound(location=request.route_url('email_already_registered'))
         except request.userdb.exceptions.UserDoesNotExist:
             pass
-        else:
-            raise HTTPFound(location=request.route_url('email_already_registered'))
-
-        mail_registered = signup_user
 
     if request.method == 'GET':
-        return {
+        # If `mail_registered' is true, the user is told the address already exists and they
+        # are given the option to do a password reset.
+        #
+        # If `mail_empty' is true, the user is told the Social network did not provide an e-mail
+        # address and they need to press 'cancel' and choose another Signup method.
+        res = {
             'social_info': social_info,
-            'mail_registered': bool(mail_registered),
+            'mail_registered': bool(am_user),
             'mail_empty': not email,
             'reset_password_link': request.registry.settings['reset_password_link'],
         }
+        logger.debug("Rendering review form: {!r}".format(res))
+        return res
 
-    elif email:
-        if request.POST.get('action', 'cancel') == 'accept':
-            create_or_update_sna(request, social_info, signup_user)
+    if request.method == 'POST' and email and not am_user:
+        if request.POST.get('action') == 'accept':
+            logger.debug("Proceeding with social signup of {!r}: {!r}")
+            create_or_update_sna(request, social_info)
             raise HTTPFound(location=request.route_url('sna_account_created'))
         else:
+            logger.debug("Social signup aborted")
             if request.session is not None:
                 request.session.delete()
             headers = forget(request)
@@ -279,7 +288,7 @@ def review_fetched_info(request):
         raise HTTPBadRequest()
 
 
-def registered_completed(request, user, context=None):
+def registered_completed(request, signup_user, context=None):
     """
     After a successful registration
     (through the mail or through a social network),
@@ -287,43 +296,26 @@ def registered_completed(request, user, context=None):
     add it to the registration record in the registrations db,
     update the attribute manager db with the new account,
     and send the pertinent information to the user.
-    """
-    user_id = user.get("_id")
-    eppn = user.get('eduPersonPrincipalName')
 
-    logger.info("Completing registration for user {!s}/{!s} (first created: {!s})".format(
-        user_id, eppn, user.get('created_ts')))
+    :param signup_user: SignupUser instance
+    :type signup_user: SignupUser
+    """
+    logger.info("Completing registration for user {!s}/{!s}".format(signup_user.user_id, signup_user.eppn))
 
     if context is None:
         context = {}
     password_id = ObjectId()
     (password, salt) = generate_password(request.registry.settings,
-                                         str(password_id), user,
+                                         str(password_id), signup_user,
                                          )
-    request.db.registered.update(
-        {
-            'eduPersonPrincipalName': eppn,
-        }, {
-            '$push': {
-                'passwords': {
-                    'id': password_id,
-                    'salt': salt,
-                    'source': 'signup',
-                    'created_ts': datetime.datetime.utcnow(),
-                }
-            },
-        }, safe=True)
+    credential = Password(credential_id=password_id, salt=salt, application='signup')
+    signup_user.passwords.add(credential)
+    request.signup_db.save(signup_user)
 
-    logger.debug("Asking for sync by Attribute Manager")
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
-    rtask = update_attributes_keep_result.delay('eduid_signup', str(user_id))
-
-    eppn = user.get('eduPersonPrincipalName')
-    secret = request.registry.settings.get('auth_shared_secret')
-    timestamp = '{:x}'.format(int(time.time()))
-    nonce = os.urandom(16).encode('hex')
-
+    logger.debug("Asking for sync of {!r} by Attribute Manager".format(str(signup_user.user_id)))
+    rtask = update_attributes_keep_result.delay('eduid_signup', str(signup_user.user_id))
     timeout = request.registry.settings.get("account_creation_timeout", 10)
     try:
         result = rtask.get(timeout=timeout)
@@ -337,13 +329,16 @@ def registered_completed(request, user, context=None):
         url = request.route_path('home')
         raise HTTPFound(location=url)
 
-    auth_token = generate_auth_token(secret, eppn, nonce, timestamp)
+    secret = request.registry.settings.get('auth_shared_secret')
+    timestamp = '{:x}'.format(int(time.time()))
+    nonce = os.urandom(16).encode('hex')
+    auth_token = generate_auth_token(secret, signup_user.eppn, nonce, timestamp)
 
     context.update({
         "profile_link": request.registry.settings.get("profile_link", "#"),
         "password": password,
-        "email": user.get('email'),
-        "eppn": eppn,
+        "email": signup_user.mail_addresses.primary.email,
+        "eppn": signup_user.eppn,
         "nonce": nonce,
         "timestamp": timestamp,
         "auth_token": auth_token,
@@ -355,13 +350,12 @@ def registered_completed(request, user, context=None):
     logger.debug("Context Finish URL : {!r}".format(context.get('finish_url')))
 
     if request.registry.settings.get("email_credentials", False):
-        send_credentials(request, eppn, password)
+        send_credentials(request, signup_user.eppn, password)
 
     # Record the acceptance of the terms of use
+    record_tou(request, signup_user.user_id, 'signup')
 
-    record_tou(request, user_id, 'signup')
-
-    logger.info("Signup process for new user {!s}/{!s} complete".format(user_id, eppn))
+    logger.info("Signup process for new user {!s}/{!s} complete".format(signup_user.user_id, signup_user.eppn))
     return context
 
 
@@ -375,9 +369,40 @@ def email_verification_link(request):
 
     logger.debug("Trying to confirm e-mail using confirmation link")
     code = request.matchdict['code']
+    return _verify_code(request, code)
+
+
+@view_config(route_name='verification_code_form',
+             renderer="templates/verification_code_form.jinja2")
+def verification_code_form(request):
+    """
+    form to enter the verification code
+    """
+    if request.method == 'POST':
+        code = request.POST['code']
+        return _verify_code(request, code)
+    return {}
+
+
+def _verify_code(request, code):
+    """
+    Common code for the link- and form-based code verification.
+
+    :param request:
+    :param code: Code given by the user
+    :return:
+    """
     try:
-        verify_email_code(request.db.registered, code)
+        signup_user = verify_email_code(request.signup_db, code)
+        # XXX at this stage the confirmation code is marked as 'used' but no
+        # credential have been created yet. If that fails (done beyond registered_completed),
+        # the user will get an error and when retrying will get a message saying the email
+        # address has already been verified. The user *is* given the possibility to reset
+        # the password at that point, but it would be less surprising if the code was only
+        # marked as 'used' when everything worked as expected.
     except AlreadyVerifiedException:
+        # Should not be able to get here. Raise exception instead?
+        logger.error("The pending MailAddress was verified already. Should not happen!")
         return {
             'email_already_verified': True,
             "reset_password_link": request.registry.settings.get("reset_password_link", "#"),
@@ -389,47 +414,7 @@ def email_verification_link(request):
             "signup_link": request.route_path('home'),
         }
 
-    user = request.db.registered.find_one({
-        'code': code,
-    })
-
-    return registered_completed(request, user, {'from_email': True})
-
-
-@view_config(route_name='verification_code_form',
-             renderer="templates/verification_code_form.jinja2")
-def verification_code_form(request):
-    """
-    form to enter the verification code
-    """
-    context = {}
-    if request.method == 'POST':
-        try:
-            try:
-                code = request.POST['code']
-                verify_email_code(request.db.registered, code)
-                user = request.db.registered.find_one({
-                    'code': code
-                })
-                # XXX at this stage the confirmation code is marked as 'used' but no
-                # credential have been created yet. If that fails (done beyond registered_completed),
-                # the user will get an error and when retrying will get a message saying the email
-                # address has already been verified. The user *is* given the possibility to reset
-                # the password at that point, but it would be less surprising if the code was only
-                # marked as 'used' when everything worked as expected.
-                return registered_completed(request, user, {'from_email': True})
-            except AlreadyVerifiedException:
-                context = {
-                    'email_already_verified': True,
-                    'reset_password_link': request.registry.settings.get('reset_password_link', '#'),
-                }
-        except CodeDoesNotExists:
-            context = {
-                'code_does_not_exists': True,
-                'code_form': request.route_path('verification_code_form'),
-                'signup_link': request.route_path('home'),
-            }
-    return context
+    return registered_completed(request, signup_user, {'from_email': True})
 
 
 @view_config(route_name='sna_account_created',
@@ -439,10 +424,12 @@ def account_created_from_sna(request):
     View where the registration from a social network is completed,
     after the user has reviewed the information fetched from the s.n.
     """
+    user = request.signup_db.get_user_by_mail(request.session.get('email'),
+                                              raise_on_missing=True,
+                                              include_unconfirmed=True,
+                                              )
 
-    user = request.db.registered.find_one({
-        'email': request.session.get('email')
-    })
+    assert isinstance(user, SignupUser)
 
     return registered_completed(request, user)
 

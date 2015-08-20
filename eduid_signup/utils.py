@@ -26,56 +26,79 @@ def generate_verification_link(request):
     return (link, code)
 
 
-def verify_email_code(collection, code):
-    status = collection.find_one({
-        'code': code,
-    })
+def verify_email_code(signup_db, code):
+    """
+    Look up a user in the signup userdb using an e-mail verification code.
 
-    if status is None:
+    Mark the e-mail address as confirmed, save the user and return the user object.
+
+    :param signup_db: Signup user database
+    :param code: Code as received from user
+    :type signup_db: SignupUserDb
+    :type code: str | unicode
+
+    :return: Signup user object
+    :rtype: SignupUser
+    """
+    signup_user = signup_db.get_user_by_mail_verification_code(code)
+
+    if not signup_user:
         logger.debug("Code {!r} not found in database".format(code))
         raise CodeDoesNotExists()
-    else:
-        if status.get('verified'):
-            logger.debug("Code {!r} already verified".format(code))
-            raise AlreadyVerifiedException()
 
-    result = collection.update(
-        {
-            "code": code,
-            "verified": False
-        }, {
-            "$set": {
-                "verified": True,
-                "verified_ts": datetime.datetime.utcnow(),
-            }
-        },
-        new=True,
-        safe=True
-    )
+    mail = signup_user.pending_mail_address
+    if mail.is_verified:
+        # There really should be no way to get here. is_verified is set when
+        # the MailAddress is moved from pending_mail_address to mail_addresses.
+        logger.debug("Code {!r} already verified ({!s})".format(code, mail))
+        raise AlreadyVerifiedException()
 
-    logger.debug("Code {!r} verified : {!r}".format(code, result))
-    return True
+    mail.is_verified = True
+    mail.verified_ts = True
+    mail.verified_by = 'signup'
+    mail.is_primary = True
+    signup_user.pending_mail_address = None
+    signup_user.mail_addresses.add(mail)
+    result = signup_db.save(signup_user)
+
+    logger.debug("Code {!r} verified and user {!s} saved: {!r}".format(code, signup_user, result))
+    return signup_user
 
 
-def check_email_status(userdb, email):
+def check_email_status(userdb, signup_db, email):
     """
-        Check the email registration status.
+    Check the email registration status.
 
-        If the email doesn't exist in database, then return 'new'.
+    If the email doesn't exist in database, then return 'new'.
 
-        If exists and it hasn't been verified, then return 'not_verified'.
+    If exists and it hasn't been verified, then return 'not_verified'.
 
-        If exists and it has been verified before, then return 'verified'.
+    If exists and it has been verified before, then return 'verified'.
+
+    :param userdb: eduID central userdb
+    :param signup_db: Signup userdb
+    :param email: Address to look for
+
+    :type userdb: eduid_userdb.UserDb
+    :type signup_db: eduid_signup.userdb.SignupUserDB
+    :type email: str | unicode
     """
     try:
-        am_user = userdb.get_user_by_email(email)
+        am_user = userdb.get_user_by_mail(email, raise_on_missing=True, include_unconfirmed=False)
+        logger.debug("Found user {!s} with email {!s}".format(am_user, email))
+        return 'verified'
     except userdb.exceptions.UserDoesNotExist:
-        return 'new'
-    emails = am_user.get_mail_aliases()
-    for mail in emails:
-        if mail.get('email', '') == email and mail.get('verified', False):
-            return 'verified'
-    return 'not_verified'
+        logger.debug("No user found with email {!s} in eduid userdb".format(email))
+
+    try:
+        signup_user = signup_db.get_user_by_pending_mail_address(email)
+        if signup_user:
+            logger.debug("Found user {!s} with pending email {!s} in signup db".format(signup_user, email))
+            return 'not_verified'
+    except userdb.exceptions.UserDoesNotExist:
+        logger.debug("No user found with email {!s} in signup db either".format(email))
+
+    return 'new'
 
 
 def generate_auth_token(shared_key, email, nonce, timestamp, generator=sha256):
@@ -102,7 +125,7 @@ def generate_eppn(request):
         eppn_int = struct.unpack('I', os.urandom(4))[0]
         eppn = proquint.from_int(eppn_int)
         try:
-            request.userdb.get_user_by_attr('eduPersonPrincipalName', eppn)
+            request.userdb.get_user_by_eppn(eppn)
         except request.userdb.exceptions.UserDoesNotExist:
             return eppn
     raise HTTPServerError()

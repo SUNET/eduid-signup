@@ -10,10 +10,11 @@ from pyramid.interfaces import IStaticURLInfo
 from pyramid.config.views import StaticURLInfo
 
 from eduid_am.celery import celery
-from eduid_am.db import MongoDB
-from eduid_am.userdb import UserDB
+#from eduid_am.userdb import UserDB
 from eduid_am.config import read_setting_from_env, read_mapping
 from eduid_signup.i18n import locale_negotiator
+from eduid_userdb import MongoDB, UserDB
+from eduid_userdb.signup import SignupUserDB
 
 
 class ConfiguredHostStaticURLInfo(StaticURLInfo):
@@ -28,30 +29,23 @@ class ConfiguredHostStaticURLInfo(StaticURLInfo):
 
 def includeme(config):
     # DB setup
-    mongo_replicaset = config.registry.settings.get('mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        mongodb = MongoDB(config.registry.settings['mongo_uri'],
-                          replicaSet=mongo_replicaset)
-        mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'],
-                          replicaSet=mongo_replicaset)
-    else:
-        mongodb = MongoDB(config.registry.settings['mongo_uri'])
-        mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'])
+    _mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'])
+    _userdb = UserDB(config.registry.settings['mongo_uri_am'])
+    _signup_db = SignupUserDB(config.registry.settings['mongo_uri'])
+
     # Create mongodb client instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
-    config.registry.settings['mongodb'] = mongodb
-    config.registry.settings['db_conn'] = mongodb.get_connection
-    config.add_request_method(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
+    config.registry.settings['signup_db'] = _signup_db
+    config.add_request_method(lambda x: x.registry.settings['signup_db'], 'signup_db', reify=True)
 
     # Create userdb instance and store it in our config,
-    # and make a getter lambda for pyramid to retreive it
-    _userdb = UserDB(config.registry.settings)
+    # and make a getter lambda for pyramid to retreive it (will be available as 'request.userdb')
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
     # store mongodb tou client instance in our config,
     # and make a getter lambda for pyramid to retreive it
-    config.registry.settings['mongodb_tou'] = mongodb_tou
+    config.registry.settings['mongodb_tou'] = _mongodb_tou
     config.add_request_method(lambda x: x.registry.settings['mongodb_tou'].get_database(), 'toudb', reify=True)
 
     # root views
