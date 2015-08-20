@@ -51,7 +51,7 @@ if sys.version_info[0] < 3:
 test_requires = [
     'WebTest==1.4.3',
     'mock==1.0.1',
-    'eduid_signup_amp==0.2.8',
+    'eduid_signup_amp>=0.2.9b0',
 ]
 
 
