@@ -65,6 +65,26 @@ class SuccessViewTests(FunctionalTests):
         res = self.testapp.get('/success/')
         self.assertEqual(res.status, '200 OK')
 
+    def test_success_no_email(self):
+        res = self.testapp.get('/success/')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/')
+
+    def test_favicon(self):
+        res = self.testapp.get('/favicon.ico')
+        self.assertEqual(res.status, '200 OK')
+
+    def test_resend_verification(self):
+        self.add_to_session({'email': 'mail@example.com'})
+        res = self.testapp.post('/resend_email_verification/')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/success/')
+
+    def test_resend_verification_get(self):
+        self.add_to_session({'email': 'mail@example.com'})
+        res = self.testapp.get('/resend_email_verification/')
+        self.assertEqual(res.status, '200 OK')
+
 
 class HelpViewTests(FunctionalTests):
 
