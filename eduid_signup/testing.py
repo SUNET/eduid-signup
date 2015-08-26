@@ -50,7 +50,7 @@ class FunctionalTests(MongoTestCase):
         _settings = SETTINGS
         _settings.update({
             'mongo_uri': self.tmp_db.get_uri('eduid_signup_test'),
-            'mongo_uri_am': self.tmp_db.get_uri('eduid_am_test'),
+            'mongo_uri_am': self.tmp_db.get_uri('eduid_userdb'),
             'mongo_uri_tou': self.tmp_db.get_uri('eduid_tou_test'),
             })
 

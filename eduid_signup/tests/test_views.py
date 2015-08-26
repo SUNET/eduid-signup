@@ -1,4 +1,5 @@
 import time
+from copy import deepcopy
 from mock import patch
 import pymongo
 import unittest
@@ -7,6 +8,7 @@ from pyramid_sna.compat import urlparse
 from webtest import TestApp
 
 from eduid_userdb.testing import MongoTestCase
+from eduid_userdb.data_samples import NEW_BASIC_USER_EXAMPLE
 from eduid_signup import main
 from eduid_signup.testing import FunctionalTests, SETTINGS
 
@@ -470,3 +472,228 @@ class SignupEmailTests(SignupAppTest):
             res6 = res5.form.submit('foo')
             self.assertEqual(res6.status, '200 OK')
             res6.mustcontain('You can now log in')
+
+
+class MockCapchaTests(FunctionalTests):
+
+    mock_users_patches = []
+
+    def setUp(self):
+        super(MockCapchaTests, self).setUp()
+
+        from eduid_signup.views import captcha
+        class MockCaptcha:
+            is_valid = True
+        mock_config = {
+            'return_value': MockCaptcha(),
+        }
+        self.patcher_captcha = patch.object(captcha, 'submit', **mock_config)
+        self.patcher_captcha.start()
+
+        from eduid_signup.vccs import vccs_client
+        class MockClient:
+            def add_credentials(self, *args, **kwargs):
+                return True
+        mock_config2 = {
+            'return_value': MockClient(),
+        }
+        self.patcher_vccs = patch.object(vccs_client, 'VCCSClient', **mock_config2)
+        self.patcher_vccs.start()
+
+        from eduid_am.tasks import USERDBS
+        USERDBS['eduid_signup'] = self.signup_userdb
+
+    def tearDown(self):
+        super(MockCapchaTests, self).tearDown()
+        self.patcher_captcha.stop()
+        self.patcher_vccs.stop()
+
+    def _start_registration(self, email='foo@example.com'):
+        res = self.testapp.post('/', {'email': email})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        res = self.testapp.get(res.location)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        res = res.form.submit()
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/success/')
+        self.assertEqual(self.signup_userdb.db_count(), 1)
+        registered = self.signup_userdb.get_user_by_pending_mail_address(email)
+        self.assertEqual(registered.pending_mail_address.is_verified, False)
+        return registered
+
+    def _complete_registration(self, email='foo@example.com'):
+        registered = self._start_registration(email=email)
+        code = registered.pending_mail_address.verification_code
+        url = 'http://localhost/email_verification/%s/' % code
+        res = self.testapp.get(url)
+        self.assertEqual(res.status, '200 OK')
+        new_user = self.amdb.get_user_by_mail(email)
+        return new_user
+
+    def test_set_invalid_method(self):
+        self.add_to_session({'email': 'mail@example.com'})
+        res = self.testapp.delete('http://localhost/trycaptcha/', status=405)
+        self.assertEqual(res.status, '405 Method Not Allowed')
+
+    def test_set_language(self):
+        res = self.testapp.get('http://localhost/set_language/?lang=sv')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://signup.example.com')
+        res = self.testapp.get(res.location)
+        self.assertIn('eller avbryta den avsedda', res.body)
+
+    def test_set_language_invalid_lang(self):
+        res = self.testapp.get('http://localhost/set_language/?lang=gr', status=404)
+        self.assertEqual(res.status, '404 Not Found')
+
+    def test_404(self):
+        res = self.testapp.get('http://localhost/ho-ho-ho/', status=404)
+        self.assertEqual(res.status, '404 Not Found')
+
+    def test_start_registration(self):
+        self._start_registration()
+        new_user = self.amdb.get_user_by_mail('foo@example.com')
+        self.assertEqual(new_user, None)
+
+    def test_email_verification_link(self):
+        new_user = self._complete_registration()
+        self.assertEqual(new_user.mail_addresses.primary.email, 'foo@example.com')
+        self.assertEqual(new_user.mail_addresses.primary.is_verified, True)
+
+    def test_email_verification_link_already_verified(self):
+        registered = self._start_registration()
+        registered.pending_mail_address.is_verified = True
+        self.signup_userdb.save(registered, check_sync=False)
+        code = registered.pending_mail_address.verification_code
+        url = 'http://localhost/email_verification/%s/' % code
+        res = self.testapp.get(url)
+        self.assertEqual(res.status, '200 OK')
+        self.assertIn('Email address has already been verified', res.body)
+
+    def test_email_verification_code_form(self):
+        registered = self._start_registration()
+        code = registered.pending_mail_address.verification_code
+        res = self.testapp.get('http://localhost/verification_code_form/')
+        res.form['code'] = code
+        res = res.form.submit()
+        self.assertEqual(res.status, '200 OK')
+        new_user = self.amdb.get_user_by_mail('foo@example.com')
+        self.assertEqual(new_user.mail_addresses.primary.email, 'foo@example.com')
+        self.assertEqual(new_user.mail_addresses.primary.is_verified, True)
+
+    def test_email_verification_code_form_already_verified(self):
+        registered = self._start_registration()
+        registered.pending_mail_address.is_verified = True
+        self.signup_userdb.save(registered, check_sync=False)
+        code = registered.pending_mail_address.verification_code
+        res = self.testapp.get('http://localhost/verification_code_form/')
+        res.form['code'] = code
+        res = res.form.submit()
+        self.assertEqual(res.status, '200 OK')
+        self.assertIn('Email address has already been verified', res.body)
+
+
+    def test_email_verification_code_form_invalid_code(self):
+        res = self.testapp.get('http://localhost/verification_code_form/')
+        res.form['code'] = 'xxx'
+        res = res.form.submit()
+        self.assertEqual(res.status, '200 OK')
+        self.assertIn('The provided code does not exist', res.body)
+
+    def test_email_verification_link_invalid_code(self):
+        url = 'http://localhost/email_verification/%s/' % 'xxx'
+        res = self.testapp.get(url)
+        self.assertEqual(res.status, '200 OK')
+        self.assertIn('The provided code does not exist', res.body)
+
+    def test_no_email(self):
+        res = self.testapp.post('/', {})
+        self.assertEqual(res.status, '200 OK')
+
+    def test_no_email_in_session(self):
+        res = self.testapp.post('/', {'email': 'foo@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        res = self.testapp.get(res.location)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        self.add_to_session({'dummy': 'dummy'})
+        res = res.form.submit()
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/')
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+    def test_email_exists(self):
+        res = self.testapp.post('/', {'email': 'johnsmith@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        res = self.testapp.get(res.location)
+        res = res.form.submit()
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/email_already_registered/')
+        res = self.testapp.get(res.location)
+        self.assertEqual(res.status, '200 OK')
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+    def test_celery_error(self):
+        from eduid_am.tasks import update_attributes_keep_result
+        class MockAttrManager:
+            def get(*args, **kwargs):
+                raise Exception('ho')
+        mock_config = {
+            'return_value': MockAttrManager(),
+        }
+        with patch.object(update_attributes_keep_result,
+                          'delay', **mock_config):
+            registered = self._start_registration()
+            code = registered.pending_mail_address.verification_code
+            url = 'http://localhost/email_verification/%s/' % code
+            res = self.testapp.get(url)
+            self.assertEqual(res.status, '302 Found')
+            self.assertEqual(res.location, 'http://localhost/')
+            registered = self.signup_userdb.get_user_by_mail('foo@example.com')
+            registered_central = self.amdb.get_user_by_mail('foo@example.com')
+            self.assertEqual(registered_central, None)
+            # XXX Should this be verified?
+            self.assertEqual(registered.pending_mail_address, None)
+            self.assertEqual(registered.mail_addresses.primary.email, 'foo@example.com')
+            self.assertEqual(registered.mail_addresses.primary.is_verified, True)
+
+    def test_captcha_url_error(self):
+        from eduid_signup.views import captcha
+        from urllib2 import URLError
+        def side_effect(*args, **kwargs):
+            raise URLError('ho')
+        mock_config = {
+            'side_effect': side_effect,
+        }
+        with patch.object(captcha, 'submit', **mock_config):
+            res = self.testapp.post('/', {'email': 'foo@example.com'})
+            self.assertEqual(res.status, '302 Found')
+            self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+            res = self.testapp.get(res.location)
+            self.assertEqual(self.signup_userdb.db_count(), 0)
+            from urllib2 import URLError
+            self.assertRaises(URLError, res.form.submit)
+
+
+class MockInvalidCapchaTest(FunctionalTests):
+
+    def test_captcha_invalid_error(self):
+        self.testapp.app.registry.settings['recaptcha_public_key'] = 'key'
+        from eduid_signup.views import captcha
+        class MockCaptcha:
+            is_valid = False
+            error_code = 'invalid'
+        mock_config = {
+            'return_value': MockCaptcha(),
+        }
+        with patch.object(captcha, 'submit', **mock_config):
+            res = self.testapp.post('/', {'email': 'foo@example.com'})
+            self.assertEqual(res.status, '302 Found')
+            self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+            res = self.testapp.get(res.location)
+            self.assertEqual(self.signup_userdb.db_count(), 0)
+            res = res.form.submit()
+            self.assertEqual(self.signup_userdb.db_count(), 0)
