@@ -5,9 +5,10 @@ import pymongo
 import unittest
 from pyramid_sna.compat import urlparse
 
+from pyramid.testing import DummyRequest, DummyResource
+from pyramid.interfaces import ISessionFactory
 from webtest import TestApp
 
-from eduid_userdb.testing import MongoTestCase
 from eduid_userdb.data_samples import NEW_BASIC_USER_EXAMPLE
 from eduid_signup import main
 from eduid_signup.testing import FunctionalTests, SETTINGS
@@ -117,19 +118,10 @@ class HelpViewTests(FunctionalTests):
         res.mustcontain('Help')
 
 
-class SignupAppTest(MongoTestCase):
+class SignupAppTest(FunctionalTests):
 
     def setUp(self):
-        super(SignupAppTest, self).setUp(celery, get_attribute_manager)
-        # get the mongo URI for the temporary mongo instance that was just started in MongoTestCase.setup()
-        mongo_settings = {
-            'mongo_uri': self.mongodb_uri('eduid_signup_test'),
-            'mongo_uri_tou': self.mongodb_uri('eduid_tou_test'),
-            'tou_version': '2014-v1',
-        }
-
-        if getattr(self, 'settings', None) is None:
-            self.settings = SETTINGS
+        super(SignupAppTest, self).setUp()
 
         from eduid_signup import views
         mock_config = {
@@ -138,31 +130,8 @@ class SignupAppTest(MongoTestCase):
         self.patcher = patch.object(views, 'generate_password', **mock_config)
         self.patcher.start()
 
-        self.settings.update(mongo_settings)
-        try:
-            _settings = SETTINGS
-            _settings.update(self.settings)
-            app = main({}, **_settings)
-            self.testapp = TestApp(app)
-            self.signup_userdb = app.registry.settings['signup_db']
-            self.toudb = app.registry.settings['mongodb_tou'].get_database()
-            logger.info("Unit tests self.signup_userdb: {!s} / {!s}".format(
-                self.signup_userdb, self.signup_userdb._coll))
-            logger.info("Unit tests self.toudb: {!s}".format(self.toudb))
-        except pymongo.errors.ConnectionFailure:
-            raise unittest.SkipTest("requires accessible MongoDB server")
-        self.signup_userdb._drop_whole_collection()
-        self.toudb.consent.drop()
-
-        # Tell the Celery task where to find the SignupUserDb
-        import eduid_am.tasks
-        eduid_am.tasks.USERDBS['eduid_signup'] = self.signup_userdb
-
     def tearDown(self):
         super(SignupAppTest, self).tearDown()
-        self.testapp.reset()
-        self.signup_userdb._drop_whole_collection()
-        self.toudb.consent.drop()
         self.patcher.stop()
 
     def _start_and_solve_captcha(self, email, check_captcha_post_result=True,
