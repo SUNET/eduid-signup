@@ -24,7 +24,6 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 
 from eduid_signup import main
-from eduid_userdb.signup import SignupUserDB
 from eduid_userdb.testing import MongoTestCase
 
 from eduid_am.celery import celery, get_attribute_manager

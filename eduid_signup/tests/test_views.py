@@ -1,19 +1,8 @@
 import time
-from copy import deepcopy
 from mock import patch
-import pymongo
-import unittest
 from pyramid_sna.compat import urlparse
 
-from pyramid.testing import DummyRequest, DummyResource
-from pyramid.interfaces import ISessionFactory
-from webtest import TestApp
-
-from eduid_userdb.data_samples import NEW_BASIC_USER_EXAMPLE
-from eduid_signup import main
-from eduid_signup.testing import FunctionalTests, SETTINGS
-
-from eduid_am.celery import celery, get_attribute_manager
+from eduid_signup.testing import FunctionalTests
 
 import pprint
 import logging
@@ -498,9 +487,6 @@ class MockCapchaTests(FunctionalTests):
         }
         self.patcher_vccs = patch.object(vccs_client, 'VCCSClient', **mock_config2)
         self.patcher_vccs.start()
-
-        from eduid_am.tasks import USERDBS
-        USERDBS['eduid_signup'] = self.signup_userdb
 
     def tearDown(self):
         super(MockCapchaTests, self).tearDown()
