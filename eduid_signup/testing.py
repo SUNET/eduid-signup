@@ -1,3 +1,18 @@
+"""
+Funny quirk of running these tests in PyCharm:
+
+  If you, like me, have a project in PyCharm with eduid-signup and all it's dependencies
+  'open', and a virtualenv without any of the eduid packages installed, be aware:
+
+  The AM setup will use pkg_resources to find entry points to plugins. Entry points don't
+  exist in source code, so you need to build an egg of eduid-signup-amp and put it somewhere
+  where it will be found. For me it works to
+
+    $ cd eduid-signup-amp
+    $ python setup.py sdist
+
+"""
+
 import unittest
 
 import pymongo
@@ -73,9 +88,7 @@ class FunctionalTests(DBTests):
 
         _settings = SETTINGS
         _settings.update({
-            'mongo_uri': self.tmp_db.get_uri('eduid_signup_test'),
-            'mongo_uri_am': self.tmp_db.get_uri('eduid_am_test'),
-            'mongo_uri_tou': self.tmp_db.get_uri('eduid_tou_test'),
+            'mongo_uri': self.tmp_db.get_uri('eduid_am'),
             })
 
         # Don't call DBTests.setUp because we are getting the

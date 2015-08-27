@@ -101,8 +101,7 @@ class SignupAppTest(MongoTestCase):
         super(SignupAppTest, self).setUp(celery, get_attribute_manager)
         # get the mongo URI for the temporary mongo instance that was just started in MongoTestCase.setup()
         mongo_settings = {
-            'mongo_uri': self.mongodb_uri(),
-            'mongo_uri_tou': self.mongodb_uri('tou'),
+            'mongo_uri': self.mongodb_uri(''),
             'tou_version': '2014-v1',
         }
 
@@ -131,10 +130,6 @@ class SignupAppTest(MongoTestCase):
             raise unittest.SkipTest("requires accessible MongoDB server")
         self.signup_userdb._drop_whole_collection()
         self.toudb.consent.drop()
-
-        # Tell the Celery task where to find the SignupUserDb
-        import eduid_am.tasks
-        eduid_am.tasks.USERDBS['eduid_signup'] = self.signup_userdb
 
     def tearDown(self):
         super(SignupAppTest, self).tearDown()

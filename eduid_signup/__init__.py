@@ -29,9 +29,9 @@ class ConfiguredHostStaticURLInfo(StaticURLInfo):
 
 def includeme(config):
     # DB setup
-    _mongodb_tou = MongoDB(config.registry.settings['mongo_uri_tou'])
-    _userdb = UserDB(config.registry.settings['mongo_uri_am'])
-    _signup_db = SignupUserDB(config.registry.settings['mongo_uri'])
+    _mongodb_tou = MongoDB(config.registry.settings['mongo_uri'], 'eduid_tou')
+    _userdb = UserDB(config.registry.settings['mongo_uri'], 'eduid_am')
+    _signup_db = SignupUserDB(config.registry.settings['mongo_uri'], 'eduid_signup')
 
     # Create mongodb client instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
@@ -106,8 +106,6 @@ def main(global_config, **settings):
 
     for item in (
         'mongo_uri',
-        'mongo_uri_am',
-        'mongo_uri_tou',
         'profile_link',
         'site.name',
         'signup_hostname',
