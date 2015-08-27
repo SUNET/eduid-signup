@@ -23,7 +23,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 version = '0.4.5b0'
 
 requires = [
-    'eduid_am >= 0.6.0-dev, < 0.7.0',
+    'eduid_am >= 0.6.0b0, < 0.7.0',
     'vccs_client >= 0.4.1, < 0.5.0',
     'wsgi_ratelimit >= 0.1',
     'eduid_userdb >= 0.0.0, < 0.1.0',
@@ -51,7 +51,7 @@ if sys.version_info[0] < 3:
 test_requires = [
     'WebTest==1.4.3',
     'mock==1.0.1',
-    'eduid_signup_amp==0.2.8',
+    'eduid_signup_amp>=0.2.9b0',
 ]
 
 

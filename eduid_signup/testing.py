@@ -14,22 +14,20 @@ Funny quirk of running these tests in PyCharm:
 """
 
 import unittest
+from copy import deepcopy
 
 import pymongo
 
 from webtest import TestApp, TestRequest
 from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
-from pyramid.testing import DummyRequest
+from pyramid.testing import DummyRequest, DummyResource
 
 from eduid_signup import main
 from eduid_userdb.signup import SignupUserDB
-from eduid_userdb.testing import MongoTemporaryInstance
+from eduid_userdb.testing import MongoTestCase
 
-
-MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
-MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
-MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
+from eduid_am.celery import celery, get_attribute_manager
 
 
 SETTINGS = {
@@ -39,9 +37,7 @@ SETTINGS = {
     'auth_tk_secret': '123456',
     'auth_shared_secret': '123123',
     'session.cookie_expires': '3600',
-    'mongo_uri': MONGO_URI_TEST,
-    'mongo_uri_am': MONGO_URI_TEST_AM,
-    'mongo_uri_tou': MONGO_URI_TEST_TOU,
+    'session.key': 'session',
     'tou_version': '2014-v1',
     'testing': True,
     'jinja2.directories': 'eduid_signup:templates',
@@ -61,47 +57,32 @@ static_url = pyramid_jinja2.filters:static_url_filter
 }
 
 
-class DBTests(unittest.TestCase):
-    """Base TestCase for those tests that need a db configured"""
-
-    clean_dbs = dict()
-
-    def setUp(self):
-        try:
-            self.signup_userdb = SignupUserDB(SETTINGS['mongo_uri'])
-        except pymongo.errors.ConnectionFailure:
-            self.signup_userdb = None
-
-    def tearDown(self):
-        if not self.signup_userdb:
-            return None
-        if 'signup_userdb' in self.clean_dbs:
-            self.signup_userdb._drop_whole_collection()
-
-
-class FunctionalTests(DBTests):
+class FunctionalTests(MongoTestCase):
     """Base TestCase for those tests that need a full environment setup"""
 
     def setUp(self):
-        super(DBTests, self).setUp()
-        self.tmp_db = MongoTemporaryInstance.get_instance()
+        super(FunctionalTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
-        _settings = SETTINGS
+        _settings = deepcopy(SETTINGS)
         _settings.update({
-            'mongo_uri': self.tmp_db.get_uri('eduid_am'),
+            'mongo_uri': self.tmp_db.get_uri('eduid_signup_test'),
+            'mongo_uri_tou': self.tmp_db.get_uri('eduid_tou_test'),
             })
+        self.settings.update(_settings)
 
-        # Don't call DBTests.setUp because we are getting the
-        # db in a different way
         try:
-            app = main({}, **_settings)
+            app = main({}, **(self.settings))
             self.testapp = TestApp(app)
             self.signup_userdb = app.registry.settings['signup_db']
+            self.toudb = app.registry.settings['mongodb_tou'].get_database()
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server")
 
     def tearDown(self):
         super(FunctionalTests, self).tearDown()
+        self.signup_userdb._drop_whole_collection()
+        self.amdb._drop_whole_collection()
+        self.toudb.consent.drop()
         self.testapp.reset()
 
     def set_user_cookie(self, user_id):
@@ -111,12 +92,19 @@ class FunctionalTests(DBTests):
         cookie_value = remember_headers[0][1].split('"')[1]
         self.testapp.cookies['auth_tkt'] = cookie_value
 
+    def dummy_request(self, cookies={}):
+        request = DummyRequest()
+        request.context = DummyResource()
+        request.signup_userdb = self.signup_userdb
+        request.registry.settings = self.settings
+        return request
+
     def add_to_session(self, data):
         queryUtility = self.testapp.app.registry.queryUtility
         session_factory = queryUtility(ISessionFactory)
-        request = DummyRequest()
+        request = self.dummy_request()
         session = session_factory(request)
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
