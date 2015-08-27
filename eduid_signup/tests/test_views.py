@@ -258,6 +258,36 @@ class SNATests(SignupAppTest):
         self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 0)
 
+    def test_google_bad_request(self):
+        # call the login to fill the session
+        self._google_login(NEW_USER)
+
+        self.add_to_session({'dummy': 'dummy'})
+        res = self.testapp.get('/review_fetched_info/', status=400)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+
+    def test_google_cancel(self):
+        # call the login to fill the session
+        self._google_login(NEW_USER)
+
+        res = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        res = res.form.submit('cancel')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        self.assertEqual(res.location, 'http://localhost/')
+
+    def test_google_tou(self):
+        # call the login to fill the session
+        self._google_login(NEW_USER)
+
+        res = self.testapp.get('/review_fetched_info/')
+        self.assertEqual(self.toudb.consent.find({}).count(), 0)
+        res = res.form.submit('action')
+        self.assertEqual(res.status, '302 Found')
+        self.testapp.get(res.location)
+        self.assertEqual(self.toudb.consent.find({}).count(), 1)
+
     def _google_callback(self, state, user):
 
         with patch('requests.post') as fake_post:
