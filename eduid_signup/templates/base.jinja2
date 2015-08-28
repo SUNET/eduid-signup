@@ -13,33 +13,64 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link href="{{'eduid_signup:static/css/bootstrap-3.2.0.min.css'|static_url}}" rel="stylesheet" media="screen">
     <link href="{{'eduid_signup:static/css/screen.css'|static_url}}" rel="stylesheet" media="screen">
+    <link href="{{'eduid_signup:static/css/signup.css'|static_url}}" rel="stylesheet" />
   </head>
   <body>
-   <div class="container">
+    <div class="container">
+        <header id="header" class="header">
+            <div class="logo"></div>
+            <div id="mobile-nav">
+                <span></span>
+            </div>  
+            <nav>
+                <ul><!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
+                    <li>
+                        <a href="/">Student</a>
+                    </li>
+                    <li>
+                        <a href="/">Tekniker</a>
+                    </li>
+                    <li>
+                        <a href="/">Personal</a>
+                    </li>
+                    <li>
+                        <a href="/">Vanliga frågor</a>
+                    </li>
+                </ul>
+                <div class="buttons">
+                    <div class="button orange">
+                        <!-- Link leads to signup page -->
+                        <a href="https://signup.eduid.se/">Skapa konto</a>
+                    </div>
+                    <div class="button white-border">
+                        <!-- Link leads to login page -->
+                        <a href="https://dashboard.eduid.se/">Logga in</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        
+        <div class="messages-wrapper">
+            <div class="messages">
+            {% for message in request.session.pop_flash() %}
+                <div class="alert">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message }}
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+         <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
+   
+   <!-- 
      <div class="masthead">
-       <ul class="nav nav-pills pull-right">
+      <ul class="nav nav-pills pull-right">
          <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
          <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
        </ul>
-       <a href="https://www.eduid.se/"><img src="{{'eduid_signup:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
-       <a href="http://www.sunet.se/" target="_blank">
-           <img src="{{'eduid_signup:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
-       </a>
-       <div class="clear-right"></div>
      </div>
+    -->
 
-     <div class="messages-wrapper">
-       <div class="messages">
-       {% for message in request.session.pop_flash() %}
-         <div class="alert">
-           <button type="button" class="close" data-dismiss="alert">&times;</button>
-           {{ message }}
-         </div>
-       {% endfor %}
-       </div>
-     </div>
-
-     <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
      <div id="content-block">
 
      {% block contents %}
