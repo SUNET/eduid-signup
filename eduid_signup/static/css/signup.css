@@ -185,7 +185,12 @@ input:focus {
 #email-register,
 #social-register {
     float:none;
+}
+#email-register{
     margin:0 auto;
+}
+#social-register {
+    margin:30px auto 0;
 }
 .btn,
 button[type=submit].btn {
