@@ -53,6 +53,7 @@ static_url = pyramid_jinja2.filters:static_url_filter
     'facebook_app_secret': 'def',
     'signup_hostname': 'signup.example.com',
     'signup_baseurl': 'http://signup.example.com',
+    'dashboard_baseurl': 'http://dashboard.example.com',
 }
 
 

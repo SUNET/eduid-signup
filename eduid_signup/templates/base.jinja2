@@ -25,26 +25,26 @@
             <nav>
                 <ul><!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
                     <li>
-                        <a href="/">Student</a>
+                    <a href="/">{{ _("Student") }}</a>
                     </li>
                     <li>
-                        <a href="/">Tekniker</a>
+                        <a href="/">{{ _("Technician") }}</a>
                     </li>
                     <li>
-                        <a href="/">Personal</a>
+                        <a href="/">{{ _("Personal") }}</a>
                     </li>
                     <li>
-                        <a href="/">Vanliga frågor</a>
+                        <a href="/">{{ _("FAQ") }}</a>
                     </li>
                 </ul>
                 <div class="buttons">
                     <div class="button orange">
                         <!-- Link leads to signup page -->
-                        <a href="https://signup.eduid.se/">Skapa konto</a>
+                        <a href="{{ request.registry.settings['signup_baseurl'] }}">{{ _("Sign up") }}</a>
                     </div>
                     <div class="button white-border">
                         <!-- Link leads to login page -->
-                        <a href="https://dashboard.eduid.se/">Logga in</a>
+                        <a href="{{ request.registry.settings['dashboard_baseurl'] }}">{{ _("Sign in") }}</a>
                     </div>
                 </div>
             </nav>

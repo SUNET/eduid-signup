@@ -109,6 +109,7 @@ def main(global_config, **settings):
         'site.name',
         'signup_hostname',
         'signup_baseurl',
+        'dashboard_baseurl',
         'reset_password_link',
         'vccs_url',
         'auth_shared_secret',
