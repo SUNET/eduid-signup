@@ -647,7 +647,8 @@ button[type=submit].btn {
         margin-right:0;
     }
     .btn-google,
-    .btn-facebook {
+    .btn-facebook,
+    .btn-liveconnect {
         width:100%;
         padding:0;
     }
