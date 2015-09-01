@@ -135,30 +135,6 @@ input#verification-code-input {
     padding-right: 3px;
 }
 
-.btn-google {
-    background-color: rgb(204, 55, 50);
-}
-
-.btn-google:hover {
-    background-color: rgb(231, 75, 55);
-}
-
-.btn-facebook {
-    background-color: rgb(79, 106, 163);
-}
-
-.btn-facebook:hover {
-    background-color: rgb(114, 136, 181);
-}
-
-.btn-liveconnect {
-    background-color: rgb(38, 114, 236);
-}
-
-.btn-liveconnect:hover {
-    background-color: rgb(30, 93, 194);
-}
-
 .pre-big {
     font-size: 150%;
 }

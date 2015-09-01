@@ -253,21 +253,20 @@ div#footer span.langselector {
 .btn:hover {
     text-decoration:none;
 }
+
+.btn-google,
+.btn-google:hover,
 .btn-facebook,
-.btn-facebook:hover {
-   background-color: #58b78c;
-border-color: #58b78c;
+.btn-facebook:hover,
+.btn-liveconnect,
+.btn-liveconnect:hover {
+    background-color: #58b78c;
+    border-color: #58b78c;
 }
 .btn-facebook .btn-icon {
     background-image: url(../img/sprite.png);
     background-repeat: no-repeat;
     background-position: -42px -48px;
-}
-
-.btn-google,
-.btn-google:hover {
-    background-color: #58b78c;
-border-color: #58b78c;
 }
 .btn-google .btn-icon {
     background-image: url(../img/sprite.png);
@@ -281,7 +280,8 @@ border-color: #58b78c;
     left: -10px;
 }
 .btn-google,
-.btn-facebook   {
+.btn-facebook,
+.btn-liveconnect   {
     width:335px;
     height: 60px;
     line-height: 60px;
@@ -293,7 +293,8 @@ border-color: #58b78c;
     border-color: #58b78c;
 }
 .btn-google .btn-text,
-.btn-facebook  .btn-text {
+.btn-facebook  .btn-text,
+.btn-liveconnect  .btn-text {
     color:#fff;
 }
 .btn-social,
