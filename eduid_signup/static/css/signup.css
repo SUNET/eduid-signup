@@ -262,7 +262,8 @@ div#footer span.langselector {
 
 /* Success */
 
-.jumbotron.eduid-success {
+.jumbotron.eduid-success,
+.jumbotron.eduid-fetched-info {
     padding-bottom: 0px;
 }
 
@@ -282,6 +283,18 @@ div#footer span.langselector {
 
 .jumbotron.eduid-account-created {
     padding-bottom: 30px;
+}
+
+/* review fetched info */
+
+div.eduid-fetched-info-form .form-control {
+    height: 60px;
+    border-radius: 0px;
+    padding: 20px;
+}
+
+div.eduid-fetched-info-form {
+    vertical-align: middle;
 }
 
 /* Buttons
