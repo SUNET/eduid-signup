@@ -10,7 +10,7 @@
 
   <div id='instructions_div' class='hide row container'>
       <div class='row'>
-        <div class='span6'>
+        <div class='col-sm-6'>
             <h4>{{  _("You can now log in") }}</h4>
             <p>
             {% trans %}
@@ -19,7 +19,7 @@
             </p>
         </div>
 
-        <div class='span6'>
+        <div class='col-sm-6'>
             <h4>{{ _("Access more") }}</h4>
             <p>
               {{ _("To get access to additional sites that require a confirmed identity, proceed to the dashboard.") }}
@@ -28,7 +28,7 @@
       </div>
 
       <div class="row">
-          <div class='span6'>
+          <div class='col-sm-6'>
               {% if finish_url is defined %}
                 <a class="btn btn-primary btn-lg" href="{{ finish_url }}">{{ _("Finish") }}</a>
               {% else %}
@@ -36,7 +36,7 @@
               {% endif %}
            </div>
 
-          <div class='span6'>
+          <div class='col-sm-6'>
               <p class="text-center">
                 <form method="post" action="{{ profile_link }}">
                   <input type="hidden" name="eppn" value="{{ eppn }}"/>
