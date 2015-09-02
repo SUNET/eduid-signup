@@ -231,6 +231,21 @@ div#footer span.langselector {
     color:#000;
 }
 
+/* Help */
+
+.jumbotron.eduid-help .panel-body,
+.jumbotron.eduid-help p {
+    font-size: 16px;
+    color: #222;
+}
+
+.jumbotron.eduid-help .panel-heading a {
+    font-size: 18px;
+}
+
+.jumbotron.eduid-help > h2 {
+    font-size: 40px;
+}
 
 /* Buttons
     -------------------------------------------------------------------------------------- */
