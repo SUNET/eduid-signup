@@ -244,6 +244,7 @@ div#footer span.langselector {
 }
 
 .jumbotron.eduid-help > h2,
+.jumbotron.eduid-error > h2,
 .jumbotron.eduid-success > h2 {
     font-size: 40px;
 }
