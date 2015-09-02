@@ -27,7 +27,7 @@
         <form class="form-inline" role="form" method="POST">
           <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
             <div class="input-group">
-              <input type="text" name="code" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
+              <input type="text" name="code" id="verification-code-input" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
               <span class="input-group-btn">
                 <button class="btn btn-success has-spinner"
                     id="verify-button"
