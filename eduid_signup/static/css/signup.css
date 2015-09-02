@@ -12,9 +12,6 @@
 .jumbotron h1 {
     font-size:72px;
 }
-.jumbotron p.lead {
-    font-size:24px;
-}
 h1,
 h2,
 h3,
@@ -212,6 +209,9 @@ button[type=submit].btn {
 }
 .btn-success {
     margin-left:20px!important;
+}
+div#instructions_div .btn-success {
+    margin-left:0px!important;
 }
 
 /* Footer */
@@ -503,6 +503,9 @@ form.form-inline div.input-group p.help-block {
     .jumbotron h1 {
         font-size:46px;
     }
+    .jumbotron p.lead {
+        font-size:18px;
+    }
 
     #header {
         position: fixed;
@@ -618,6 +621,9 @@ form.form-inline div.input-group p.help-block {
 
 }
 @media only screen and (min-width: 768px) {
+    .jumbotron p.lead {
+        font-size:24px;
+    }
     nav.navbar.navbar-default#eduid-signup-navbar {
         background-color: transparent;
         border-color: transparent;
