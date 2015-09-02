@@ -270,6 +270,10 @@ div#footer span.langselector {
     font-size: 40px;
 }
 
+.jumbotron.eduid-account-created {
+    padding-bottom: 30px;
+}
+
 /* Buttons
     -------------------------------------------------------------------------------------- */
 
