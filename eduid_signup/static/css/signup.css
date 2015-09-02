@@ -243,7 +243,28 @@ div#footer span.langselector {
     font-size: 18px;
 }
 
-.jumbotron.eduid-help > h2 {
+.jumbotron.eduid-help > h2,
+.jumbotron.eduid-success > h2 {
+    font-size: 40px;
+}
+
+/* Success */
+
+.jumbotron.eduid-success {
+    padding-bottom: 0px;
+}
+
+.jumbotron.eduid-success > h2,
+.row.success-instructions h2,
+.row.success-instructions p {
+    text-align: center;
+}
+
+.row.success-instructions p {
+    padding-bottom: 40px;
+}
+
+.row.success-instructions h2 {
     font-size: 40px;
 }
 
