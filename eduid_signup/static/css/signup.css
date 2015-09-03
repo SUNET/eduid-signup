@@ -540,9 +540,8 @@ form.form-inline div.input-group p.help-block {
     }
 
     #header .logo {
-        margin:10px;
         width:80px;
-        height:30px;
+        height:26px;
         background-size:80px;
     }
 
@@ -621,9 +620,9 @@ form.form-inline div.input-group p.help-block {
         border-color: #333;
     }
 
-    img#eduid-logo-small {
+    div#eduid-logo-small {
         margin-left: -90px;
-        margin-top: -14px;
+        margin-top: -4px;
     } 
 
     ul.nav.navbar-nav li a {
@@ -646,8 +645,12 @@ form.form-inline div.input-group p.help-block {
         border-color: transparent;
     }
 
-    img#eduid-logo-small {
+    div#eduid-logo-small {
         display: none;
+    }
+
+    #header .logo {
+        margin:10px;
     }
 }
 
