@@ -3,7 +3,7 @@
 {% block contents %}
 
 {% if email_already_verified is defined %}
-  <div class="jumbotron">
+  <div class="jumbotron eduid-account-created">
     <h1>{{ _("Welcome to eduID!") }}</h1>
     <p class="lead">{{ _("Email address has already been verified") }}</p>
     <p class="lead">{{ _("Maybe you want to reset your password again?") }}</p>
@@ -17,20 +17,20 @@
       </div>
   </div>
 {% elif code_does_not_exists is defined %}
-  <div class="jumbotron">
+  <div class="jumbotron eduid-account-created">
     <h1>{{ _("Welcome to eduID!") }}</h1>
     <p class="lead">{{ _("The provided code does not exist or your link is broken") }}</p>
     <p class="lead">{{ _("If you have a code, you should go to the verification code form to enter it") }}</p>
   </div>
   <div class="row">
-    <div class="span6">
+    <div class="col-sm-6">
       <p class="text-center">
           <a class="btn btn-success btn-lg profile-link"
              href="{{ signup_link }}">
               {{ _("Return to the register form") }}</a>
       </p>
     </div>
-    <div class="span6">
+    <div class="col-sm-6">
       <p class="text-center">
           <a class="btn btn-success btn-lg profile-link"
              href="{{ code_form }}">
@@ -39,7 +39,7 @@
     </div>
   </div>
 {% else %}
-  <div class="jumbotron">
+  <div class="jumbotron eduid-account-created">
     <h1>{{ _("Welcome to eduID!") }}</h1>
     {% if from_email is defined %}
       <p class="lead">

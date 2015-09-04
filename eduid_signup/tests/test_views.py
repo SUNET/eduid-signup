@@ -83,14 +83,14 @@ class HelpViewTests(FunctionalTests):
     def test_default_language(self):
         res = self.testapp.get('/help/')
         self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Help')
+        res.mustcontain('Frequently Asked Questions')
 
     def test_help_in_english(self):
         res = self.testapp.get('/help/', headers={
             'Accept-Language': 'en',
         })
         self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Help')
+        res.mustcontain('Frequently Asked Questions')
 
     def test_help_in_swedish(self):
         res = self.testapp.get('/help/', headers={
@@ -104,7 +104,7 @@ class HelpViewTests(FunctionalTests):
             'Accept-Language': 'xx',
         })
         self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Help')
+        res.mustcontain('Frequently Asked Questions')
 
 
 class SignupAppTest(FunctionalTests):
@@ -435,8 +435,8 @@ class SignupEmailTests(SignupAppTest):
         self.assertEqual(res5.status, '200 OK')
         res5.mustcontain('verification-code-input')
 
-        res5.form['code'] = 'not-the-right-code-in-form'
-        res6 = res5.form.submit('foo')
+        res5.forms[0]['code'] = 'not-the-right-code-in-form'
+        res6 = res5.forms[0].submit('foo')
         self.assertEqual(res6.status, '200 OK')
         logger.debug("BODY:\n{!s}".format(res6.body))
 
@@ -456,8 +456,8 @@ class SignupEmailTests(SignupAppTest):
             self.assertEqual(res5.status, '200 OK')
             res5.mustcontain('verification-code-input')
 
-            res5.form['code'] = user.pending_mail_address.verification_code
-            res6 = res5.form.submit('foo')
+            res5.forms[0]['code'] = user.pending_mail_address.verification_code
+            res6 = res5.forms[0].submit('foo')
             self.assertEqual(res6.status, '200 OK')
             res6.mustcontain('You can now log in')
 
@@ -560,8 +560,8 @@ class MockCapchaTests(FunctionalTests):
         registered = self._start_registration()
         code = registered.pending_mail_address.verification_code
         res = self.testapp.get('http://localhost/verification_code_form/')
-        res.form['code'] = code
-        res = res.form.submit()
+        res.forms[0]['code'] = code
+        res = res.forms[0].submit()
         self.assertEqual(res.status, '200 OK')
         new_user = self.amdb.get_user_by_mail('foo@example.com')
         self.assertEqual(new_user.mail_addresses.primary.email, 'foo@example.com')
@@ -573,16 +573,16 @@ class MockCapchaTests(FunctionalTests):
         self.signup_userdb.save(registered, check_sync=False)
         code = registered.pending_mail_address.verification_code
         res = self.testapp.get('http://localhost/verification_code_form/')
-        res.form['code'] = code
-        res = res.form.submit()
+        res.forms[0]['code'] = code
+        res = res.forms[0].submit()
         self.assertEqual(res.status, '200 OK')
         self.assertIn('Email address has already been verified', res.body)
 
 
     def test_email_verification_code_form_invalid_code(self):
         res = self.testapp.get('http://localhost/verification_code_form/')
-        res.form['code'] = 'xxx'
-        res = res.form.submit()
+        res.forms[0]['code'] = 'xxx'
+        res = res.forms[0].submit()
         self.assertEqual(res.status, '200 OK')
         self.assertIn('The provided code does not exist', res.body)
 

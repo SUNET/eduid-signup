@@ -51,13 +51,14 @@ div#content-block {
 
 @media only screen and (min-width: 768px) {
 
-#email-register-sm {
+#email-register-sm,
+#code-verify-sm {
     display: none;
 }
 
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 767px) {
 
 .jumbotron h1 {
     font-size: 36px;
@@ -69,11 +70,13 @@ div#content-block {
     margin: 10px;
 }
 
-#email-register-lg {
+#email-register-lg,
+#code-verify-lg {
     display: none;
 }
 
-input#input-email-register {
+input#input-email-register,
+input#input-code-verify {
     max-width: 300px;
     display: block;
     margin-left: auto;
@@ -81,14 +84,6 @@ input#input-email-register {
     margin-bottom: 10px;
 }
 
-}
-
-input#verification-code-input {
-    max-width: 300px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;
 }
 
 .input-group .help-block {
@@ -110,7 +105,7 @@ input#verification-code-input {
 .btn-icon {
     display: inline-block;
     vertical-align: middle;
-    width: 40px;
+    width: 42px;
     height: 40px;
 }
 
@@ -133,30 +128,6 @@ input#verification-code-input {
 .btn-liveconnect .btn-icon {
     background: url("../img/liveconnect_icon_32.png") no-repeat scroll 10px 50% transparent;
     padding-right: 3px;
-}
-
-.btn-google {
-    background-color: rgb(204, 55, 50);
-}
-
-.btn-google:hover {
-    background-color: rgb(231, 75, 55);
-}
-
-.btn-facebook {
-    background-color: rgb(79, 106, 163);
-}
-
-.btn-facebook:hover {
-    background-color: rgb(114, 136, 181);
-}
-
-.btn-liveconnect {
-    background-color: rgb(38, 114, 236);
-}
-
-.btn-liveconnect:hover {
-    background-color: rgb(30, 93, 194);
 }
 
 .pre-big {
@@ -250,4 +221,10 @@ html, body {
 -------------------------------------------------- */
 
 /* Center captcha */
-.center-block {float: none !important}
+.center-block {float: none !important;}
+
+/* raise modal over menu */
+.modal {z-index: 10000 !important;}
+
+/* color for the modal title */
+.modal-header h3 {color: #333 !important;}

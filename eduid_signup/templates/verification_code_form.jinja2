@@ -21,20 +21,39 @@
 
   <p class="lead">{{ _("Put here the verification code sent to you by e-mail") }}</p>
 
-  <div class="row">
-      <form class="form-horizontal" method="POST">
-        <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
-            <input type="text" name="code" id="verification-code-input" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
-            <button class="btn btn-success has-spinner"
+  <div class="row text-center">
+    <div id="code-verify" class="col-md-12">
+      <div id="code-verify-lg">
+        <form class="form-inline" role="form" method="POST">
+          <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
+            <div class="input-group">
+              <input type="text" name="code" id="verification-code-input" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
+              <span class="input-group-btn">
+                <button class="btn btn-success has-spinner"
                     id="verify-button"
-                    type="submit"">
-                    <span class="glyphicon glyphicon-refresh glyphicon-spin hidden"></span> {{ _("Verify account") }}
-            </button>
-            {% if code_does_not_exists is defined %}
+                    type="submit">
+                    {{ _("Verify account") }}
+                </button>
+              </span>
+              {% if code_does_not_exists is defined %}
               <p class="help-block">{{ _("The provided code does not exist") }}</p>
-            {% endif %}
-        </div>
-      </form>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="code-verify-sm">
+        <form role="form" class="form-horizontal" method="POST">
+         <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
+          <input type="text" name="code" id="input-code-verify" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocua />
+          {% if code_does_not_exists is defined %}
+            <p class="help-block">{{ _("The provided code does not exist") }}</p>
+          {% endif %}
+          <button class="btn btn-success" type="submit">{{ _("Verify account") }}</button>
+         </div>
+        </form>
+      </div>
+    </div>
   </div>
 
 {% else %}
@@ -46,24 +65,3 @@
 </div>
 
 {% endblock %}
-
-{% if email_already_verified is not defined and password is not defined %}
-
-  {% block extrajs %}
-  <script type="text/javascript">
-$(function () {
-    "use strict";
-
-    $(document).ready(function () {
-        $('#verify-button').click(function (e) {
-            if ($('#verification-code-input').val() !== '') {
-                $(this).find('span').removeClass('hidden');
-            }
-        });
-    });
-
-}());
-  </script>
-  {% endblock %}
-
-{% endif %}

@@ -1,14 +1,14 @@
 {% extends "templates/base.jinja2" %}
 
 {% block contents %}
-    <div class="jumbotron">
+    <div class="jumbotron eduid-success">
       <h1>{{ _("Welcome to eduID!") }}</h1>
-      <p class="lead">{{ _("Account created successfully") }}</p>
+      <h2 class="lead">{{ _("Account created successfully") }}</h2>
     </div>
 
-    <div class="row">
+    <div class="row success-instructions">
         <div class="col-md-12 lead">
-          <h4>{{ _("Confirm registration") }}</h4>
+          <h2>{{ _("Confirm registration") }}</h2>
           <p>
           {% trans email=email %}
           An email with instructions on how to proceed has been sent to <strong>{{ email }}</strong>.
