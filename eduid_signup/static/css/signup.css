@@ -199,20 +199,6 @@ input:focus {
 #social-register {
     margin:30px auto 0;
 }
-.btn,
-button[type=submit].btn {
-    margin-top:0;
-}
-.btn-text {
-    border-left:0;
-    padding-left:0;
-}
-.btn-success {
-    margin-left:20px!important;
-}
-div#instructions_div .btn-success {
-    margin-left:0px!important;
-}
 
 /* Footer */
 #footer .container {
@@ -386,6 +372,20 @@ input[type=submit].btn,
 button[type=submit].btn {
     display: block;
 }
+.btn,
+button[type=submit].btn {
+    margin-top:0;
+}
+.btn-text {
+    border-left:0;
+    padding-left:0;
+}
+.modal-footer .btn-success {
+    margin-left:20px!important;
+}
+div#instructions_div .btn-success {
+    margin-left:0px!important;
+}
 
 form.form-inline div.input-group p.help-block {
     text-align: center;
@@ -515,6 +515,10 @@ form.form-inline div.input-group p.help-block {
     .btn-facebook {
         margin-left: 4px;
     } 
+    #email-register-lg input,
+    #code-verify-lg input {
+        margin-bottom:10px;
+    }
     
 }
 @media only screen and (max-width: 767px) {
