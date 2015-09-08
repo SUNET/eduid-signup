@@ -315,6 +315,9 @@ div.eduid-fetched-info-form {
     text-transform:uppercase;
     margin-bottom:10px;
 }
+.modal-footer .btn {
+    margin-bottom: 0px;
+}
 .btn:hover {
     text-decoration:none;
 }
