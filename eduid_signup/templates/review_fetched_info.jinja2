@@ -107,16 +107,5 @@
 
 
 {% block extrajs %}
-  <script type="text/javascript">
-$(function () {
-    "use strict";
-
-    $(document).ready(function () {
-        $('#do-review-button').click(function (e) {
-            $(this).find('span').removeClass('hidden');
-        });
-    });
-
-}());
-  </script>
+   <script type="text/javascript" src="{{'eduid_signup:static/js/review_fetched_info.js'|static_url}}"></script>
 {% endblock %}
