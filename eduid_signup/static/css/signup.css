@@ -634,6 +634,10 @@ form.form-inline div.input-group p.help-block {
         border-bottom: 1px solid #CCC;
     }
 
+    ul.nav.navbar-nav li a:hover {
+        color: #aaa;
+    }
+
     div#eduid-signup-menu > div.buttons.nav {
         float:none;
         margin-top: 10px;
