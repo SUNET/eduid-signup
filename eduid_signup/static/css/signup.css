@@ -490,7 +490,7 @@ form.form-inline div.input-group p.help-block {
     .header .logo {
         margin:12px 10px 0 0;
         width: 80px;
-        height: 27px;
+        height: 26px;
         background-size: 80px;
     }
     .header nav li {
@@ -544,23 +544,6 @@ form.form-inline div.input-group p.help-block {
         width:80px;
         height:26px;
         background-size:80px;
-    }
-
-    #header .buttons {
-        padding: 0 60px;
-        width:100%;
-    }
-    #header .buttons .button {
-        margin-bottom:10px;
-        text-align:center;
-        padding:0;
-        float:none;
-        height:auto;
-    }
-    #header .buttons a { 
-        display:block;
-        padding:10px 0;
-        line-height:1em;
     }
 
 
@@ -641,7 +624,20 @@ form.form-inline div.input-group p.help-block {
     div#eduid-signup-menu > div.buttons.nav {
         float:none;
         margin-top: 10px;
-        margin: 7.5px 0px;
+        margin: 7.5px auto;
+        padding: 0 60px;
+        max-width:400px;
+    }
+    div#eduid-signup-menu > div.buttons.nav .button         margin-bottom:10px;
+        text-align:center;
+        padding:0;
+        float:none;
+        height:auto;
+    }
+    div#eduid-signup-menu > div.buttons.nav a {
+        display:block;
+        padding:10px 0;
+        line-height:1em;
     }
 
     #eduid-signup-navbar div.navbar-header > span, 
