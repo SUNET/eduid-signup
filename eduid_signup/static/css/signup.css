@@ -436,7 +436,23 @@ form.form-inline div.input-group p.help-block {
 	font-weight: normal;
 	font-style: normal;
 }
-@media only screen and (min-width: 960px) and (max-width: 1024px) {
+
+@media only screen and (min-width: 1280px) {
+    
+    .header nav li {
+        margin:0 20px;
+    }
+
+}
+
+@media only screen and (min-width: 1024px) and (max-width: 1279px) {
+    
+    .header nav li {
+        margin:0 16px;
+    }
+
+}
+@media only screen and (min-width: 960px) and (max-width: 1023px) {
     .header {
         padding-left:23px;
         padding-right:20px;
@@ -451,7 +467,7 @@ form.form-inline div.input-group p.help-block {
         background-size: 100px;
     }
     .header nav li {
-        margin:0 20px;
+        margin:0 13px;
     }
     .header nav li.button {
         padding:0 20px;
@@ -479,6 +495,7 @@ form.form-inline div.input-group p.help-block {
         margin-left:0!important;
     }
 }
+
 @media only screen and (min-width: 768px) and (max-width: 959px) {
     .header {
         padding-left:23px;
@@ -488,7 +505,7 @@ form.form-inline div.input-group p.help-block {
         width:700px;
     }
     .header .logo {
-        margin:12px 10px 0 0;
+        margin:10px 10px 0 0;
         width: 80px;
         height: 27px;
         background-size: 80px;

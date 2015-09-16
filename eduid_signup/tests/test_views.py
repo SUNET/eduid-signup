@@ -39,6 +39,12 @@ class HomeViewTests(FunctionalTests):
             'Sign up with Google',
         )
 
+    def test_home(self):
+        res = self.testapp.get('/')
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Welcome to eduID')
+        res.mustcontain(self.settings['privacy_policy_url'])
+
     def test_sign_up_with_bad_email(self):
         res = self.testapp.post('/', {'email': 'a@com'})
         self.assertEqual(res.status, '200 OK')
