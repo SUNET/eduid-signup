@@ -112,6 +112,7 @@ def main(global_config, **settings):
         'reset_password_link',
         'vccs_url',
         'auth_shared_secret',
+        'privacy_policy_url',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
