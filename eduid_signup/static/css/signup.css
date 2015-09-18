@@ -628,7 +628,8 @@ form.form-inline div.input-group p.help-block {
         padding: 0 60px;
         max-width:400px;
     }
-    div#eduid-signup-menu > div.buttons.nav .button         margin-bottom:10px;
+    div#eduid-signup-menu > div.buttons.nav .button {
+        margin-bottom:10px;
         text-align:center;
         padding:0;
         float:none;
