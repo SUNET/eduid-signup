@@ -106,6 +106,7 @@ def main(global_config, **settings):
     for item in (
         'mongo_uri',
         'profile_link',
+        'dashboard_link'
         'site.name',
         'signup_hostname',
         'signup_baseurl',
