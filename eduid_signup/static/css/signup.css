@@ -390,6 +390,27 @@ form.form-inline div.input-group p.help-block {
     display: inline-block;
 }
 
+/* ReCaptcha */
+
+div#eduid-captcha {
+    text-align: center;
+}
+
+div#eduid-captcha-inner {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 320px;
+}
+
+div#recaptcha_widget_div {
+    margin-top: -100px;
+    margin-bottom: 50px;
+}
+div#recaptcha_widget_div input#recaptcha_response_field {
+    height: 30px;
+    padding-left: 4px !important;
+}
+
 /* Fontface */
 @font-face {
 	font-family: 'Roboto-Light';
@@ -692,6 +713,13 @@ form.form-inline div.input-group p.help-block {
         -ms-transform: rotate(-45deg);
         -o-transform: rotate(-45deg);
         transform: rotate(-45deg);
+    }
+
+    /* ReCaptcha */
+
+    div#recaptcha_widget_div {
+        margin-top: 0px;
+        margin-bottom: 30px;
     }
 }
 @media only screen and (min-width: 768px) {
