@@ -225,6 +225,3 @@ html, body {
 
 /* raise modal over menu */
 .modal {z-index: 10000 !important;}
-
-/* color for the modal title */
-.modal-header h3 {color: #333 !important;}

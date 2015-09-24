@@ -1,5 +1,6 @@
 ﻿body, 
-.container .jumbotron {
+.container .jumbotron,
+div.modal-content {
     background-color:#bbded9;
     background-image:url(../img/texture.png);
 }
@@ -195,6 +196,10 @@ input:focus {
     max-width: 550px;
 }
 
+div.modal-content > div.modal-header > h3 {
+    color: #fff;
+}
+
 /* Footer */
 #footer .container {
     padding-top:20px;
@@ -375,9 +380,6 @@ button[type=submit].btn {
     border-left:0;
     padding-left:0;
 }
-.modal-footer .btn-success {
-    margin-left:20px!important;
-}
 div#instructions_div .btn-success {
     margin-left:0px!important;
 }
@@ -388,6 +390,27 @@ form.form-inline div.input-group p.help-block {
 
 .row.eduid-resend-code .btn {
     display: inline-block;
+}
+
+/* ReCaptcha */
+
+div#eduid-captcha {
+    text-align: center;
+}
+
+div#eduid-captcha-inner {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 320px;
+}
+
+div#recaptcha_widget_div {
+    margin-top: -100px;
+    margin-bottom: 50px;
+}
+div#recaptcha_widget_div input#recaptcha_response_field {
+    height: 30px;
+    padding-left: 4px !important;
 }
 
 /* Fontface */
@@ -611,6 +634,17 @@ form.form-inline div.input-group p.help-block {
         height:auto;
     }
 
+    .modal-footer .btn-success {
+        margin-top:20px;
+    }
+    div#eduid-modal-buttons {
+        text-align: center;
+    }
+    div#eduid-modal-buttons a {
+        margin-left: auto;
+        margin-left: auto;
+    }
+
     /* Pages */
 
     .form-group {
@@ -710,6 +744,13 @@ form.form-inline div.input-group p.help-block {
         -o-transform: rotate(-45deg);
         transform: rotate(-45deg);
     }
+
+    /* ReCaptcha */
+
+    div#recaptcha_widget_div {
+        margin-top: 0px;
+        margin-bottom: 30px;
+    }
 }
 @media only screen and (min-width: 768px) {
     .jumbotron p.lead {
@@ -722,6 +763,18 @@ form.form-inline div.input-group p.help-block {
 
     div#eduid-logo-small {
         display: none;
+    }
+    div#eduid-modal-buttons {
+        text-align: center;
+    }
+    div.eduid-modal-button {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+    div#eduid-modal-buttons a {
+        margin-left: auto;
+        margin-right: auto;
     }
 
 }

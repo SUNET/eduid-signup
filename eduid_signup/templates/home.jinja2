@@ -67,9 +67,13 @@
   <div class="modal-dialog">
     <div class="modal-content">
       {% include "acceptable_use_policy-{0}.jinja2".format(request.locale) %}
-      <div class="modal-footer">
+      <div id="eduid-modal-buttons" class="modal-footer">
+        <div class="col-xs-12 col-sm-6 eduid-modal-button">
           <a href="#reject" class="btn btn-danger">{{  _("Reject") }}</a>
+        </div>
+        <div class="col-xs-12 col-sm-6 eduid-modal-button">
           <a href="#accept" class="btn btn-success">{{ _("Accept") }}</a>
+        </div>
       </div>
     </div>
   </div>
