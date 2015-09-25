@@ -310,6 +310,8 @@ def registered_completed(request, signup_user, context=None):
                                          )
     credential = Password(credential_id=password_id, salt=salt, application='signup')
     signup_user.passwords.add(credential)
+    # Record the acceptance of the terms of use
+    record_tou(request, signup_user, 'signup')
     request.signup_db.save(signup_user)
 
     # Send the signal to the attribute manager so it can update
@@ -351,9 +353,6 @@ def registered_completed(request, signup_user, context=None):
 
     if request.registry.settings.get("email_credentials", False):
         send_credentials(request, signup_user.eppn, password)
-
-    # Record the acceptance of the terms of use
-    record_tou(request, signup_user.user_id, 'signup')
 
     logger.info("Signup process for new user {!s}/{!s} complete".format(signup_user.user_id, signup_user.eppn))
     return context

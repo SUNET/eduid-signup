@@ -1,7 +1,9 @@
+import bson
 from uuid import uuid4
 from hashlib import sha256
 import datetime
 from eduid_signup.compat import text_type
+from eduid_userdb.tou import ToUEvent
 
 import os
 import struct
@@ -135,27 +137,28 @@ def normalize_email(addr):
     return addr.lower()
 
 
-def record_tou(request, user_id, source):
+def record_tou(request, user, source):
     """
     Record user acceptance of terms of use.
 
     :param request: The request
     :type request: Request
-    :param user_id: the _id of the user that has accepted the ToU
-    :type user_id: ObjectId
-    :param source: An identificator for the proccess during which the user has accepted the ToU (e.g., "signup")
+    :param user: the user that has accepted the ToU
+    :type user: eduid_userdb.signup:User
+    :param source: An identificator for the proccess during which
+                   the user has accepted the ToU (e.g., "signup")
     :type source: str
     """
-    logger.debug('Recording ToU acceptance for user {!r} (source: {!r})'.format(user_id, source))
+    event_id = bson.ObjectId()
+    created_ts = datetime.datetime.utcnow()
     tou_version = request.registry.settings['tou_version']
-    request.toudb.consent.update(
-        {'_id': user_id},
-        {'$push': {
-            'eduid_ToU': {
-                tou_version: {
-                    'ts': datetime.datetime.utcnow(),
-                    'source': source
-                }
-            }
-        }}
-        , safe=True, upsert=True)
+    logger.debug('Recording ToU acceptance {!r} (version {!s})'
+                 ' for user {!r} (source: {!s})'.format(
+                     event_id, tou_version,
+                     user.user_id, source))
+    user.tou.add(ToUEvent(
+        version = tou_version,
+        application = source,
+        created_ts = created_ts,
+        event_id = event_id
+        ))
