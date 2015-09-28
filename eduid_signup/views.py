@@ -134,6 +134,7 @@ def trycaptcha(request):
                     response_field,
                     settings.get("recaptcha_private_key", ''),
                     remote_ip,
+                    use_ssl=True
                 )
                 logger.debug("Sent the CAPTCHA with the user's response to google")
                 break
