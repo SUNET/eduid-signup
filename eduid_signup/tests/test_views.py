@@ -174,7 +174,6 @@ class SNATests(SignupAppTest):
 
     def test_google_signup(self):
         # Verify known starting point (empty ToU database)
-        self.assertEqual(self.toudb.consent.find({}).count(), 0)
         self.assertEqual(self.amdb.db_count(), 2)
         self.assertEqual(self.signup_userdb.db_count(), 0)
 
@@ -191,7 +190,8 @@ class SNATests(SignupAppTest):
         # Verify there is now one more user in the central eduid user database
         self.assertEqual(self.amdb.db_count(), 3)
         self.assertEqual(self.signup_userdb.db_count(), 0)
-        self.assertEqual(self.toudb.consent.find({}).count(), 1)
+        user = self.amdb.get_user_by_mail(NEW_USER['email'])
+        self.assertTrue(user.tou.has_accepted(self.settings['tou_version']))
 
     def test_google_existing_user(self):
         self._google_login(EXISTING_USER)
@@ -277,11 +277,11 @@ class SNATests(SignupAppTest):
         self._google_login(NEW_USER)
 
         res = self.testapp.get('/review_fetched_info/')
-        self.assertEqual(self.toudb.consent.find({}).count(), 0)
         res = res.form.submit('action')
         self.assertEqual(res.status, '302 Found')
         self.testapp.get(res.location)
-        self.assertEqual(self.toudb.consent.find({}).count(), 1)
+        user = self.amdb.get_user_by_mail(NEW_USER['email'])
+        self.assertTrue(user.tou.has_accepted(self.settings['tou_version']))
 
     def _google_callback(self, state, user):
 
