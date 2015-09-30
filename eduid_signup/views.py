@@ -316,19 +316,25 @@ def registered_completed(request, signup_user, context=None):
     # Send the signal to the attribute manager so it can update
     # this user's attributes in the IdP
     logger.debug("Asking for sync of {!r} by Attribute Manager".format(str(signup_user.user_id)))
-    rtask = update_attributes_keep_result.delay('eduid_signup', str(signup_user.user_id))
-    timeout = request.registry.settings.get("account_creation_timeout", 10)
     try:
+        rtask = update_attributes_keep_result.delay('eduid_signup', str(signup_user.user_id))
+        timeout = request.registry.settings.get("account_creation_timeout", 3)
         result = rtask.get(timeout=timeout)
         logger.debug("Attribute Manager sync result: {!r}".format(result))
-    except Exception:
-        logger.exception("Failed Attribute Manager sync request")
-        message = _('There were problems with your submission. '
-                    'You may want to try again later, '
-                    'or contact the site administrators.')
-        request.session.flash(message)
-        url = request.route_path('home')
-        raise HTTPFound(location=url)
+    except:
+        logger.exception("Failed Attribute Manager sync request. trying again")
+        try:
+            rtask = update_attributes_keep_result.delay('eduid_signup', str(signup_user.user_id))
+            timeout = request.registry.settings.get("account_creation_timeout", 7)
+            result = rtask.get(timeout=timeout)
+            logger.debug("Attribute Manager sync result: {!r}".format(result))
+        except:
+            logger.exception("Failed Attribute Manager sync request")
+            message = _('Sorry, but the requested page is unavailable due to a server hiccup. '
+                        'Our engineers have been notified, so check back later. ')
+            request.session.flash(message)
+            url = request.route_path('home')
+            raise HTTPFound(location=url)
 
     secret = request.registry.settings.get('auth_shared_secret')
     timestamp = '{:x}'.format(int(time.time()))
