@@ -25,7 +25,11 @@ def generate_password(settings, credential_id, user):
     logger.debug("Adding VCCS password factor for user {!r}, credential_id {!r}".format(user_id, credential_id))
 
     vccs = vccs_client.VCCSClient(base_url = settings.get('vccs_url'))
-    result = vccs.add_credentials(user_id, [factor])
+    try:
+        result = vccs.add_credentials(user_id, [factor])
+    except vccs_client.VCCSClientHTTPError as e:
+        logger.error(e)
+        raise e
     logger.debug("VCCS password (id {!r}) creation result: {!r}".format(credential_id, result))
 
     return _human_readable(password), factor.salt
