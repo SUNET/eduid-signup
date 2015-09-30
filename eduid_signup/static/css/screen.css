@@ -225,3 +225,45 @@ html, body {
 
 /* raise modal over menu */
 .modal {z-index: 10000 !important;}
+
+/* Messages */
+
+.messages-center-block {
+    float: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media only screen and (max-width: 768px) {
+
+div.messages-wrapper {
+    display: block;
+    position: relative;
+    left: 5px !important;
+}
+
+}
+@media only screen and (min-width: 768px) {
+
+div.messages-wrapper {
+  position:sticky;
+  top:70px;
+  height:0px;
+}
+
+}
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+
+div.messages-wrapper {
+  width:338px;
+}
+
+}
+@media only screen and (min-width: 992px) {
+
+div.messages-wrapper {
+  width:600px;
+}
+
+}
