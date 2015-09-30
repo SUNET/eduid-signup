@@ -60,20 +60,20 @@
           </div>
         </nav>
       </header>
-        
-      <div class="messages-wrapper">
+
+      <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
+
+     <div id="content-block">
+     <div class="messages-wrapper messages-center-block">
         <div class="messages">
         {% for message in request.session.pop_flash() %}
-          <div class="alert">
+          <div class="alert alert-danger">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
                 {{ message }}
           </div>
         {% endfor %}
         </div>
       </div>
-      <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
-
-     <div id="content-block">
      {% block contents %}
 
      {% endblock %}
