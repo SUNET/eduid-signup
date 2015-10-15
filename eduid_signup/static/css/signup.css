@@ -392,6 +392,10 @@ form.form-inline div.input-group p.help-block {
     display: inline-block;
 }
 
+#gotit_btn {
+  margin: auto;
+}
+
 /* ReCaptcha */
 
 div#eduid-captcha {
@@ -409,7 +413,7 @@ div#recaptcha_widget_div {
     margin-bottom: 50px;
 }
 div#recaptcha_widget_div input#recaptcha_response_field {
-    height: 30px;
+    height: 22px;
     padding-left: 4px !important;
 }
 
