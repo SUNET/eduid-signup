@@ -144,7 +144,7 @@ def record_tou(request, user, source):
     :param request: The request
     :type request: Request
     :param user: the user that has accepted the ToU
-    :type user: eduid_userdb.signup:User
+    :type user: eduid_userdb.signup.User
     :param source: An identificator for the proccess during which
                    the user has accepted the ToU (e.g., "signup")
     :type source: str
