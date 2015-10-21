@@ -16,8 +16,6 @@ Funny quirk of running these tests in PyCharm:
 import unittest
 from copy import deepcopy
 
-import pymongo
-
 from webtest import TestApp, TestRequest
 from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
@@ -25,6 +23,7 @@ from pyramid.testing import DummyRequest, DummyResource
 
 from eduid_signup import main
 from eduid_userdb.testing import MongoTestCase
+from eduid_userdb.exceptions import MongoConnectionError
 
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -76,7 +75,7 @@ class FunctionalTests(MongoTestCase):
             self.testapp = TestApp(app)
             self.signup_userdb = app.registry.settings['signup_db']
             self.toudb = app.registry.settings['mongodb_tou'].get_database()
-        except pymongo.errors.ConnectionFailure:
+        except MongoConnectionError:
             raise unittest.SkipTest("requires accessible MongoDB server")
 
     def tearDown(self):
