@@ -669,7 +669,7 @@ class MockCapchaTests(FunctionalTests):
             self.assertRaises(URLError, res.form.submit)
 
 
-class MockInvalidCapchaTest(FunctionalTests):
+class MockInvalidCaptchaTest(FunctionalTests):
 
     def test_captcha_invalid_error(self):
         self.testapp.app.registry.settings['recaptcha_public_key'] = 'key'
