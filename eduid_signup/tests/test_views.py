@@ -544,7 +544,7 @@ class MockCapchaTests(FunctionalTests):
 
     def test_start_registration(self):
         self._start_registration()
-        new_user = self.amdb.get_user_by_mail('foo@example.com')
+        new_user = self.amdb.get_user_by_mail('foo@example.com', raise_on_missing=False)
         self.assertEqual(new_user, None)
 
     def test_email_verification_link(self):
@@ -644,7 +644,7 @@ class MockCapchaTests(FunctionalTests):
             self.assertEqual(res.status, '302 Found')
             self.assertEqual(res.location, 'http://localhost/')
             registered = self.signup_userdb.get_user_by_mail('foo@example.com')
-            registered_central = self.amdb.get_user_by_mail('foo@example.com')
+            registered_central = self.amdb.get_user_by_mail('foo@example.com', raise_on_missing=False)
             self.assertEqual(registered_central, None)
             # XXX Should this be verified?
             self.assertEqual(registered.pending_mail_address, None)
