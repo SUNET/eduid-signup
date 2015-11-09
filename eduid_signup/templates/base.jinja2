@@ -12,19 +12,19 @@
     <link href="{{'eduid_signup:static/css/signup.css'|static_url}}" rel="stylesheet" />
   </head>
   <body>
-    <div class="container">
+    <div class="container-fluid">
       <header id="header" class="header">
         <div class="logo"></div>
-        <nav class="navbar navbar-default" id="eduid-signup-navbar">
+        <nav class="navbar navbar-default" id="eduid-navbar">
           <div class="container-fluid">
             <div class="navbar-header">
               <a class="navbar-brand" href="#">
                 <div id="eduid-logo-small" class="logo"></div>
               </a>
-              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-signup-menu" aria-expanded="false">
+              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-menu" aria-expanded="false">
               </span>
             </div>
-          <div class="collapse navbar-collapse text-center" id="eduid-signup-menu">
+          <div class="collapse navbar-collapse text-center" id="eduid-menu">
             <ul  class="nav navbar-nav">
               <li>
                 <a href="/">{{ _("Student") }}</a>
@@ -78,7 +78,7 @@
    </div>
    <script src="{{'eduid_signup:static/js/libs/jquery-1.9.1.min.js'|static_url}}"></script>
    <script src="{{'eduid_signup:static/js/libs/bootstrap-3.2.0.min.js'|static_url}}"></script>
-   <script src="{{'eduid_signup:static/js/mobilemenu.js'|static_url}}"></script>
+   <script src="{{'eduid_signup:static/js/signup-mobilemenu.js'|static_url}}"></script>
 
    <div class="clearfix"></div>
 
@@ -100,7 +100,7 @@
         </p>
     </div>
    </div>
-   <script type="text/javascript" src="{{'eduid_signup:static/js/base.js'|static_url}}"></script>
+   <script type="text/javascript" src="{{'eduid_signup:static/js/signup-base.js'|static_url}}"></script>
 
     {% block extrajs %}
     {% endblock %}
