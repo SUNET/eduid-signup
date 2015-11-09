@@ -69,6 +69,7 @@ class SuccessViewTests(FunctionalTests):
         self.assertEqual(res.location, 'http://localhost/')
 
     def test_favicon(self):
+        self.skipTest('Static files are no longer a part of the package')
         res = self.testapp.get('/favicon.ico')
         self.assertEqual(res.status, '200 OK')
 
