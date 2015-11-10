@@ -27,19 +27,19 @@
           <div class="collapse navbar-collapse text-center" id="eduid-menu">
             <ul  class="nav navbar-nav">
               <li>
-                <a href="/">{{ _("Student") }}</a>
+                <a href="{{ request.registry.settings['student_link'] }}">{{ _("Student") }}</a>
               </li>
               <li>
-                <a href="/">{{ _("Technician") }}</a>
+                <a href="{{ request.registry.settings['technicians_link'] }}">{{ _("Technician") }}</a>
               </li>
               <li>
-                <a href="/">{{ _("Personal") }}</a>
+                <a href="{{ request.registry.settings['staff_link'] }}">{{ _("Personal") }}</a>
               </li>
               <li>
-                <a href="/">{{ _("FAQ") }}</a>
+                <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>
               </li>
               <li>
-                <a href="{{ request.registry.settings['privacy_policy_url'] }}">{{ _("Privacy") }}</a>
+                <a href="{{ request.registry.settings['privacy_link'] }}">{{ _("Privacy") }}</a>
               </li>
             </ul>
             <div class="buttons nav navbar-nav navbar-right">

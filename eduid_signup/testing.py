@@ -53,7 +53,11 @@ static_url = pyramid_jinja2.filters:static_url_filter
     'signup_hostname': 'signup.example.com',
     'signup_baseurl': 'http://signup.example.com',
     'dashboard_link': 'http://dashboard.example.com',
-    'privacy_policy_url': 'http://eduid.se/privacy.html',
+    'student_link': 'http://eduid.se/privacy.html',
+    'technicians_link': 'http://eduid.se/privacy.html',
+    'staff_link': 'http://eduid.se/privacy.html',
+    'faq_link': 'http://eduid.se/privacy.html',
+    'privacy_link': 'http://eduid.se/privacy.html',
 }
 
 
