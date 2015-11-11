@@ -19,22 +19,22 @@
 {% elif code_does_not_exists is defined %}
   <div class="jumbotron eduid-account-created">
     <h1>{{ _("Welcome to eduID!") }}</h1>
-    <p class="lead">{{ _("The provided code does not exist or your link is broken") }}</p>
-    <p class="lead">{{ _("If you have a code, you should go to the verification code form to enter it") }}</p>
+    <p class="lead">{{ _("There was a problem with the provided code") }}</p class="lead">
+    <p class="lead">{{ _("Go to the code verification page to manually enter the code or try to register again") }}</p>
   </div>
   <div class="row">
     <div class="col-sm-6">
       <p class="text-center">
           <a class="btn btn-success btn-lg profile-link"
              href="{{ signup_link }}">
-              {{ _("Return to the register form") }}</a>
+              {{ _("Register again") }}</a>
       </p>
     </div>
     <div class="col-sm-6">
       <p class="text-center">
           <a class="btn btn-success btn-lg profile-link"
              href="{{ code_form }}">
-              {{ _("Go to verification code form") }}</a>
+              {{ _("Code verification page") }}</a>
       </p>
     </div>
   </div>

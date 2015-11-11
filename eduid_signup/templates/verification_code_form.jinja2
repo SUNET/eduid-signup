@@ -20,7 +20,7 @@
 {% else %}
 {% if password is not defined %}
 
-  <p class="lead">{{ _("Put here the verification code sent to you by e-mail") }}</p>
+  <p class="lead">{{ _("Please enter the confirmation code below") }}</p>
 
   <div class="row text-center">
     <div id="code-verify" class="col-md-12">
@@ -28,7 +28,7 @@
         <form class="form-inline" role="form" method="POST">
           <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
             <div class="input-group">
-              <input type="text" name="code" id="verification-code-input" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocus />
+              <input type="text" name="code" id="verification-code-input" class="form-control" placeholder="{{ _("Confirmation code") }}" value="" required autofocus />
               <span class="input-group-btn">
                 <button class="btn btn-success has-spinner"
                     id="verify-button"
@@ -46,7 +46,7 @@
       <div id="code-verify-sm">
         <form role="form" class="form-horizontal" method="POST">
          <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
-          <input type="text" name="code" id="input-code-verify" class="form-control" placeholder="{{ _("Paste here your code") }}" value="" required autofocua />
+          <input type="text" name="code" id="input-code-verify" class="form-control" placeholder="{{ _("Confirmation code") }}" value="" required autofocus />
           {% if code_does_not_exists is defined %}
             <p class="help-block">{{ _("The provided code does not exist") }}</p>
           {% endif %}
