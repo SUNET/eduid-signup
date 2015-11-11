@@ -68,9 +68,8 @@ class SuccessViewTests(FunctionalTests):
         self.assertEqual(res.location, 'http://localhost/')
 
     def test_favicon(self):
-        self.skipTest('Static files are no longer a part of the package')
         res = self.testapp.get('/favicon.ico')
-        self.assertEqual(res.status, '200 OK')
+        self.assertEqual(res.status, '302 Found')
 
     def test_resend_verification(self):
         self.add_to_session({'email': 'mail@example.com'})

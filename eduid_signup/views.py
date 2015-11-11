@@ -67,9 +67,7 @@ def get_url_from_email_status(request, email):
 
 @view_config(name='favicon.ico')
 def favicon_view(context, request):
-    path = os.path.dirname(__file__)
-    icon = os.path.join(path, 'static', 'favicon.ico')
-    return FileResponse(icon, request=request)
+    return HTTPFound(request.static_url('static/favicon.ico'))
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
