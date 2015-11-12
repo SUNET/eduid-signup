@@ -37,7 +37,7 @@
                 </button>
               </span>
               {% if code_does_not_exists is defined %}
-              <p class="help-block">{{ _("The provided code does not exist") }}</p>
+              <p class="help-block">{{ _("The provided code could not be found") }}</p>
               {% endif %}
             </div>
           </div>
@@ -48,7 +48,7 @@
          <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
           <input type="text" name="code" id="input-code-verify" class="form-control" placeholder="{{ _("Confirmation code") }}" value="" required autofocus />
           {% if code_does_not_exists is defined %}
-            <p class="help-block">{{ _("The provided code does not exist") }}</p>
+            <p class="help-block">{{ _("The provided code could not be found") }}</p>
           {% endif %}
           <button class="btn btn-success" type="submit">{{ _("Verify account") }}</button>
          </div>
