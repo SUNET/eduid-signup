@@ -589,13 +589,13 @@ class MockCapchaTests(FunctionalTests):
         res.forms[0]['code'] = 'xxx'
         res = res.forms[0].submit()
         self.assertEqual(res.status, '200 OK')
-        self.assertIn('The provided code does not exist', res.body)
+        self.assertIn('The provided code could not be found', res.body)
 
     def test_email_verification_link_invalid_code(self):
         url = 'http://localhost/email_verification/%s/' % 'xxx'
         res = self.testapp.get(url)
         self.assertEqual(res.status, '200 OK')
-        self.assertIn('The provided code does not exist', res.body)
+        self.assertIn('There was a problem with the provided code', res.body)
 
     def test_no_email(self):
         res = self.testapp.post('/', {})
