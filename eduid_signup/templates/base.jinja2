@@ -57,7 +57,7 @@
       <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
 
      <div id="content-block">
-     <div class="messages-wrapper messages-center-block">
+       <div class="messages-wrapper messages-center-block{% if request.session.peek_flash %} messages-wrapper-empty{% endif %}">
         <div class="messages">
         {% for message in request.session.pop_flash() %}
           <div class="alert alert-danger">

@@ -4,12 +4,13 @@
 
 {% block contents %}
 <div class="jumbotron">
+  <div class="media"></div>
   <h1>{{ _("Welcome to eduID!") }}</h1>
 
   <p class="lead">{{ _("Create an account for use with Swedish Universities.") }}</p>
 
   <div class="row text-center">
-    <div id="email-register" class="col-md-12">
+    <div id="email-register" class="col-md-8">
       <div id="email-register-lg">
         <form class="form-inline" role="form" method="POST">
          <div class="form-group{% if email_error is defined %} has-error{% endif %}">
@@ -40,7 +41,7 @@
     </div>
   </div>
   <div class="row text-center">
-    <div id="social-register" class="col-lg-6">
+    <div id="social-register" class="col-md-8">
       {% if request.registry.settings.get('facebook_auth_enabled', False) %}
         <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
           <span class="btn-icon"></span>
