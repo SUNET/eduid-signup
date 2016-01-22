@@ -1,9 +1,9 @@
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
-from eduid_signup.utils import generate_eppn, normalize_email
+from eduid_signup.utils import generate_eppn, normalize_email, remove_users_with_mail_address
 
-from eduid_userdb.signup import SignupUser
+from eduid_userdb.signup import SignupUser, SignupUserDB
 import eduid_userdb
 
 import logging
@@ -19,6 +19,9 @@ def create_or_update_sna(request, social_info):
     :type social_info: dict
     :return:
     """
+    # Type hint for the IDE
+    assert isinstance(request.signup_db, SignupUserDB)
+
     provider = request.session['provider']
     provider_user_id = request.session['provider_user_id']
 
@@ -28,6 +31,9 @@ def create_or_update_sna(request, social_info):
     logger.debug("Signup user from pending e-mail address {!r}: {!r}".format(social_info['email'], signup_user))
 
     if signup_user is None:
+        # Workaround for failed earlier sync of user to userdb: Remove any signup_user with this e-mail address.
+        remove_users_with_mail_address(request.signup_db, social_info['email'])
+
         # The user doesn't exist at all in the signup_userdb.
         signup_user = SignupUser(eppn = generate_eppn(request))
     else:
@@ -55,10 +61,6 @@ def create_or_update_sna(request, social_info):
         signup_user, signup_user.mail_addresses.primary.email))
     res = request.signup_db.save(signup_user)
     logging.debug("Save result: {!r}".format(res))
-
-    # Send the signal to the attribute manager so it can update
-    # this user's attributes in the central eduID UserDB
-    #update_attributes.delay('eduid_signup', signup_user.user_id)
 
     # Create an authenticated session and send the user to the
     # success screeen (use sanitized address)

@@ -4,6 +4,7 @@ from hashlib import sha256
 import datetime
 from eduid_signup.compat import text_type
 from eduid_userdb.tou import ToUEvent
+from eduid_userdb.exceptions import UserDoesNotExist
 
 import os
 import struct
@@ -82,7 +83,7 @@ def check_email_status(userdb, signup_db, email):
     :param email: Address to look for
 
     :type userdb: eduid_userdb.UserDb
-    :type signup_db: eduid_signup.userdb.SignupUserDB
+    :type signup_db: eduid_userdb.signup.SignupUserDB
     :type email: str | unicode
     """
     try:
@@ -99,6 +100,9 @@ def check_email_status(userdb, signup_db, email):
             return 'not_verified'
     except userdb.exceptions.UserDoesNotExist:
         logger.debug("No user found with email {!s} in signup db either".format(email))
+
+    # Workaround for failed earlier sync of user to userdb: Remove any signup_user with this e-mail address.
+    remove_users_with_mail_address(signup_db, email)
 
     return 'new'
 
@@ -162,3 +166,35 @@ def record_tou(request, user, source):
         created_ts = created_ts,
         event_id = event_id
         ))
+
+
+def remove_users_with_mail_address(signup_db, email):
+    """
+    Remove all users with a certain (confirmed) e-mail address from signup_db.
+
+    When syncing of signed up users fail, they remain in the signup_db in a completed state
+    (no pending mail address). This prevents the user from signing up again, and they can't
+    use their new eduid account either since it is not synced to the central userdb.
+
+    An option would have been to sync the user again, now, but that was deemed more
+    surprising to the user so instead we remove all the unsynced users from signup_db
+    so the user can do a new signup.
+
+    :param signup_db: SignupUserDB
+    :param email: E-mail address
+
+    :param signup_db: eduid_userdb.signup.SignupUserDB
+    :param email: str | unicode
+
+    :return:
+    """
+    while True:
+        # The e-mail address does not exist in userdb (checked by caller), so if there exists a user
+        # in signup_db with this (non-pending) e-mail address, it is probably left-overs from a
+        # previous signup where the sync to userdb failed. Clean away all such users in signup_db
+        # and continue like this was a completely new signup.
+        completed_user = signup_db.get_user_by_mail(email, raise_on_missing = False, raise_on_multiple = False)
+        if not completed_user:
+            break
+        logger.warning('Removing old user {!s} with e-mail {!s} from signup_db'.format(completed_user, email))
+        signup_db.remove_user_by_id(completed_user.user_id)

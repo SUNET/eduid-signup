@@ -273,7 +273,7 @@ def review_fetched_info(request):
 
     if request.method == 'POST' and email and not am_user:
         if request.POST.get('action') == 'accept':
-            logger.debug("Proceeding with social signup of {!r}: {!r}")
+            logger.debug("Proceeding with social signup of {!r}: {!r}".format(email, social_info))
             create_or_update_sna(request, social_info)
             raise HTTPFound(location=request.route_url('sna_account_created'))
         else:
