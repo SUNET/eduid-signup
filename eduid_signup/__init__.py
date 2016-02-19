@@ -134,13 +134,16 @@ def main(global_config, **settings):
 
     # configure Celery broker
     broker_url = cp.read_setting_from_env(settings, 'broker_url', 'amqp://')
+    celery_result_backend = cp.read_setting_from_env(settings, 'broker_url', '')
     celery.conf.update({
         'MONGO_URI': settings.get('mongo_uri'),
         'BROKER_URL': broker_url,
+        'CELERY_RESULT_BACKEND': celery_result_backend,
         'CELERY_TASK_SERIALIZER': 'json',
     })
     settings['celery'] = celery
     settings['broker_url'] = broker_url
+    settings['celery_result_backend'] = celery_result_backend
 
     settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
     settings['facebook_callback'] = 'eduid_signup.sna_callbacks.facebook_callback'
