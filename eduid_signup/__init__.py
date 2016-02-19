@@ -8,7 +8,7 @@ from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
 #from eduid_am.userdb import UserDB
-from eduid_am.config import read_setting_from_env, read_mapping
+from eduid_common.config.parsers import IniConfigParser
 from eduid_signup.i18n import locale_negotiator
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.signup import SignupUserDB
@@ -71,6 +71,7 @@ def includeme(config):
 
 
 def main(global_config, **settings):
+    cp = IniConfigParser('')  # Init without config file as it is already loaded
 
     # read pyramid_mailer options
     for key, default in (
@@ -81,13 +82,13 @@ def main(global_config, **settings):
         ('default_sender', 'no-reply@example.com')
     ):
         option = 'mail.' + key
-        settings[option] = read_setting_from_env(settings, option, default)
+        settings[option] = cp.read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
-    available_languages = read_mapping(settings,
-                                       'available_languages',
-                                       default={'en': 'English',
-                                                'sv': 'Svenska'})
+    available_languages = cp.read_mapping(settings,
+                                          'available_languages',
+                                          default={'en': 'English',
+                                                   'sv': 'Svenska'})
 
     settings['available_languages'] = available_languages
 
@@ -107,49 +108,52 @@ def main(global_config, **settings):
         'faq_link',
         'privacy_link',
     ):
-        settings[item] = read_setting_from_env(settings, item, None)
+        settings[item] = cp.read_setting_from_env(settings, item, None)
         if settings[item] is None:
             raise ConfigurationError('The {0} configuration option is required'.format(item))
 
     # reCaptcha
-    settings['recaptcha_public_key'] = read_setting_from_env(settings,
-                                                             'recaptcha_public_key',
-                                                             None)
+    settings['recaptcha_public_key'] = cp.read_setting_from_env(settings,
+                                                                'recaptcha_public_key',
+                                                                None)
 
-    settings['recaptcha_private_key'] = read_setting_from_env(settings,
-                                                              'recaptcha_private_key',
+    settings['recaptcha_private_key'] = cp.read_setting_from_env(settings,
+                                                                 'recaptcha_private_key',
+                                                                 None)
+    settings['lang_cookie_domain'] = cp.read_setting_from_env(settings,
+                                                              'lang_cookie_domain',
                                                               None)
-    settings['lang_cookie_domain'] = read_setting_from_env(settings,
-                                                           'lang_cookie_domain',
-                                                           None)
 
-    settings['lang_cookie_name'] = read_setting_from_env(settings,
-                                                         'lang_cookie_name',
-                                                         'lang')
+    settings['lang_cookie_name'] = cp.read_setting_from_env(settings,
+                                                            'lang_cookie_name',
+                                                            'lang')
 
-    mongo_replicaset = read_setting_from_env(settings, 'mongo_replicaset', None)
+    mongo_replicaset = cp.read_setting_from_env(settings, 'mongo_replicaset', None)
     if mongo_replicaset is not None:
         settings['mongo_replicaset'] = mongo_replicaset
 
     # configure Celery broker
-    broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
+    broker_url = cp.read_setting_from_env(settings, 'broker_url', 'amqp://')
+    celery_result_backend = cp.read_setting_from_env(settings, 'broker_url', '')
     celery.conf.update({
         'MONGO_URI': settings.get('mongo_uri'),
         'BROKER_URL': broker_url,
+        'CELERY_RESULT_BACKEND': celery_result_backend,
         'CELERY_TASK_SERIALIZER': 'json',
     })
     settings['celery'] = celery
     settings['broker_url'] = broker_url
+    settings['celery_result_backend'] = celery_result_backend
 
     settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
     settings['facebook_callback'] = 'eduid_signup.sna_callbacks.facebook_callback'
     settings['liveconnect_callback'] = 'eduid_signup.sna_callbacks.liveconnect_callback'
 
-    settings['password_length'] = int(read_setting_from_env(settings, 'password_length', '10'))
+    settings['password_length'] = int(cp.read_setting_from_env(settings, 'password_length', '10'))
 
-    settings['account_creation_timeout'] = int(read_setting_from_env(settings,
-                                                                     'account_creation_timeout',
-                                                                     '10'))
+    settings['account_creation_timeout'] = int(cp.read_setting_from_env(settings,
+                                                                        'account_creation_timeout',
+                                                                        '10'))
 
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
