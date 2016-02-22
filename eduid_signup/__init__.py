@@ -71,6 +71,8 @@ def includeme(config):
 
 
 def main(global_config, **settings):
+    settings = dict(settings)
+
     cp = IniConfigParser('')  # Init without config file as it is already loaded
 
     # read pyramid_mailer options
