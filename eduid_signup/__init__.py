@@ -142,6 +142,9 @@ def main(global_config, **settings):
         'BROKER_URL': broker_url,
         'CELERY_RESULT_BACKEND': celery_result_backend,
         'CELERY_TASK_SERIALIZER': 'json',
+        # Avoid broken connections across firewall by disabling pool
+        # http://docs.celeryproject.org/en/latest/configuration.html#broker-pool-limit
+        'BROKER_POOL_LIMIT': 0,
     })
     settings['celery'] = celery
     settings['broker_url'] = broker_url
