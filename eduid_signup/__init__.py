@@ -136,7 +136,7 @@ def main(global_config, **settings):
 
     # configure Celery broker
     broker_url = cp.read_setting_from_env(settings, 'broker_url', 'amqp://')
-    celery_result_backend = cp.read_setting_from_env(settings, 'broker_url', '')
+    celery_result_backend = cp.read_setting_from_env(settings, 'celery_result_backend', '')
     celery.conf.update({
         'MONGO_URI': settings.get('mongo_uri'),
         'BROKER_URL': broker_url,
