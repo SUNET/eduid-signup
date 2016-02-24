@@ -1,13 +1,11 @@
 import re
 
 from pyramid.config import Configurator
-from pyramid.exceptions import ConfigurationError
 from pyramid.settings import asbool
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
-#from eduid_am.userdb import UserDB
 from eduid_common.config.parsers import IniConfigParser
 from eduid_signup.i18n import locale_negotiator
 from eduid_userdb import MongoDB, UserDB
@@ -57,7 +55,7 @@ def includeme(config):
     config.add_subscriber('eduid_signup.i18n.add_localizer',
                           'pyramid.events.NewRequest')
 
-    if not config.registry.settings.get('testing', False):
+    if not config.registry.settings['testing']:
         config.add_view(context=Exception,
                         view='eduid_signup.views.exception_view',
                         renderer='templates/error500.jinja2')
@@ -70,111 +68,128 @@ def includeme(config):
     config.add_view('eduid_signup.views.favicon_view', route_name='favicon')
 
 
-def main(global_config, **settings):
-    settings = dict(settings)
+def add_setting(src, default, dst=None, type_='unicode', required=False):
+    if dst is None:
+        dst = src
+    params = {'type': type_,
+              'required': required,
+              }
+    return src, dst, default, params,
 
+
+def parse_settings(cfg, parser, settings):
+    res = {}
+    for (src, dst, default, params) in cfg:
+        if src in settings:
+            if params.get('type') == 'mapping':
+                value = parser.read_mapping(settings, src, default)
+            else:
+                value = parser.read_setting_from_env(settings, src, default)
+            res[dst] = _type_cast(src, value, params)
+        else:
+            if params.get('required'):
+                raise ValueError('Required setting {!r} not set'.format(src))
+            res[dst] = default
+    return res
+
+
+def _type_cast(name, value, params):
+    try:
+        return _type_cast_safe(value, params)
+    except Exception as exc:
+        raise ValueError('Failed parsing configuration option {!r}: {!s}'.format(name, exc))
+
+
+def _type_cast_safe(value, params):
+    if params['type'] is 'unicode':
+        return unicode(value)
+    if params['type'] == 'int':
+        return int(value)
+    if params['type'] == 'bool':
+        return asbool(value)
+    raise NotImplementedError('Type casting to {!r} not implemented'.format(params['type']))
+
+
+def main(global_config, **settings_in):
     cp = IniConfigParser('')  # Init without config file as it is already loaded
 
-    # read pyramid_mailer options
-    for key, default in (
-        ('host', 'localhost'),
-        ('port', '25'),
-        ('username', None),
-        ('password', None),
-        ('default_sender', 'no-reply@example.com')
-    ):
-        option = 'mail.' + key
-        settings[option] = cp.read_setting_from_env(settings, option, default)
+    cfg = [
+        # Required settings
+        add_setting('mongo_uri', None, required = True),
+        add_setting('profile_link', None, required = True),
+        add_setting('dashboard_link', None, required = True),
+        add_setting('site.name', 'eduid_signup', required = True),
+        add_setting('signup_hostname', None, required = True),
+        add_setting('signup_baseurl', None, required = True),
+        add_setting('reset_password_link', None, required = True),
+        add_setting('vccs_url', None, required = True),
+        add_setting('auth_shared_secret', None, required = True),
+        add_setting('student_link', None, required = True),
+        # add_setting('technicians_link', None, required = True),
+        add_setting('staff_link', None, required = True),
+        add_setting('faq_link', None, required = True),
+        add_setting('privacy_link', None, required = True),
+        add_setting('session.cookie_expires', None, required = True, type_ = 'int'),
+        add_setting('tou_version', None, required = True),
+        add_setting('lang_cookie_domain', None, required = True),
 
-    # Parse settings before creating the configurator object
-    available_languages = cp.read_mapping(settings,
-                                          'available_languages',
-                                          default={'en': 'English',
-                                                   'sv': 'Svenska'})
+        # Mailer settings
+        add_setting('host', 'localhost', dst = 'mail.host'),
+        add_setting('port', 25, dst = 'mail.port', type_ = 'int'),
+        add_setting('username', None, dst = 'mail.username'),
+        add_setting('password', None, dst = 'mail.password'),
+        add_setting('default_sender', 'no-reply@example.com', dst = 'mail.default_sender'),
 
-    settings['available_languages'] = available_languages
+        add_setting('available_languages', {'en': 'English',
+                                            'sv': 'Svenska'}, type_ = 'mapping'),
+        add_setting('default_locale_name', 'en'),
+        add_setting('recaptcha_public_key', ''),
+        add_setting('recaptcha_private_key', ''),
+        # add_setting('mongo_replicaset', None),
+        add_setting('broker_url', 'amqp://'),
+        add_setting('celery_result_backend', 'amqp'),
+        add_setting('google_callback', 'eduid_signup.sna_callbacks.google_callback'),
+        add_setting('facebook_callback', 'eduid_signup.sna_callbacks.facebook_callback'),
+        add_setting('liveconnect_callback', 'eduid_signup.sna_callbacks.liveconnect_callback'),
+        add_setting('password_length', 10, type_ = 'int'),
+        add_setting('account_creation_timeout', 10, type_ = 'int'),
+        add_setting('testing', False, type_ = 'bool'),
+        add_setting('development', False, type_ = 'bool'),
+        add_setting('static_url', None),
+        add_setting('httponly', True, dst = 'session.httponly', type_ = 'bool'),
+        add_setting('secure', True, dst = 'session.secure', type_ = 'bool'),
+        add_setting('lang_cookie_name', 'lang'),
+    ]
 
-    for item in (
-        'mongo_uri',
-        'profile_link',
-        'dashboard_link',
-        'site.name',
-        'signup_hostname',
-        'signup_baseurl',
-        'reset_password_link',
-        'vccs_url',
-        'auth_shared_secret',
-        'student_link',
-        'technicians_link',
-        'staff_link',
-        'faq_link',
-        'privacy_link',
-    ):
-        settings[item] = cp.read_setting_from_env(settings, item, None)
-        if settings[item] is None:
-            raise ConfigurationError('The {0} configuration option is required'.format(item))
-
-    # reCaptcha
-    settings['recaptcha_public_key'] = cp.read_setting_from_env(settings,
-                                                                'recaptcha_public_key',
-                                                                None)
-
-    settings['recaptcha_private_key'] = cp.read_setting_from_env(settings,
-                                                                 'recaptcha_private_key',
-                                                                 None)
-    settings['lang_cookie_domain'] = cp.read_setting_from_env(settings,
-                                                              'lang_cookie_domain',
-                                                              None)
-
-    settings['lang_cookie_name'] = cp.read_setting_from_env(settings,
-                                                            'lang_cookie_name',
-                                                            'lang')
-
-    mongo_replicaset = cp.read_setting_from_env(settings, 'mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        settings['mongo_replicaset'] = mongo_replicaset
+    settings = parse_settings(cfg, cp, dict(settings_in))
 
     # configure Celery broker
-    broker_url = cp.read_setting_from_env(settings, 'broker_url', 'amqp://')
-    celery_result_backend = cp.read_setting_from_env(settings, 'broker_url', '')
     celery.conf.update({
-        'MONGO_URI': settings.get('mongo_uri'),
-        'BROKER_URL': broker_url,
-        'CELERY_RESULT_BACKEND': celery_result_backend,
+        'MONGO_URI': settings['mongo_uri'],
+        'BROKER_URL': settings['broker_url'],
+        'CELERY_RESULT_BACKEND': settings['celery_result_backend'],
         'CELERY_TASK_SERIALIZER': 'json',
         # Avoid broken connections across firewall by disabling pool
         # http://docs.celeryproject.org/en/latest/configuration.html#broker-pool-limit
         'BROKER_POOL_LIMIT': 0,
     })
     settings['celery'] = celery
-    settings['broker_url'] = broker_url
-    settings['celery_result_backend'] = celery_result_backend
 
-    settings['google_callback'] = 'eduid_signup.sna_callbacks.google_callback'
-    settings['facebook_callback'] = 'eduid_signup.sna_callbacks.facebook_callback'
-    settings['liveconnect_callback'] = 'eduid_signup.sna_callbacks.liveconnect_callback'
+    for x in settings_in.keys():
+        if not x in settings:
+            import sys
+            sys.stderr.write("SETTING {!r} NOT FOUND\n".format(x))
+            settings[x] = settings_in[x]
 
-    settings['password_length'] = int(cp.read_setting_from_env(settings, 'password_length', '10'))
-
-    settings['account_creation_timeout'] = int(cp.read_setting_from_env(settings,
-                                                                        'account_creation_timeout',
-                                                                        '10'))
 
     # The configurator is the main object about configuration
     config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
-
-    try:
-        settings['session.cookie_expires'] = int(settings['session.cookie_expires'])
-    except ValueError:
-        raise ConfigurationError('session.cookie_expires must be a integer value')
 
     # include other packages
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
 
-    if 'testing' in settings and asbool(settings['testing']):
-        config.include('pyramid_mailer.testing')
-    elif 'development' in settings and asbool(settings['development']):
+    if settings['testing'] or settings['development']:
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')
@@ -183,7 +198,7 @@ def main(global_config, **settings):
     config.include('pyramid_sna')
 
     # global directives
-    if settings.get('static_url', False):
+    if settings['static_url']:
         config.add_static_view(settings['static_url'], 'static')
     else:
         config.add_static_view('static', 'static', cache_max_age=3600)

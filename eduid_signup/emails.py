@@ -21,14 +21,14 @@ def send_verification_mail(request, email):
         "email": email,
         "verification_link": verification_link,
         "site_url": request.route_url("home"),
-        "site_name": request.registry.settings.get("site.name", "eduid_signup"),
+        "site_name": request.registry.settings["site.name"],
         "code": code,
         "verification_code_form_link": request.route_url("verification_code_form"),
     }
 
     message = Message(
         subject=_("eduid-signup verification email"),
-        sender=request.registry.settings.get("mail.default_sender"),
+        sender=request.registry.settings["mail.default_sender"],
         recipients=[email],
         body=render(
             "templates/verification_email.txt.jinja2",
@@ -60,7 +60,7 @@ def send_verification_mail(request, email):
         request.signup_db.save(signup_user)
         logger.info("User {!s}/{!s} updated with new e-mail confirmation code".format(signup_user, email))
 
-    if request.registry.settings.get("development", '') != 'true':
+    if not request.registry.settings["development"]:
         mailer.send(message)
     else:
         # Development
@@ -75,11 +75,11 @@ def send_credentials(request, email, password):
         "email": email,
         "password": password,
         "site_url": request.route_url("home"),
-        "site_name": request.registry.settings.get("site.name", "eduid_signup"),
+        "site_name": request.registry.settings["site.name"],
     }
     message = Message(
         subject=_("eduid-signup credentials"),
-        sender=request.registry.settings.get("mail.default_sender"),
+        sender=request.registry.settings["mail.default_sender"],
         recipients=[email],
         body=render(
             "templates/credentials_email.txt.jinja2",
@@ -93,7 +93,7 @@ def send_credentials(request, email, password):
         ),
     )
     logger.info("Credentials e-mail sent to {!s}".format(email))
-    if request.registry.settings.get("development", '') != 'true':
+    if not request.registry.settings["development"]:
         mailer.send(message)
     else:
         # Development

@@ -16,7 +16,7 @@ def locale_negotiator(request):
     locale_name = request.accept_language.best_match(available_languages)
 
     if locale_name not in available_languages:
-        locale_name = settings.get('default_locale_name', 'sv')
+        locale_name = settings['default_locale_name']
     return locale_name
 
 

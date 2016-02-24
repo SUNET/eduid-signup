@@ -58,6 +58,7 @@ static_url = pyramid_jinja2.filters:static_url_filter
     'staff_link': 'http://eduid.se/privacy.html',
     'faq_link': 'http://eduid.se/privacy.html',
     'privacy_link': 'http://eduid.se/privacy.html',
+    'lang_cookie_domain': 'test.example.edu',
 }
 
 

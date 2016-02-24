@@ -9,7 +9,6 @@ from pyramid.httpexceptions import (HTTPFound, HTTPNotFound,
 from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
-from pyramid.settings import asbool
 from pyramid.response import FileResponse
 
 from wsgi_ratelimit import is_ratelimit_reached
@@ -114,7 +113,7 @@ def trycaptcha(request):
     settings = request.registry.settings
 
     remote_ip = request.environ.get("REMOTE_ADDR", '')
-    recaptcha_public_key = settings.get("recaptcha_public_key", '')
+    recaptcha_public_key = settings["recaptcha_public_key"]
     if request.method == 'GET':
         logger.debug("Presenting CAPTCHA to {!s} (email {!s})".format(remote_ip, request.session['email']))
         return {
@@ -130,9 +129,9 @@ def trycaptcha(request):
                 response = captcha.submit(
                     challenge_field,
                     response_field,
-                    settings.get("recaptcha_private_key", ''),
+                    settings["recaptcha_private_key"],
                     remote_ip,
-                    use_ssl=True
+                    #use_ssl=True
                 )
                 logger.debug("Sent the CAPTCHA with the user's response to google")
                 break
@@ -215,8 +214,7 @@ def already_registered(request):
     """
     logger.debug("E-mail already registered: {!s}".format(request.session.get('email')))
     return {
-        'reset_password_link': request.registry.settings.get(
-            'reset_password_link', '#'),
+        'reset_password_link': request.registry.settings['reset_password_link'],
     }
 
 
@@ -232,7 +230,7 @@ def review_fetched_info(request):
     """
 
     logger.debug("View review_fetched_info ({!s})".format(request.method))
-    debug_mode = request.registry.settings.get('development', False)
+    debug_mode = request.registry.settings['development']
     if not 'social_info' in request.session and not debug_mode:
         raise HTTPBadRequest()
 
@@ -492,8 +490,8 @@ def set_language(request):
     url = request.environ.get('HTTP_REFERER', None)
     host = request.environ.get('HTTP_HOST', None)
 
-    signup_hostname = settings.get('signup_hostname')
-    signup_baseurl = settings.get('signup_baseurl')
+    signup_hostname = settings['signup_hostname']
+    signup_baseurl = settings['signup_baseurl']
 
     # To avoid malicious redirects, using header injection, we only
     # allow the client to be redirected to an URL that is within the
@@ -508,15 +506,15 @@ def set_language(request):
 
     response = HTTPFound(location=url)
 
-    cookie_domain = settings.get('lang_cookie_domain', None)
-    cookie_name = settings.get('lang_cookie_name')
+    cookie_domain = settings['lang_cookie_domain']
+    cookie_name = settings['lang_cookie_name']
 
     extra_options = {}
     if cookie_domain is not None:
         extra_options['domain'] = cookie_domain
 
-    extra_options['httponly'] = asbool(settings.get('session.httponly'))
-    extra_options['secure'] = asbool(settings.get('session.secure'))
+    extra_options['httponly'] = settings['session.httponly']
+    extra_options['secure'] = settings['session.secure']
 
     response.set_cookie(cookie_name, value=lang, **extra_options)
 
