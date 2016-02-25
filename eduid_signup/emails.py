@@ -3,6 +3,7 @@ from pyramid.renderers import render
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 
+from eduid_signup.config import pyramid_unpack_config
 from eduid_signup.utils import generate_verification_link, generate_eppn
 
 from eduid_userdb.signup import SignupUser
@@ -13,6 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 def send_verification_mail(request, email):
+    """
+    Send a verification code to someone's email address.
+
+    :param request: Pyramid request
+    :param email: Email address
+
+    :type request: pyramid.request.Request
+    :return:
+    """
+    config = pyramid_unpack_config(request)
+
     mailer = get_mailer(request)
     (verification_link, code) = generate_verification_link(request)
     _ = request.translate
@@ -21,14 +33,14 @@ def send_verification_mail(request, email):
         "email": email,
         "verification_link": verification_link,
         "site_url": request.route_url("home"),
-        "site_name": request.registry.settings["site.name"],
+        "site_name": config.site_name,
         "code": code,
         "verification_code_form_link": request.route_url("verification_code_form"),
     }
 
     message = Message(
         subject=_("eduid-signup verification email"),
-        sender=request.registry.settings["mail.default_sender"],
+        sender=config.mail_default_sender,
         recipients=[email],
         body=render(
             "templates/verification_email.txt.jinja2",
@@ -60,7 +72,7 @@ def send_verification_mail(request, email):
         request.signup_db.save(signup_user)
         logger.info("User {!s}/{!s} updated with new e-mail confirmation code".format(signup_user, email))
 
-    if not request.registry.settings["development"]:
+    if not config.development:
         mailer.send(message)
     else:
         # Development
@@ -69,17 +81,29 @@ def send_verification_mail(request, email):
 
 
 def send_credentials(request, email, password):
+    """
+    Send user credentials to new user in e-mail.
+
+    :param request: Pyramid request
+    :param email: E-mail address
+    :param password: Plaintext password
+
+    :type request: pyramid.request.Request
+
+    :return:
+    """
+    config = pyramid_unpack_config(request)
     _ = request.translate
     mailer = get_mailer(request)
     context = {
         "email": email,
         "password": password,
         "site_url": request.route_url("home"),
-        "site_name": request.registry.settings["site.name"],
+        "site_name": config.site_name,
     }
     message = Message(
         subject=_("eduid-signup credentials"),
-        sender=request.registry.settings["mail.default_sender"],
+        sender=config.mail_default_sender,
         recipients=[email],
         body=render(
             "templates/credentials_email.txt.jinja2",
@@ -93,7 +117,7 @@ def send_credentials(request, email, password):
         ),
     )
     logger.info("Credentials e-mail sent to {!s}".format(email))
-    if not request.registry.settings["development"]:
+    if not config.development:
         mailer.send(message)
     else:
         # Development

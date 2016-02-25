@@ -1,20 +1,20 @@
 import os
+import re
 import time
 from recaptcha.client import captcha
 from bson import ObjectId
 
+from urllib2 import URLError
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import (HTTPFound, HTTPNotFound,
                                     HTTPMethodNotAllowed, HTTPBadRequest,)
 from pyramid.security import forget
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
-from pyramid.response import FileResponse
-
-from wsgi_ratelimit import is_ratelimit_reached
 
 from eduid_am.tasks import update_attributes_keep_result
 
+from eduid_signup.config import pyramid_unpack_config
 from eduid_signup.i18n import TranslationString as _
 from eduid_signup.emails import send_verification_mail, send_credentials
 from eduid_signup.validators import validate_email, ValidationError
@@ -40,9 +40,10 @@ def get_url_from_email_status(request, email):
     Otherwise, send a verification e-mail.
 
     :param request: the request
-    :type request: WebOb Request
     :param email: the email
-    :type email: string
+
+    :type request: pyramid.request.Request
+    :type email: str | unicode
 
     :return: redirect response
     """
@@ -73,22 +74,21 @@ def favicon_view(context, request):
 def home(request):
     """
     Home view.
-    If request.method is GET, 
-    return the initial signup form.
-    If request.method is POST, 
-    validate the sent email and
+    If request.method is GET, return the initial signup form.
+    If request.method is POST, validate the sent email and
     redirects as appropriate.
+
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
     """
-    context = {}
     if request.method == 'POST':
         try:
             email = validate_email(request.POST)
         except ValidationError as error:
-            context.update({
+            return {
                 'email_error': error.msg,
                 'email': error.email
-            })
-            return context
+            }
 
         request.session['email'] = email
         remote_ip = request.environ.get('REMOTE_ADDR', '')
@@ -96,40 +96,42 @@ def home(request):
         trycaptcha_url = request.route_url("trycaptcha")
         return HTTPFound(location=trycaptcha_url)
 
-    return context
+    return {}
 
 
 @view_config(route_name='trycaptcha', renderer='templates/trycaptcha.jinja2')
 def trycaptcha(request):
     """
     Kantara requires a check for humanness even at level AL1.
+
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
     """
-    from urllib2 import URLError
+    config = pyramid_unpack_config(request)
+    context = {
+        'recaptcha_public_key': config.recaptcha_public_key,
+    }
 
     if 'email' not in request.session:
         home_url = request.route_url("home")
+        logger.debug('No email in session, redirecting user to {!s}'.format(home_url))
         return HTTPFound(location=home_url)
 
-    settings = request.registry.settings
-
     remote_ip = request.environ.get("REMOTE_ADDR", '')
-    recaptcha_public_key = settings["recaptcha_public_key"]
     if request.method == 'GET':
         logger.debug("Presenting CAPTCHA to {!s} (email {!s})".format(remote_ip, request.session['email']))
-        return {
-            'recaptcha_public_key': recaptcha_public_key
-        }
+        return context
 
     if request.method == 'POST':
         challenge_field = request.POST.get('recaptcha_challenge_field', '')
         response_field = request.POST.get('recaptcha_response_field', '')
 
-        for i in range(0,3):
+        for i in range(0, 3):
             try:
                 response = captcha.submit(
                     challenge_field,
                     response_field,
-                    settings["recaptcha_private_key"],
+                    config.recaptcha_private_key,
                     remote_ip,
                     #use_ssl=True
                 )
@@ -143,7 +145,7 @@ def trycaptcha(request):
                     logger.debug("Caught URLError while sending recaptcha, giving up.")
                     raise
 
-        if response.is_valid or not recaptcha_public_key:
+        if response.is_valid or not config.recaptcha_public_key:
             logger.debug("Valid CAPTCHA response (or CAPTCHA disabled) from {!r}".format(remote_ip))
 
             # recaptcha_public_key not set in development environment, just accept
@@ -151,10 +153,8 @@ def trycaptcha(request):
             return get_url_from_email_status(request, email)
 
         logger.debug("Invalid CAPTCHA response from {!r}: {!r}".format(remote_ip, response.error_code))
-        return {
-            "error": True,
-            "recaptcha_public_key": recaptcha_public_key
-        }
+        context['error'] = True
+        return context
 
     return HTTPMethodNotAllowed()
 
@@ -164,26 +164,20 @@ def success(request):
     """
     After a successful operation with no
     immediate follow up on the web.
-    """
 
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
+    """
+    config = pyramid_unpack_config(request)
     if 'email' not in request.session:
         home_url = request.route_url("home")
         return HTTPFound(location=home_url)
 
     email = request.session['email']
-    #secret = request.registry.settings.get('auth_shared_secret')
-    #timestamp = "{:x}".format(int(time.time()))
-    #nonce = os.urandom(16).encode('hex')
-    #auth_token = generate_auth_token(secret, email, nonce, timestamp)
 
     logger.debug("Successful signup for {!s}".format(email))
-    return {
-        #"profile_link": request.registry.settings.get("profile_link", "#"),
-        "email": email,
-        #"nonce": nonce,
-        #"timestamp": timestamp,
-        #"auth_token": auth_token,
-    }
+    return {'email': email,
+            }
 
 
 @view_config(route_name='resend_email_verification',
@@ -192,6 +186,9 @@ def resend_email_verification(request):
     """
     The user has no yet verified the email address.
     Send a verification message to the address so it can be verified.
+
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
     """
     if request.method == 'POST':
         email = request.session.get('email', '')
@@ -211,10 +208,14 @@ def already_registered(request):
     """
     There is already an account with that address.
     Return a link to reset the password for that account.
+
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
     """
+    config = pyramid_unpack_config(request)
     logger.debug("E-mail already registered: {!s}".format(request.session.get('email')))
     return {
-        'reset_password_link': request.registry.settings['reset_password_link'],
+        'reset_password_link': config.reset_password_link,
     }
 
 
@@ -227,17 +228,19 @@ def review_fetched_info(request):
 
     First, a GET renders the information for the user to review, then
     a POST is used to accept the information shown, or abort the signup.
-    """
 
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
+    """
+    config = pyramid_unpack_config(request)
     logger.debug("View review_fetched_info ({!s})".format(request.method))
-    debug_mode = request.registry.settings['development']
-    if not 'social_info' in request.session and not debug_mode:
+    if 'social_info' not in request.session and not config.development:
         raise HTTPBadRequest()
 
     social_info = request.session.get('social_info', {})
     email = social_info.get('email', None)
 
-    if debug_mode:
+    if config.development:
         social_info = {
             'email': 'dummy@eduid.se',
             'screen_name': 'dummy',
@@ -264,7 +267,7 @@ def review_fetched_info(request):
             'social_info': social_info,
             'mail_registered': bool(am_user),
             'mail_empty': not email,
-            'reset_password_link': request.registry.settings['reset_password_link'],
+            'reset_password_link': config.reset_password_link,
         }
         logger.debug("Rendering review form: {!r}".format(res))
         return res
@@ -294,17 +297,19 @@ def registered_completed(request, signup_user, context=None):
     update the attribute manager db with the new account,
     and send the pertinent information to the user.
 
+    :param request: Pyramid request
     :param signup_user: SignupUser instance
+
+    :type request: pyramid.request.Request
     :type signup_user: SignupUser
     """
+    config = pyramid_unpack_config(request)
     logger.info("Completing registration for user {!s}/{!s}".format(signup_user.user_id, signup_user.eppn))
 
     if context is None:
         context = {}
     password_id = ObjectId()
-    (password, salt) = generate_password(request.registry.settings,
-                                         str(password_id), signup_user,
-                                         )
+    (password, salt) = generate_password(config, str(password_id), signup_user)
     credential = Password(credential_id=password_id, salt=salt, application='signup')
     signup_user.passwords.add(credential)
     # Record the acceptance of the terms of use
@@ -316,14 +321,14 @@ def registered_completed(request, signup_user, context=None):
     logger.debug("Asking for sync of {!r} by Attribute Manager".format(str(signup_user.user_id)))
     try:
         rtask = update_attributes_keep_result.delay('eduid_signup', str(signup_user.user_id))
-        timeout = request.registry.settings.get("account_creation_timeout", 3)
+        timeout = config.account_creation_timeout
         result = rtask.get(timeout=timeout)
         logger.debug("Attribute Manager sync result: {!r}".format(result))
     except:
         logger.exception("Failed Attribute Manager sync request. trying again")
         try:
             rtask = update_attributes_keep_result.delay('eduid_signup', str(signup_user.user_id))
-            timeout = request.registry.settings.get("account_creation_timeout", 7)
+            timeout = config.account_creation_timeout * 2
             result = rtask.get(timeout=timeout)
             logger.debug("Attribute Manager sync result: {!r}".format(result))
         except:
@@ -334,13 +339,13 @@ def registered_completed(request, signup_user, context=None):
             url = request.route_path('home')
             raise HTTPFound(location=url)
 
-    secret = request.registry.settings.get('auth_shared_secret')
+    secret = config.auth_shared_secret
     timestamp = '{:x}'.format(int(time.time()))
     nonce = os.urandom(16).encode('hex')
     auth_token = generate_auth_token(secret, signup_user.eppn, nonce, timestamp)
 
     context.update({
-        "profile_link": request.registry.settings.get("profile_link", "#"),
+        "profile_link": config.profile_link,
         "password": password,
         "email": signup_user.mail_addresses.primary.email,
         "eppn": signup_user.eppn,
@@ -349,12 +354,13 @@ def registered_completed(request, signup_user, context=None):
         "auth_token": auth_token,
     })
 
-    if request.registry.settings.get("default_finish_url"):
-        context['finish_url'] = request.registry.settings.get("default_finish_url")
+    if config.default_finish_url:
+        # XXX shouldn't this only happen if there is no context['finish_url']?
+        context['finish_url'] = config.default_finish_url
 
     logger.debug("Context Finish URL : {!r}".format(context.get('finish_url')))
 
-    if request.registry.settings.get("email_credentials", False):
+    if config.email_credentials:
         send_credentials(request, signup_user.eppn, password)
 
     logger.info("Signup process for new user {!s}/{!s} complete".format(signup_user.user_id, signup_user.eppn))
@@ -367,8 +373,10 @@ def email_verification_link(request):
     """
     View for the link sent to the user's mail
     so that she can verify the address she has provided.
-    """
 
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
+    """
     logger.debug("Trying to confirm e-mail using confirmation link")
     code = request.matchdict['code']
     return _verify_code(request, code)
@@ -379,6 +387,9 @@ def email_verification_link(request):
 def verification_code_form(request):
     """
     form to enter the verification code
+
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
     """
     if request.method == 'POST':
         code = request.POST['code']
@@ -390,10 +401,14 @@ def _verify_code(request, code):
     """
     Common code for the link- and form-based code verification.
 
-    :param request:
+    :param request: Pyramid request
     :param code: Code given by the user
+
+    :type request: pyramid.request.Request
     :return:
     """
+    config = pyramid_unpack_config(request)
+
     try:
         signup_user = verify_email_code(request.signup_db, code)
         # XXX at this stage the confirmation code is marked as 'used' but no
@@ -407,7 +422,7 @@ def _verify_code(request, code):
         logger.error("The pending MailAddress was verified already. Should not happen!")
         return {
             'email_already_verified': True,
-            "reset_password_link": request.registry.settings.get("reset_password_link", "#"),
+            "reset_password_link": config.reset_password_link,
         }
     except CodeDoesNotExists:
         return {
@@ -425,6 +440,9 @@ def account_created_from_sna(request):
     """
     View where the registration from a social network is completed,
     after the user has reviewed the information fetched from the s.n.
+
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
     """
     user = request.signup_db.get_user_by_mail(request.session.get('email'),
                                               raise_on_missing=True,
@@ -440,6 +458,9 @@ def account_created_from_sna(request):
 def help(request):
     """
     help view
+
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
     """
     # We don't want to mess up the gettext .po file
     # with a lot of strings which don't belong to the
@@ -464,9 +485,13 @@ def error500view(request):
 
 @view_config(route_name='error500', renderer='templates/error500.jinja2')
 def exception_view(context, request):
+    """
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
+    """
     logger.error("The error was: %s" % context, exc_info=(context))
     request.response.status = 500
-    #message = getattr(context, 'message', '')
+    # message = getattr(context, 'message', '')
     # `message' might include things like database connection details (with authentication
     # parameters), so it should NOT be displayed to the user.
     return {'msg': 'Code exception'}
@@ -474,48 +499,48 @@ def exception_view(context, request):
 
 @view_config(route_name='error404', renderer='templates/error404.jinja2')
 def not_found_view(request):
+    """
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
+    """
     request.response.status = 404
     return {}
 
 
 @view_config(route_name='set_language', request_method='GET')
 def set_language(request):
-    import re
-
-    settings = request.registry.settings
+    """
+    :param request: Pyramid request
+    :type request: pyramid.request.Request
+    """
+    config = pyramid_unpack_config(request)
     lang = request.GET.get('lang', 'en')
-    if lang not in settings['available_languages']:
+    if lang not in config.available_languages:
         return HTTPNotFound()
 
     url = request.environ.get('HTTP_REFERER', None)
     host = request.environ.get('HTTP_HOST', None)
 
-    signup_hostname = settings['signup_hostname']
-    signup_baseurl = settings['signup_baseurl']
-
     # To avoid malicious redirects, using header injection, we only
     # allow the client to be redirected to an URL that is within the
     # predefined scope of the application.
-    allowed_url = re.compile('^(http|https)://' + signup_hostname + '[:]{0,1}\d{0,5}($|/)')
-    allowed_host = re.compile('^' + signup_hostname + '[:]{0,1}\d{0,5}$')
+    allowed_url = re.compile('^(http|https)://' + config.signup_hostname + '[:]{0,1}\d{0,5}($|/)')
+    allowed_host = re.compile('^' + config.signup_hostname + '[:]{0,1}\d{0,5}$')
 
     if url is None or not allowed_url.match(url):
-        url = signup_baseurl
+        url = config.signup_baseurl
     elif host is None or not allowed_host.match(host):
-        url = signup_baseurl
+        url = config.signup_baseurl
 
     response = HTTPFound(location=url)
 
-    cookie_domain = settings['lang_cookie_domain']
-    cookie_name = settings['lang_cookie_name']
-
     extra_options = {}
-    if cookie_domain is not None:
-        extra_options['domain'] = cookie_domain
+    if config.lang_cookie_domain is not None:
+        extra_options['domain'] = config.lang_cookie_domain
 
-    extra_options['httponly'] = settings['session.httponly']
-    extra_options['secure'] = settings['session.secure']
+    extra_options['httponly'] = config.session_cookie_httponly
+    extra_options['secure'] = config.session_cookie_secure
 
-    response.set_cookie(cookie_name, value=lang, **extra_options)
+    response.set_cookie(config.lang_cookie_name, value=lang, **extra_options)
 
     return response

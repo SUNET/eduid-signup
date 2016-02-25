@@ -2,9 +2,9 @@ import bson
 from uuid import uuid4
 from hashlib import sha256
 import datetime
+from eduid_signup.config import pyramid_unpack_config
 from eduid_signup.compat import text_type
 from eduid_userdb.tou import ToUEvent
-from eduid_userdb.exceptions import UserDoesNotExist
 
 import os
 import struct
@@ -125,7 +125,7 @@ def generate_eppn(request):
 
     :param request:
     :return: eppn
-    :rtype: string
+    :rtype: unicode
     """
     for _ in range(10):
         eppn_int = struct.unpack('I', os.urandom(4))[0]
@@ -133,7 +133,7 @@ def generate_eppn(request):
         try:
             request.userdb.get_user_by_eppn(eppn)
         except request.userdb.exceptions.UserDoesNotExist:
-            return eppn
+            return unicode(eppn)
     raise HTTPServerError()
 
 
@@ -145,17 +145,18 @@ def record_tou(request, user, source):
     """
     Record user acceptance of terms of use.
 
-    :param request: The request
-    :type request: Request
+    :param request: Pyramid request
     :param user: the user that has accepted the ToU
-    :type user: eduid_userdb.signup.User
     :param source: An identificator for the proccess during which
                    the user has accepted the ToU (e.g., "signup")
+    :type request: pyramid.request.Request
+    :type user: eduid_userdb.signup.User
     :type source: str
     """
+    config = pyramid_unpack_config(request)
     event_id = bson.ObjectId()
     created_ts = datetime.datetime.utcnow()
-    tou_version = request.registry.settings['tou_version']
+    tou_version = config.tou_version
     logger.debug('Recording ToU acceptance {!r} (version {!s})'
                  ' for user {!r} (source: {!s})'.format(
                      event_id, tou_version,
@@ -165,7 +166,7 @@ def record_tou(request, user, source):
         application = source,
         created_ts = created_ts,
         event_id = event_id
-        ))
+    ))
 
 
 def remove_users_with_mail_address(signup_db, email):

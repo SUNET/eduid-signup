@@ -13,9 +13,10 @@ logger = logging.getLogger(__name__)
 def create_or_update_sna(request, social_info):
     """
 
-    :param request:
+    :param request: Pyramid request
     :param social_info: Information from Social network login provider
 
+    :type request: pyramid.request.Request
     :type social_info: dict
     :return:
     """

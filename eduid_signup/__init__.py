@@ -1,212 +1,165 @@
 import re
+from copy import deepcopy
 
 from pyramid.config import Configurator
-from pyramid.settings import asbool
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
 from eduid_common.config.parsers import IniConfigParser
 from eduid_signup.i18n import locale_negotiator
+from eduid_signup.config import SignupConfig
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.signup import SignupUserDB
 
+import logging
+logger = logging.getLogger(__name__)
 
-def includeme(config):
+
+def includeme(configurator, config):
     # DB setup
-    _mongodb_tou = MongoDB(config.registry.settings['mongo_uri'], 'eduid_tou')
-    _userdb = UserDB(config.registry.settings['mongo_uri'], 'eduid_am')
-    _signup_db = SignupUserDB(config.registry.settings['mongo_uri'], 'eduid_signup')
+    _mongodb_tou = MongoDB(config.mongo_uri, 'eduid_tou')
+    _userdb = UserDB(config.mongo_uri, 'eduid_am')
+    _signup_db = SignupUserDB(config.mongo_uri, 'eduid_signup')
 
-    # Create mongodb client instance and store it in our config,
+    # Create mongodb client instance and store it in our configurator,
     # and make a getter lambda for pyramid to retreive it
-    config.registry.settings['signup_db'] = _signup_db
-    config.add_request_method(lambda x: x.registry.settings['signup_db'], 'signup_db', reify=True)
+    configurator.registry.settings['signup_db'] = _signup_db
+    configurator.add_request_method(lambda x: x.registry.settings['signup_db'], 'signup_db', reify=True)
 
-    # Create userdb instance and store it in our config,
+    # Create userdb instance and store it in our configurator,
     # and make a getter lambda for pyramid to retreive it (will be available as 'request.userdb')
-    config.registry.settings['userdb'] = _userdb
-    config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
+    configurator.registry.settings['userdb'] = _userdb
+    configurator.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
-    # store mongodb tou client instance in our config,
+    # store mongodb tou client instance in our configurator,
     # and make a getter lambda for pyramid to retreive it
-    config.registry.settings['mongodb_tou'] = _mongodb_tou
-    config.add_request_method(lambda x: x.registry.settings['mongodb_tou'].get_database(), 'toudb', reify=True)
+    configurator.registry.settings['mongodb_tou'] = _mongodb_tou
+    configurator.add_request_method(lambda x: x.registry.settings['mongodb_tou'].get_database(), 'toudb', reify=True)
+
+    # store SignupConfig instance in our configurator,
+    # and make a getter lambda for pyramid to retreive it
+    # By calling it exactly 'signupconfig', Pycharm provides code completion using the class SignupConfig.
+    configurator.registry.settings['signupconfig'] = config
+    configurator.add_request_method(lambda x: x.registry.settings['signupconfig'], 'signupconfig', reify=True)
 
     # root views
-    config.add_route('home', '/')
-    config.add_route('help', '/help/')
-    config.add_route('success', '/success/')
-    config.add_route('email_verification_link', '/email_verification/{code}/')
-    config.add_route('sna_account_created', '/sna_account_created/')
-    config.add_route('trycaptcha', '/trycaptcha/')
-    config.add_route('resend_email_verification', '/resend_email_verification/')
-    config.add_route('email_already_registered', '/email_already_registered/')
-    config.add_route('verification_code_form', '/verification_code_form/')
-    config.add_route('review_fetched_info', '/review_fetched_info/')
-    config.add_route('set_language', '/set_language/')
+    configurator.add_route('home', '/')
+    configurator.add_route('help', '/help/')
+    configurator.add_route('success', '/success/')
+    configurator.add_route('email_verification_link', '/email_verification/{code}/')
+    configurator.add_route('sna_account_created', '/sna_account_created/')
+    configurator.add_route('trycaptcha', '/trycaptcha/')
+    configurator.add_route('resend_email_verification', '/resend_email_verification/')
+    configurator.add_route('email_already_registered', '/email_already_registered/')
+    configurator.add_route('verification_code_form', '/verification_code_form/')
+    configurator.add_route('review_fetched_info', '/review_fetched_info/')
+    configurator.add_route('set_language', '/set_language/')
 
-    config.add_route('error500test', '/error500test/')
-    config.add_route('error500', '/error500/')
+    configurator.add_route('error500test', '/error500test/')
+    configurator.add_route('error500', '/error500/')
 
-    config.add_route('error404', '/error404/')
+    configurator.add_route('error404', '/error404/')
 
-    config.set_request_property(get_locale_name, 'locale', reify=True)
-    config.add_subscriber('eduid_signup.i18n.add_localizer',
-                          'pyramid.events.NewRequest')
+    configurator.set_request_property(get_locale_name, 'locale', reify=True)
+    configurator.add_subscriber('eduid_signup.i18n.add_localizer',
+                                'pyramid.events.NewRequest')
 
-    if not config.registry.settings['testing']:
-        config.add_view(context=Exception,
-                        view='eduid_signup.views.exception_view',
-                        renderer='templates/error500.jinja2')
-        config.add_view(context=HTTPNotFound,
-                        view='eduid_signup.views.exception_view',
-                        renderer='templates/error404.jinja2')
+    if not config.testing:
+        configurator.add_view(context=Exception,
+                              view='eduid_signup.views.exception_view',
+                              renderer='templates/error500.jinja2')
+        configurator.add_view(context=HTTPNotFound,
+                              view='eduid_signup.views.exception_view',
+                              renderer='templates/error404.jinja2')
 
     # Favicon
-    config.add_route('favicon', '/favicon.ico')
-    config.add_view('eduid_signup.views.favicon_view', route_name='favicon')
+    configurator.add_route('favicon', '/favicon.ico')
+    configurator.add_view('eduid_signup.views.favicon_view', route_name= 'favicon')
 
 
-def add_setting(src, default, dst=None, type_='unicode', required=False):
-    if dst is None:
-        dst = src
-    params = {'type': type_,
-              'required': required,
+def init_settings_from_dict(settings_in):
+    """
+    Make Pyramid App Settings from the input given to the Pyramid app on startup.
+
+    The result is meant to be passed to a Pyramid Configurator as `settings'.
+
+    :param settings_in: Configuration data
+    :return: App settings, and configuration
+    :rtype: dict, SignupConfig
+    """
+    _settings = dict(deepcopy(settings_in))  # don't mess with callers data
+    pyramid_settings = {}
+    rename = {'session.cookie_expires': 'session_cookie_expires',
+              'site.name': 'site_name',
               }
-    return src, dst, default, params,
+    for x in _settings.keys():
+        if x.startswith('jinja2.'):
+            # Jinja2 settings should go into the Pyramid settings dict
+            pyramid_settings[x] = _settings[x]
+            del _settings[x]
+        if x in rename:
+            logger.debug('Renaming option {!s} -> {!s}'.format(x, rename[x]))
+            _settings[rename[x]] = _settings[x]
+            del _settings[x]
 
+    cp = IniConfigParser('')  # Init without config file as it is already loaded
 
-def parse_settings(cfg, parser, settings):
-    res = {}
-    for (src, dst, default, params) in cfg:
-        if src in settings:
-            if params.get('type') == 'mapping':
-                value = parser.read_mapping(settings, src, default)
-            else:
-                value = parser.read_setting_from_env(settings, src, default)
-            res[dst] = _type_cast(src, value, params)
-        else:
-            if params.get('required'):
-                raise ValueError('Required setting {!r} not set'.format(src))
-            res[dst] = default
-    return res
+    signup_config = SignupConfig(cp, _settings)
 
+    for name in signup_config.keys():
+        # Copy SNA related options to pyramid_settings where the pyramid_sna module
+        # expects to find them
+        if name.startswith('google_') or name.startswith('facebook_') or \
+                name.startswith('liveconnect_'):
+            pyramid_settings[name] = getattr(signup_config, name)
 
-def _type_cast(name, value, params):
-    try:
-        return _type_cast_safe(value, params)
-    except Exception as exc:
-        raise ValueError('Failed parsing configuration option {!r}: {!s}'.format(name, exc))
+    pyramid_settings['session.key'] = signup_config.session_cookie_name
 
-
-def _type_cast_safe(value, params):
-    if params['type'] is 'unicode':
-        return unicode(value)
-    if params['type'] == 'int':
-        return int(value)
-    if params['type'] == 'bool':
-        return asbool(value)
-    raise NotImplementedError('Type casting to {!r} not implemented'.format(params['type']))
+    return pyramid_settings, signup_config
 
 
 def main(global_config, **settings_in):
-    cp = IniConfigParser('')  # Init without config file as it is already loaded
 
-    cfg = [
-        # Required settings
-        add_setting('mongo_uri', None, required = True),
-        add_setting('profile_link', None, required = True),
-        add_setting('dashboard_link', None, required = True),
-        add_setting('site.name', 'eduid_signup', required = True),
-        add_setting('signup_hostname', None, required = True),
-        add_setting('signup_baseurl', None, required = True),
-        add_setting('reset_password_link', None, required = True),
-        add_setting('vccs_url', None, required = True),
-        add_setting('auth_shared_secret', None, required = True),
-        add_setting('student_link', None, required = True),
-        # add_setting('technicians_link', None, required = True),
-        add_setting('staff_link', None, required = True),
-        add_setting('faq_link', None, required = True),
-        add_setting('privacy_link', None, required = True),
-        add_setting('session.cookie_expires', None, required = True, type_ = 'int'),
-        add_setting('tou_version', None, required = True),
-        add_setting('lang_cookie_domain', None, required = True),
-
-        # Mailer settings
-        add_setting('host', 'localhost', dst = 'mail.host'),
-        add_setting('port', 25, dst = 'mail.port', type_ = 'int'),
-        add_setting('username', None, dst = 'mail.username'),
-        add_setting('password', None, dst = 'mail.password'),
-        add_setting('default_sender', 'no-reply@example.com', dst = 'mail.default_sender'),
-
-        add_setting('available_languages', {'en': 'English',
-                                            'sv': 'Svenska'}, type_ = 'mapping'),
-        add_setting('default_locale_name', 'en'),
-        add_setting('recaptcha_public_key', ''),
-        add_setting('recaptcha_private_key', ''),
-        # add_setting('mongo_replicaset', None),
-        add_setting('broker_url', 'amqp://'),
-        add_setting('celery_result_backend', 'amqp'),
-        add_setting('google_callback', 'eduid_signup.sna_callbacks.google_callback'),
-        add_setting('facebook_callback', 'eduid_signup.sna_callbacks.facebook_callback'),
-        add_setting('liveconnect_callback', 'eduid_signup.sna_callbacks.liveconnect_callback'),
-        add_setting('password_length', 10, type_ = 'int'),
-        add_setting('account_creation_timeout', 10, type_ = 'int'),
-        add_setting('testing', False, type_ = 'bool'),
-        add_setting('development', False, type_ = 'bool'),
-        add_setting('static_url', None),
-        add_setting('httponly', True, dst = 'session.httponly', type_ = 'bool'),
-        add_setting('secure', True, dst = 'session.secure', type_ = 'bool'),
-        add_setting('lang_cookie_name', 'lang'),
-    ]
-
-    settings = parse_settings(cfg, cp, dict(settings_in))
+    settings, config = init_settings_from_dict(dict(settings_in))
 
     # configure Celery broker
     celery.conf.update({
-        'MONGO_URI': settings['mongo_uri'],
-        'BROKER_URL': settings['broker_url'],
-        'CELERY_RESULT_BACKEND': settings['celery_result_backend'],
+        'MONGO_URI': config.mongo_uri,
+        'BROKER_URL': config.broker_url,
+        'CELERY_RESULT_BACKEND': config.celery_result_backend,
         'CELERY_TASK_SERIALIZER': 'json',
         # Avoid broken connections across firewall by disabling pool
         # http://docs.celeryproject.org/en/latest/configuration.html#broker-pool-limit
         'BROKER_POOL_LIMIT': 0,
     })
-    settings['celery'] = celery
-
-    for x in settings_in.keys():
-        if not x in settings:
-            import sys
-            sys.stderr.write("SETTING {!r} NOT FOUND\n".format(x))
-            settings[x] = settings_in[x]
-
+    #settings.celery = celery
 
     # The configurator is the main object about configuration
-    config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
+    configurator = Configurator(settings=settings, locale_negotiator=locale_negotiator)
 
     # include other packages
-    config.include('pyramid_beaker')
-    config.include('pyramid_jinja2')
+    configurator.include('pyramid_beaker')
+    configurator.include('pyramid_jinja2')
 
-    if settings['testing'] or settings['development']:
-        config.include('pyramid_mailer.testing')
+    if config.testing or config.development:
+        configurator.include('pyramid_mailer.testing')
     else:
-        config.include('pyramid_mailer')
+        configurator.include('pyramid_mailer')
 
-    config.include('pyramid_tm')
-    config.include('pyramid_sna')
+    configurator.include('pyramid_tm')
+    configurator.include('pyramid_sna')
 
     # global directives
-    if settings['static_url']:
-        config.add_static_view(settings['static_url'], 'static')
+    if config.static_url:
+        configurator.add_static_view(config.static_url, 'static')
     else:
-        config.add_static_view('static', 'static', cache_max_age=3600)
+        configurator.add_static_view('static', 'static', cache_max_age=3600)
 
-    config.add_translation_dirs('eduid_signup:locale/')
+    configurator.add_translation_dirs('eduid_signup:locale/')
 
     # eduid specific configuration
-    includeme(config)
+    includeme(configurator, config)
 
-    config.scan(ignore=[re.compile('.*tests.*').search, '.testing'])
-    return config.make_wsgi_app()
+    configurator.scan(ignore=[re.compile('.*tests.*').search, '.testing'])
+    return configurator.make_wsgi_app()

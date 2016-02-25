@@ -45,26 +45,26 @@
           <div class="collapse navbar-collapse text-center" id="eduid-menu">
             <ul  class="nav navbar-nav">
               <li>
-                <a href="{{ request.registry.settings['student_link'] }}">{{ _("Student") }}</a>
+                <a href="{{ request.signupconfig.student_link }}">{{ _("Student") }}</a>
               </li>
               <li>
-                <a href="{{ request.registry.settings['technicians_link'] }}">{{ _("Technician") }}</a>
+                <a href="{{ request.signupconfig.technicians_link }}">{{ _("Technician") }}</a>
               </li>
               <li>
-                <a href="{{ request.registry.settings['staff_link'] }}">{{ _("Staff") }}</a>
+                <a href="{{ request.signupconfig.staff_link }}">{{ _("Staff") }}</a>
               </li>
               <li>
-                <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>
+                <a href="{{ request.signupconfig.faq_link }}">{{ _("FAQ") }}</a>
               </li>
             </ul>
             <div class="buttons nav navbar-nav navbar-right">
               <div class="button orange">
                       <!-- Link leads to signup page -->
-                <a href="{{ request.registry.settings['signup_baseurl'] }}">{{ _("Sign up") }}</a>
+                <a href="{{ request.signupconfig.signup_baseurl }}">{{ _("Sign up") }}</a>
               </div>
                 <div class="button white-border">
                       <!-- Link leads to login page -->
-                  <a href="{{ request.registry.settings['dashboard_link'] }}">{{ _("Sign in") }}</a>
+                  <a href="{{ request.signupconfig.dashboard_link }}">{{ _("Sign in") }}</a>
                 </div>
               </div>
             </div>
@@ -102,7 +102,7 @@
         <p>
             &copy; SUNET 2013-2016
             <span class="pull-right">
-            {% for lang, label in request.registry.settings.get('available_languages', {}).items() %}
+            {% for lang, label in request.signupconfig.available_languages.items() %}
                 <span class="langselector">
                     {% if request.locale == lang %}
                         <span>{{ label }}</span>

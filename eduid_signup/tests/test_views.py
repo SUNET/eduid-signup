@@ -652,7 +652,6 @@ class MockCapchaTests(FunctionalTests):
 
     def test_captcha_url_error(self):
         from eduid_signup.views import captcha
-        from urllib2 import URLError
         def side_effect(*args, **kwargs):
             raise URLError('ho')
         mock_config = {
@@ -671,7 +670,7 @@ class MockCapchaTests(FunctionalTests):
 class MockInvalidCaptchaTest(FunctionalTests):
 
     def test_captcha_invalid_error(self):
-        self.testapp.app.registry.settings['recaptcha_public_key'] = 'key'
+        self.signupconfig_set('recaptcha_public_key', 'key')
         from eduid_signup.views import captcha
         class MockCaptcha:
             is_valid = False

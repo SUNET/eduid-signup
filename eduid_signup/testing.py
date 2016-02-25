@@ -31,11 +31,9 @@ from eduid_am.celery import celery, get_attribute_manager
 SETTINGS = {
     'profile_link': 'http://profiles.example.com/edit',
     'reset_password_link': ' http://profiles.example.com/reset_password',
-    'site.name': 'Test Site',
-    'auth_tk_secret': '123456',
+    'site_name': 'Test Site',
     'auth_shared_secret': '123123',
-    'session.cookie_expires': '3600',
-    'session.key': 'session',
+    'session_cookie_expires': '3600',
     'tou_version': '2014-v1',
     'testing': True,
     'jinja2.directories': 'eduid_signup:templates',
@@ -71,7 +69,6 @@ class FunctionalTests(MongoTestCase):
         _settings = deepcopy(SETTINGS)
         _settings.update({
             'mongo_uri': self.tmp_db.get_uri('eduid_signup_test'),
-            'mongo_uri_tou': self.tmp_db.get_uri('eduid_tou_test'),
             })
         self.settings.update(_settings)
 
@@ -113,3 +110,13 @@ class FunctionalTests(MongoTestCase):
             session[key] = value
         session.persist()
         self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
+
+    def signupconfig_set(self, key, value):
+        """
+        Update a SignupConfig setting for the app.
+
+        :param key: Configuration parameter to update
+        :param value: New value
+        :return: None
+        """
+        self.testapp.app.registry.settings['signupconfig']._cache[key] = value
