@@ -188,13 +188,11 @@ def remove_users_with_mail_address(signup_db, email):
 
     :return:
     """
-    while True:
-        # The e-mail address does not exist in userdb (checked by caller), so if there exists a user
-        # in signup_db with this (non-pending) e-mail address, it is probably left-overs from a
-        # previous signup where the sync to userdb failed. Clean away all such users in signup_db
-        # and continue like this was a completely new signup.
-        completed_user = signup_db.get_user_by_mail(email, raise_on_missing = False, raise_on_multiple = False)
-        if not completed_user:
-            break
-        logger.warning('Removing old user {!s} with e-mail {!s} from signup_db'.format(completed_user, email))
-        signup_db.remove_user_by_id(completed_user.user_id)
+    # The e-mail address does not exist in userdb (checked by caller), so if there exists a user
+    # in signup_db with this (non-pending) e-mail address, it is probably left-overs from a
+    # previous signup where the sync to userdb failed. Clean away all such users in signup_db
+    # and continue like this was a completely new signup.
+    completed_users = signup_db.get_user_by_mail(email, raise_on_missing = False, return_list = True)
+    for user in completed_users:
+        logger.warning('Removing old user {!s} with e-mail {!s} from signup_db'.format(user, email))
+        signup_db.remove_user_by_id(user.user_id)
