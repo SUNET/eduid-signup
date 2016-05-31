@@ -36,7 +36,7 @@ SETTINGS = {
     'auth_shared_secret': '123123',
     'session.cookie_expires': '3600',
     'session.key': 'session',
-    'tou_version': '2014-v1',
+    'tou_version': '2016-v1',
     'testing': True,
     'jinja2.directories': 'eduid_signup:templates',
     'jinja2.undefined': 'strict',
