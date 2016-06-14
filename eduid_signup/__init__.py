@@ -12,6 +12,7 @@ from eduid_common.config.parsers import IniConfigParser
 from eduid_signup.i18n import locale_negotiator
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.signup import SignupUserDB
+from eduid_signup.session import SessionFactory
 
 
 def includeme(config):
@@ -168,8 +169,11 @@ def main(global_config, **settings):
     except ValueError:
         raise ConfigurationError('session.cookie_expires must be a integer value')
 
+    # the session factory
+    session_factory = SessionFactory(settings)
+    config.set_session_factory(session_factory)
+
     # include other packages
-    config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
 
     if 'testing' in settings and asbool(settings['testing']):
