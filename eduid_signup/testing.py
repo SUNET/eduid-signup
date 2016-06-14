@@ -80,9 +80,9 @@ class FunctionalTests(MongoTestCase):
             })
         self.settings.update(_settings)
         self.redis_instance = RedisTemporaryInstance.get_instance()
-        self.settings['REDIS_HOST'] = 'localhost'
-        self.settings['REDIS_PORT'] = self.redis_instance._port
-        self.settings['REDIS_DB'] = '0'
+        self.settings['redis_host'] = 'localhost'
+        self.settings['redis_port'] = self.redis_instance._port
+        self.settings['redis_db'] = '0'
 
         try:
             app = main({}, **(self.settings))

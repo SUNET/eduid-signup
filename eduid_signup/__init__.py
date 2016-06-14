@@ -161,13 +161,54 @@ def main(global_config, **settings):
                                                                         'account_creation_timeout',
                                                                         '10'))
 
-    # The configurator is the main object about configuration
-    config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
+    try:
+        settings['session.cookie_max_age'] = int(settings.get('session.cookie_max_age', 600))
+    except ValueError:
+        raise ConfigurationError('session.cookie_max_age should be a valid integer')
 
     try:
-        settings['session.cookie_expires'] = int(settings['session.cookie_expires'])
+        settings['session.timeout'] = int(settings.get(
+            'session.timeout',
+            settings['session.cookie_max_age'])
+        )
     except ValueError:
-        raise ConfigurationError('session.cookie_expires must be a integer value')
+        raise ConfigurationError('session.timeout should be a valid integer')
+
+    settings['session.cookie_domain'] = cp.read_setting_from_env(settings, 'session.cookie_domain',
+                                                                 'dashboard.docker')
+
+    settings['session.cookie_path'] = cp.read_setting_from_env(settings, 'session.cookie_path',
+                                                               '/')
+
+    settings['session.cookie_httponly'] = cp.read_setting_from_env_bool(settings, 'session.cookie_httponly',
+                                                                        'true')
+
+    settings['session.cookie_secure'] = cp.read_setting_from_env_bool(settings, 'session.cookie_secure',
+                                                                      'false')
+
+    settings['session.key'] = cp.read_setting_from_env(settings, 'session.key',
+                                                       'sessid')
+
+    settings['session.secret'] = cp.read_setting_from_env(settings,
+                                                          'session.secret')
+
+    settings['REDIS_HOST'] = cp.read_setting_from_env(settings, 'redis_host',
+                                                      'redis.docker')
+
+    settings['REDIS_PORT'] = int(cp.read_setting_from_env(settings, 'redis_port',
+                                                          6379))
+
+    settings['REDIS_DB'] = int(cp.read_setting_from_env(settings, 'redis_db', 0))
+
+    settings['REDIS_SENTINEL_HOSTS'] = cp.read_list(
+        settings,
+        'redis_sentinel_hosts',
+        default=[])
+    settings['REDIS_SENTINEL_SERVICE_NAME'] = cp.read_setting_from_env(settings, 'redis_sentinel_service_name',
+                                                                       'redis-cluster')
+
+    # The configurator is the main object about configuration
+    config = Configurator(settings=settings, locale_negotiator=locale_negotiator)
 
     # the session factory
     session_factory = SessionFactory(settings)
