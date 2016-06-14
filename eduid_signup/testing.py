@@ -24,6 +24,10 @@ from pyramid.testing import DummyRequest, DummyResource
 from eduid_signup import main
 from eduid_userdb.testing import MongoTestCase
 from eduid_userdb.exceptions import MongoConnectionError
+from eduid_common.api.testing import RedisTemporaryInstance
+
+from logging import getLogger
+logger = getLogger(__name__)
 
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -35,7 +39,9 @@ SETTINGS = {
     'auth_tk_secret': '123456',
     'auth_shared_secret': '123123',
     'session.cookie_expires': '3600',
-    'session.key': 'session',
+    'session.key': 'signup_session',
+    'session.cookie_max_age': 3600,
+    'session.secret': 'signupsecret',
     'tou_version': '2016-v1',
     'testing': True,
     'jinja2.directories': 'eduid_signup:templates',
@@ -73,6 +79,10 @@ class FunctionalTests(MongoTestCase):
             'mongo_uri_tou': self.tmp_db.get_uri('eduid_tou_test'),
             })
         self.settings.update(_settings)
+        self.redis_instance = RedisTemporaryInstance.get_instance()
+        self.settings['redis_host'] = 'localhost'
+        self.settings['redis_port'] = self.redis_instance._port
+        self.settings['redis_db'] = '0'
 
         try:
             app = main({}, **(self.settings))
@@ -89,13 +99,6 @@ class FunctionalTests(MongoTestCase):
         self.toudb.consent.drop()
         self.testapp.reset()
 
-    def set_user_cookie(self, user_id):
-        request = TestRequest.blank('', {})
-        request.registry = self.testapp.app.registry
-        remember_headers = remember(request, user_id)
-        cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
-
     def dummy_request(self, cookies={}):
         request = DummyRequest()
         request.context = DummyResource()
@@ -111,4 +114,6 @@ class FunctionalTests(MongoTestCase):
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
+        session_key = self.settings['session.key']
+        token = session._session.token
+        self.testapp.cookies[session_key] = token
