@@ -5,9 +5,9 @@ from eduid_signup.utils import normalize_email
 
 
 # http://www.regular-expressions.info/email.html
-RFC2822_email = re.compile("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
+RFC2822_email = re.compile("^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
                            "?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\."
-                           ")+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                           ")+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 
 
 class ValidationError(Exception):

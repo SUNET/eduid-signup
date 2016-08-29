@@ -10,3 +10,4 @@ a@com
 com
 userlocalhost
 user@localhost
+user@example.com'
