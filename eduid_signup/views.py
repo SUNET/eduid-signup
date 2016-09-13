@@ -411,11 +411,11 @@ def _verify_code(request, code):
             'email_already_verified': True,
             "reset_password_link": request.registry.settings.get("reset_password_link", "#"),
         }
+        # This can happen if the user tries to click on the link more than once
     except CodeDoesNotExists:
         return {
             "code_does_not_exists": True,
-            "code_form": request.route_path('verification_code_form'),
-            "signup_link": request.route_path('home'),
+            "dashboard_link": request.registry.settings.get("dashboard_link", "#"),
         }
 
     return registered_completed(request, signup_user, {'from_email': True})

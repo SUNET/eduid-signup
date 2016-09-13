@@ -22,7 +22,8 @@ def send_verification_mail(request, email):
         "verification_link": verification_link,
         "site_url": request.route_url("home"),
         "site_name": request.registry.settings.get("site.name", "eduid_signup"),
-        "code": code,
+        # We stopped sending the code to avoid confusing our users
+        #"code": code,
         "verification_code_form_link": request.route_url("verification_code_form"),
     }
 

@@ -6,7 +6,7 @@
   <div class="jumbotron eduid-account-created">
     <h1>{{ _("Welcome to eduID!") }}</h1>
     <p class="lead">{{ _("Email address has already been verified") }}</p>
-    <p class="lead">{{ _("Maybe you want to reset your password again?") }}</p>
+    <p class="lead">{{ _("Maybe you want to reset your password?") }}</p>
   </div>
   <div class="row">
       <div class="col-md-12">
@@ -19,25 +19,15 @@
 {% elif code_does_not_exists is defined %}
   <div class="jumbotron eduid-account-created">
     <h1>{{ _("Welcome to eduID!") }}</h1>
-    <p class="lead">{{ _("There was a problem with the provided code") }}</p>
-    <p class="lead">{{ _("Go to the code verification page to manually enter the code or try to register again") }}</p>
-  </div>
-  <div class="row">
-    <div class="col-md-3 col-md-offset-3">
-      <p class="text-center">
-          <a class="btn btn-success btn-lg profile-link"
-             href="{{ signup_link }}">
-              {{ _("Register again") }}</a>
-      </p>
+    <p class="lead">{{ _("You have probably already signed up") }}</p>
+    <div class="row">
+        <div class='col-md-10 col-md-push-1 text-center'>
+            <p class="text-center">
+                <a class="btn btn-success btn-lg profile-link" href="{{ dashboard_link }}">
+                    {{ _("Login or reset password") }}</a>
+            </p>
+        </div>
     </div>
-    <div class="col-md-3">
-      <p class="text-center">
-          <a class="btn btn-success btn-lg profile-link"
-             href="{{ code_form }}">
-              {{ _("Code verification page") }}</a>
-      </p>
-    </div>
-    <div class="col-md-3"></div>
   </div>
 {% else %}
   <div class="jumbotron eduid-account-created">
