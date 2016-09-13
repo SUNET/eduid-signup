@@ -430,20 +430,15 @@ class SignupEmailTests(SignupAppTest):
 
         self._create_account(captcha_post)
 
-        # Visit the confirmation LINK to confirm the e-mail address
+        # Visit the confirmation LINK to try to confirm the e-mail address
+        # using the wrong code in the URL. Note that it's unlikely that the
+        # user provided the wrong code by simply clicking on the LINK
+        # the first time and more likely that the user sent the "wrong"-code
+        # by clicking on the LINK a second time.
         verify_link = "/email_verification/{code!s}/".format(code = 'not-the-right-code-in-link')
         res4 = self.testapp.get(verify_link)
         self.assertEqual(res4.status, '200 OK')
-        res4.mustcontain('/verification_code_form/')
-
-        res5 = self.testapp.get('/verification_code_form/')
-        self.assertEqual(res5.status, '200 OK')
-        res5.mustcontain('verification-code-input')
-
-        res5.forms[0]['code'] = 'not-the-right-code-in-form'
-        res6 = res5.forms[0].submit('foo')
-        self.assertEqual(res6.status, '200 OK')
-        logger.debug("BODY:\n{!s}".format(res6.body))
+        res4.mustcontain('You have probably already signed up')
 
     def test_signup_confirm_using_form(self):
         captcha_post = self._start_and_solve_captcha('foo@example.com')
@@ -595,7 +590,7 @@ class MockCapchaTests(FunctionalTests):
         url = 'http://localhost/email_verification/%s/' % 'xxx'
         res = self.testapp.get(url)
         self.assertEqual(res.status, '200 OK')
-        self.assertIn('There was a problem with the provided code', res.body)
+        self.assertIn('You have probably already signed up', res.body)
 
     def test_no_email(self):
         res = self.testapp.post('/', {})
