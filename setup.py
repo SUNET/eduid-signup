@@ -32,7 +32,7 @@ requires = [
     'pyramid_debugtoolbar == 2.3',
     'pyramid_jinja2 == 2.3.3',
     'pyramid_mailer == 0.14',
-    'pyramid_tm == 0.11',
+    'pyramid_tm == 1.1.1',
     'pyramid_sna == 0.3.2',
     'waitress == 0.8.9',
     'recaptcha-client == 1.0.6',
