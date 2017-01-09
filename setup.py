@@ -31,6 +31,7 @@ requires = [
     'pyramid == 1.5.4',
     'pyramid_debugtoolbar == 2.3',
     'pyramid_jinja2 == 2.3.3',
+    'jinja2<2.9',  # Templates breaks with jinja2 2.9
     'pyramid_mailer == 0.14',
     'pyramid_tm == 1.1.1',
     'pyramid_sna == 0.3.2',
