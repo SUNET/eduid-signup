@@ -6,7 +6,7 @@ from pyramid_mailer.message import Message
 from eduid_signup.utils import generate_verification_link, generate_eppn
 
 from eduid_userdb.signup import SignupUser
-import eduid_userdb
+from eduid_userdb.proofing import EmailProofingElement
 
 import logging
 logger = logging.getLogger(__name__)
@@ -45,12 +45,8 @@ def send_verification_mail(request, email):
 
     signup_user = request.signup_db.get_user_by_pending_mail_address(email)
     if not signup_user:
-        mailaddress = eduid_userdb.mail.MailAddress(email = email,
-                                                    application = 'signup',
-                                                    verified = False,
-                                                    primary = True,
-                                                    verification_code = code,
-                                                    )
+        mailaddress = EmailProofingElement(email = email, application = 'signup', verified = False,
+                                           verification_code = code)
         signup_user = SignupUser(eppn = generate_eppn(request))
         signup_user.pending_mail_address = mailaddress
         request.signup_db.save(signup_user)

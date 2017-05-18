@@ -20,13 +20,13 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-version = '0.4.6b5'
+version = '0.4.6b6'
 
 requires = [
     'eduid_am >= 0.6.0, < 0.7.0',
     'vccs_client >= 0.4.1, < 0.5.0',
     'wsgi_ratelimit >= 0.1',
-    'eduid_userdb >= 0.2.1b0',
+    'eduid_userdb >= 0.2.6b4',
     'eduid_common[webapp]>=0.1.3b5',
     'pyramid == 1.5.4',
     'pyramid_debugtoolbar == 2.3',
