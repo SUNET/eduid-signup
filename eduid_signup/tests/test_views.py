@@ -578,7 +578,6 @@ class MockCapchaTests(FunctionalTests):
         self.assertEqual(res.status, '200 OK')
         self.assertIn('Email address has already been verified', res.body)
 
-
     def test_email_verification_code_form_invalid_code(self):
         res = self.testapp.get('http://localhost/verification_code_form/')
         res.forms[0]['code'] = 'xxx'
@@ -623,9 +622,11 @@ class MockCapchaTests(FunctionalTests):
 
     def test_celery_error(self):
         from eduid_am.tasks import update_attributes_keep_result
+
         class MockAttrManager:
             def get(*args, **kwargs):
                 raise Exception('ho')
+
         mock_config = {
             'return_value': MockAttrManager(),
         }
@@ -648,6 +649,7 @@ class MockCapchaTests(FunctionalTests):
     def test_captcha_url_error(self):
         from eduid_signup.views import captcha
         from urllib2 import URLError
+
         def side_effect(*args, **kwargs):
             raise URLError('ho')
         mock_config = {
@@ -668,6 +670,7 @@ class MockInvalidCaptchaTest(FunctionalTests):
     def test_captcha_invalid_error(self):
         self.testapp.app.registry.settings['recaptcha_public_key'] = 'key'
         from eduid_signup.views import captcha
+
         class MockCaptcha:
             is_valid = False
             error_code = 'invalid'

@@ -4,7 +4,7 @@ from hashlib import sha256
 import datetime
 from eduid_signup.compat import text_type
 from eduid_userdb.tou import ToUEvent
-from eduid_userdb.exceptions import UserDoesNotExist
+from eduid_userdb import MailAddress
 
 import os
 import struct
@@ -49,10 +49,10 @@ def verify_email_code(signup_db, code):
         logger.debug("Code {!r} not found in database".format(code))
         raise CodeDoesNotExists()
 
-    mail = signup_user.pending_mail_address
+    mail = MailAddress(data=signup_user.pending_mail_address.to_dict(), raise_on_unknown=False)
     if mail.is_verified:
-        # There really should be no way to get here. is_verified is set when
-        # the MailAddress is moved from pending_mail_address to mail_addresses.
+        # There really should be no way to get here, is_verified is set to False when
+        # the EmailProofingElement is created.
         logger.debug("Code {!r} already verified ({!s})".format(code, mail))
         raise AlreadyVerifiedException()
 

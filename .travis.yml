@@ -1,6 +1,18 @@
+sudo: required
 language: python
 python:
   - "2.7"
-  - "3.3"
-install: python setup.py develop
-script: python setup.py test
+#  - "3.3"
+# Have Travis CI start mongodb and redis for us
+services:
+  - docker
+before_install:
+  - docker pull docker.sunet.se/eduid/redis:latest
+  - docker pull docker.sunet.se/eduid/mongodb:latest
+install:
+  - pip install -U setuptools
+  - python setup.py develop
+  - python setup.py testing
+# command to run tests
+script:
+  - nosetests
