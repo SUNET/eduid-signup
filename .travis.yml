@@ -12,7 +12,7 @@ before_install:
 install:
   - pip install -U setuptools
   - python setup.py develop
-  - pip install nosexcover WebTest==1.4.3
+  - python setup.py testing
 # command to run tests
 script:
   - nosetests
