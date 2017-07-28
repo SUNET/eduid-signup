@@ -1,0 +1,18 @@
+eduid_am>=0.6.0,<0.7.0
+vccs_client>=0.4.1,<0.5.0
+wsgi_ratelimit>=0.1
+eduid_userdb >= 0.2.6b4
+eduid_common[webapp]>=0.1.3b5
+pyramid == 1.5.4
+pyramid_debugtoolbar == 2.3
+pyramid_jinja2 == 2.3.3
+# Templates breaks with jinja2 2.9
+jinja2<2.9
+pyramid_mailer == 0.14
+pyramid_tm == 1.1.1
+pyramid_sna == 0.3.2
+waitress == 0.8.9
+recaptcha-client == 1.0.6
+pwgen == 0.4
+proquint == 0.1.0
+gunicorn == 19.3.0
