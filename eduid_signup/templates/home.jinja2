@@ -42,24 +42,24 @@
   </div>
   <div class="row text-center">
     <div id="social-register" class="col-md-8">
-      {% if request.registry.settings.get('facebook_auth_enabled', False) %}
-        <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">
-          <span class="btn-icon"></span>
-          <span class="btn-text">{{ _("Sign up with Facebook") }}</span>
-        </a>
-      {% endif %}
-      {% if request.registry.settings.get('google_auth_enabled', False) %}
-        <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">
-          <span class="btn-icon"></span>
-          <span class="btn-text">{{ _("Sign up with Google") }}</span>
-        </a>
-      {% endif %}
-      {% if request.registry.settings.get('liveconnect_auth_enabled', False) %}
-        <a class="btn-social btn-liveconnect" href="{{ request.route_path('liveconnect_login') }}">
-          <span class="btn-icon"></span>
-          <span class="btn-text">{{ _("Sign up with Live Connect") }}</span>
-        </a>
-      {% endif %}
+{#      {% if request.registry.settings.get('facebook_auth_enabled', False) %}#}
+{#        <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">#}
+{#          <span class="btn-icon"></span>#}
+{#          <span class="btn-text">{{ _("Sign up with Facebook") }}</span>#}
+{#        </a>#}
+{#      {% endif %}#}
+{#      {% if request.registry.settings.get('google_auth_enabled', False) %}#}
+{#        <a class="btn-social btn-google" href="{{ request.route_path('google_login') }}">#}
+{#          <span class="btn-icon"></span>#}
+{#          <span class="btn-text">{{ _("Sign up with Google") }}</span>#}
+{#        </a>#}
+{#      {% endif %}#}
+{#      {% if request.registry.settings.get('liveconnect_auth_enabled', False) %}#}
+{#        <a class="btn-social btn-liveconnect" href="{{ request.route_path('liveconnect_login') }}">#}
+{#          <span class="btn-icon"></span>#}
+{#          <span class="btn-text">{{ _("Sign up with Live Connect") }}</span>#}
+{#        </a>#}
+{#      {% endif %}#}
     </div>
   </div>
 </div>
