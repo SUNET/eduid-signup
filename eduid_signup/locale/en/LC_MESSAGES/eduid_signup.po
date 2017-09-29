@@ -1,17 +1,20 @@
-# Spanish translations for eduid_signup.
-# Copyright (C) 2013 ORGANIZATION
+# English translations for eduid_signup.
+# Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the eduid_signup
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
+# Translators:
+# Alvin Toh <mralvintoh@gmail.com>, 2015
+# Gijutsu <ascii@binary.to>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid_signup 0.1dev\n"
-"Report-Msgid-Bugs-To: lgs@yaco.es\n"
+"Project-Id-Version:  eduid-signup\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-09-27 15:48+0200\n"
-"PO-Revision-Date: 2013-04-30 18:47+0200\n"
-"Last-Translator: Lorenzo Gil <lgs@yaco.es>\n"
-"Language-Team: es <ES@li.org>\n"
+"PO-Revision-Date: 2017-09-27 13:52+0000\n"
+"Last-Translator: Gijutsu <ascii@binary.to>\n"
+"Language-Team: English (United States) (http://www.transifex.com/sunet"
+"/eduid-signup/language/en_US/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -20,25 +23,27 @@ msgstr ""
 
 #: eduid_signup/emails.py:31
 msgid "eduid-signup verification email"
-msgstr ""
+msgstr "eduID Registration"
 
 #: eduid_signup/emails.py:78
 msgid "eduid-signup credentials"
-msgstr ""
+msgstr "eduID Credentials"
 
 #: eduid_signup/validators.py:29
 msgid "Email is required"
-msgstr "Email es requerido"
+msgstr "Email address required"
 
 #: eduid_signup/validators.py:33
 msgid "Email is not valid"
-msgstr "Email no válido"
+msgstr "Email address invalid"
 
 #: eduid_signup/views.py:333
 msgid ""
 "Sorry, but the requested page is unavailable due to a server hiccup. Our "
 "engineers have been notified, so check back later. "
 msgstr ""
+"Sorry, the requested page is unavailable due to a server error. Our "
+"engineers have been notified, please try again later."
 
 #: eduid_signup/templates/account_created.jinja2:7
 #: eduid_signup/templates/account_created.jinja2:21
@@ -49,30 +54,29 @@ msgstr ""
 #: eduid_signup/templates/success.jinja2:5
 #: eduid_signup/templates/verification_code_form.jinja2:6
 msgid "Welcome to eduID!"
-msgstr "¡Bienvenido a eduID!"
+msgstr "Welcome to eduID!"
 
 #: eduid_signup/templates/account_created.jinja2:8
 #: eduid_signup/templates/verification_code_form.jinja2:9
-#, fuzzy
 msgid "Email address has already been verified"
-msgstr "Tu email acaba de ser verificado"
+msgstr "Email address has already been verified"
 
 #: eduid_signup/templates/account_created.jinja2:9
 msgid "Maybe you want to reset your password?"
-msgstr ""
+msgstr "Maybe you want to reset your password?"
 
 #: eduid_signup/templates/account_created.jinja2:15
 #: eduid_signup/templates/verification_code_form.jinja2:15
 msgid "Reset password"
-msgstr ""
+msgstr "Reset password"
 
 #: eduid_signup/templates/account_created.jinja2:22
 msgid "You have probably already signed up"
-msgstr ""
+msgstr "You have probably already signed up"
 
 #: eduid_signup/templates/account_created.jinja2:27
 msgid "Login or reset password"
-msgstr ""
+msgstr "Login or reset password"
 
 #: eduid_signup/templates/account_created.jinja2:37
 #, python-format
@@ -81,49 +85,51 @@ msgid ""
 "          Registration of %(email)s completed\n"
 "        "
 msgstr ""
+"\n"
+"Registration of %(email)s completed"
 
 #: eduid_signup/templates/already_registered.jinja2:7
 #: eduid_signup/templates/already_registered.jinja2:11
 #: eduid_signup/templates/resend_email_verification.jinja2:6
 #: eduid_signup/templates/review_fetched_info.jinja2:50
 msgid "Email address already in use"
-msgstr ""
+msgstr "Email address already in use"
 
 #: eduid_signup/templates/already_registered.jinja2:12
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Forgot your password?"
 
 #: eduid_signup/templates/already_registered.jinja2:14
 msgid "Reset your password"
-msgstr ""
+msgstr "Reset your password"
 
 #: eduid_signup/templates/base.jinja2:6 eduid_signup/templates/base.jinja2:63
 msgid "Sign up"
-msgstr ""
+msgstr "Sign up"
 
 #: eduid_signup/templates/base.jinja2:48
 msgid "Student"
-msgstr ""
+msgstr "Student"
 
 #: eduid_signup/templates/base.jinja2:51
 msgid "Technician"
-msgstr ""
+msgstr "Technician"
 
 #: eduid_signup/templates/base.jinja2:54
 msgid "Staff"
-msgstr ""
+msgstr "Staff"
 
 #: eduid_signup/templates/base.jinja2:57
 msgid "FAQ"
-msgstr ""
+msgstr "FAQ"
 
 #: eduid_signup/templates/base.jinja2:67
 msgid "Sign in"
-msgstr ""
+msgstr "Sign in"
 
 #: eduid_signup/templates/base.jinja2:75
 msgid "This Site depends on Javascript, so please enable it."
-msgstr ""
+msgstr "This site requires JavaScript to be enabled."
 
 #: eduid_signup/templates/credentials_email.html.jinja2:1
 #, python-format
@@ -143,6 +149,19 @@ msgid ""
 "<p>%(password)s</p>\n"
 "\n"
 msgstr ""
+"\n"
+"<h2>Welcome to %(site_name)s,</h2>\n"
+"\n"
+"<p>Here are your initial credentials for <a "
+"href=\"%(site_url)s\">%(site_name)s</a> for future reference.</p>\n"
+"\n"
+"<p>Your email :</p>\n"
+"\n"
+"<p>%(email)s</p>\n"
+"\n"
+"<p>Your password :</p>\n"
+"\n"
+"<p>%(password)s</p>\n"
 
 #: eduid_signup/templates/credentials_email.txt.jinja2:1
 #, python-format
@@ -162,10 +181,23 @@ msgid ""
 "and ignore this email.\n"
 "\n"
 msgstr ""
+"\n"
+"Welcome to %(site_name)s,\n"
+"\n"
+"Here are your initial credentials\n"
+"for %(site_name)s for future reference.\n"
+"\n"
+"Your email: %(email)s\n"
+"\n"
+"Your password: %(password)s\n"
+"\n"
+"If you did not perform this registration, then please accept our "
+"apologies\n"
+"and ignore this email.\n"
 
 #: eduid_signup/templates/error404.jinja2:9
 msgid "The requested page doesn't exist."
-msgstr ""
+msgstr "The requested page does not exist."
 
 #: eduid_signup/templates/error404.jinja2:11
 msgid ""
@@ -173,10 +205,13 @@ msgid ""
 "  <p>Sorry, but the requested page doesn't exists.</p>\n"
 "  <p>Error code 404</p>\n"
 msgstr ""
+"\n"
+"  <p>The requested page does not exist.</p>\n"
+"  <p>Error code 404</p>\n"
 
 #: eduid_signup/templates/error500.jinja2:9
 msgid "An error happened."
-msgstr ""
+msgstr "An error has occured."
 
 #: eduid_signup/templates/error500.jinja2:11
 msgid ""
@@ -186,37 +221,39 @@ msgid ""
 "    <p>Our engineers have been notified, so check back later.</p>\n"
 "    <p>Error code 500</p>\n"
 msgstr ""
+"\n"
+"    <p>The requested page is unavailable due to a server error.</p>\n"
+"    <p> Our engineers have been notified, please check back later.</p>\n"
+"    <p>Error code 500</p>\n"
 
 #: eduid_signup/templates/home.jinja2:10
-#, fuzzy
 msgid "Create an account for use with Swedish Universities."
-msgstr "Crea una cuenta que te dará acceso a todas las universidades Suecas."
+msgstr "Create an account for use with Swedish universities."
 
 #: eduid_signup/templates/home.jinja2:20 eduid_signup/templates/home.jinja2:37
-#, fuzzy
 msgid "Sign up with your email address"
-msgstr "Regístrate con tu email"
+msgstr "Sign up with your email address"
 
 #: eduid_signup/templates/home.jinja2:73
 msgid "Reject"
-msgstr ""
+msgstr "Reject"
 
 #: eduid_signup/templates/home.jinja2:76
 #: eduid_signup/templates/review_fetched_info.jinja2:98
 msgid "Accept"
-msgstr ""
+msgstr "Accept"
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:3
 msgid "Write this password down and store it in a safe place."
-msgstr ""
+msgstr "Write down this password and store it in a safe place."
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:7
 msgid "OK, got it"
-msgstr ""
+msgstr "OK, got it"
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:15
 msgid "You can now log in"
-msgstr ""
+msgstr "You can now log in"
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:17
 msgid ""
@@ -225,36 +262,42 @@ msgid ""
 "<strong>unconfirmed identities</strong>.\n"
 "            "
 msgstr ""
+"\n"
+"              Your account is now ready for use with sites that accept "
+"<strong>unconfirmed identities</strong>.\n"
+"            "
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:22
 msgid "Finish"
-msgstr ""
+msgstr "Finish"
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:29
 msgid "Access more"
-msgstr ""
+msgstr "Access more"
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:31
 msgid ""
 "To get access to additional sites that require a confirmed identity, "
 "proceed to the dashboard."
 msgstr ""
+"To get access to additional sites that require a confirmed identity, "
+"proceed to the dashboard."
 
 #: eduid_signup/templates/inc.registration_completed.jinja2:39
 msgid "Confirm identity"
-msgstr ""
+msgstr "Confirm identity"
 
 #: eduid_signup/templates/resend_email_verification.jinja2:7
 msgid "Send a new verification e-mail to this address"
-msgstr ""
+msgstr "Send a new verification email to this address"
 
 #: eduid_signup/templates/resend_email_verification.jinja2:13
 msgid "Resend verification e-mail"
-msgstr ""
+msgstr "Resend verification email"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:6
 msgid "Please review the data received from the social network"
-msgstr ""
+msgstr "Please review the data received from the social network"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:13
 msgid ""
@@ -266,6 +309,13 @@ msgid ""
 "            another option for signing up with eduID.\n"
 "          "
 msgstr ""
+" No account has been created in eduID yet. If the data below is\n"
+"            correct, click the <strong>Accept</strong> button. Otherwise "
+"click the\n"
+"            <strong>Cancel</strong> button to get back to the sign-up "
+"page, and choose\n"
+"            another option for signing up with eduID.\n"
+"          "
 
 #: eduid_signup/templates/review_fetched_info.jinja2:20
 msgid ""
@@ -278,6 +328,14 @@ msgid ""
 "signing up with eduID.\n"
 "          "
 msgstr ""
+"\n"
+"          <strong>The social network did not provide eduID with an e-mail"
+" address.</strong>\n"
+"            You should click on <strong>Cancel</strong> to discard the "
+"data and\n"
+"            return to the sign-up page to choose another option for "
+"signing up with eduID.\n"
+"          "
 
 #: eduid_signup/templates/review_fetched_info.jinja2:27
 #, python-format
@@ -289,45 +347,55 @@ msgid ""
 "href='%(reset_password_link)s'>here</a>.\n"
 "           "
 msgstr ""
+"\n"
+"          <strong>The email address provided by your social network is "
+"already in use.</strong>\n"
+"            You can reset your password clicking <a "
+"href='%(reset_password_link)s'>here</a>.\n"
+"           "
 
 #: eduid_signup/templates/review_fetched_info.jinja2:34
 msgid ""
 "The data received from the social network cannot be edited here.\n"
 "            Click <strong>Cancel</strong> if it is not correct."
 msgstr ""
+"The data received from the social network cannot be edited here.\n"
+"            Click <strong>Cancel</strong> if it is not correct."
 
 #: eduid_signup/templates/review_fetched_info.jinja2:47
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:52
 msgid "Email address is required, but none was received from social network"
 msgstr ""
+"An email address is required, but none was received from the social "
+"network"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:58
 msgid "Display name"
-msgstr ""
+msgstr "Display name"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:66
 msgid "First name"
-msgstr ""
+msgstr "First name"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:72
 msgid "Last name"
-msgstr ""
+msgstr "Last name"
 
 #: eduid_signup/templates/review_fetched_info.jinja2:86
 #: eduid_signup/templates/trycaptcha.jinja2:38
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel"
 
 #: eduid_signup/templates/success.jinja2:6
 msgid "Account created successfully"
-msgstr ""
+msgstr "Account created successfully"
 
 #: eduid_signup/templates/success.jinja2:11
 msgid "Confirm registration"
-msgstr ""
+msgstr "Confirm registration"
 
 #: eduid_signup/templates/success.jinja2:13
 #, python-format
@@ -337,49 +405,53 @@ msgid ""
 "<strong>%(email)s</strong>.\n"
 "          "
 msgstr ""
+"\n"
+"          An email with instructions on how to proceed has been sent to "
+"<strong>%(email)s</strong>.\n"
+"          "
 
 #: eduid_signup/templates/trycaptcha.jinja2:9
 msgid "Oops!"
-msgstr ""
+msgstr "Oops!"
 
 #: eduid_signup/templates/trycaptcha.jinja2:10
 msgid "Please try again"
-msgstr ""
+msgstr "Please try again"
 
 #: eduid_signup/templates/trycaptcha.jinja2:12
 msgid "Only one more step!"
-msgstr ""
+msgstr "Only one more step left!"
 
 #: eduid_signup/templates/trycaptcha.jinja2:13
 msgid "eduID must verify that you are a human and not a machine."
-msgstr ""
+msgstr "eduID needs to verify that you are a human and not a machine."
 
 #: eduid_signup/templates/trycaptcha.jinja2:35
 msgid "Submit"
-msgstr ""
+msgstr "Submit"
 
 #: eduid_signup/templates/verification_code_form.jinja2:10
 msgid "Maybe you want to reset your password again?"
-msgstr ""
+msgstr "Would you like to reset your password again?"
 
 #: eduid_signup/templates/verification_code_form.jinja2:23
 msgid "Please enter the confirmation code below"
-msgstr ""
+msgstr "Please enter the confirmation code below"
 
 #: eduid_signup/templates/verification_code_form.jinja2:31
 #: eduid_signup/templates/verification_code_form.jinja2:49
 msgid "Confirmation code"
-msgstr ""
+msgstr "Confirmation code"
 
 #: eduid_signup/templates/verification_code_form.jinja2:36
 #: eduid_signup/templates/verification_code_form.jinja2:53
 msgid "Verify account"
-msgstr ""
+msgstr "Verify account"
 
 #: eduid_signup/templates/verification_code_form.jinja2:40
 #: eduid_signup/templates/verification_code_form.jinja2:51
 msgid "The provided code could not be found"
-msgstr ""
+msgstr "The provided code could not be found"
 
 #: eduid_signup/templates/verification_email.html.jinja2:1
 #, python-format
@@ -396,6 +468,17 @@ msgid ""
 "<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
 "\n"
 msgstr ""
+"\n"
+"<h2>Welcome to %(site_name)s,</h2>\n"
+"\n"
+"<p>You recently signed up for <a "
+"href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+"\n"
+"<p>Please confirm the e-mail address and get your password by clicking on"
+" this link:</p>\n"
+"\n"
+"<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
+"\n"
 
 #: eduid_signup/templates/verification_email.txt.jinja2:1
 #, python-format
@@ -411,159 +494,14 @@ msgid ""
 "  %(verification_link)s\n"
 "\n"
 msgstr ""
-
-#~ msgid "This email is already registered"
-#~ msgstr "Este email ya estaba registrado"
-
-#~ msgid "eduID Sign Up"
-#~ msgstr "Altas de eduID"
-
-#~ msgid "About"
-#~ msgstr "Acerca de"
-
-#~ msgid "Contact"
-#~ msgstr "Contacto"
-
-#~ msgid "Now, you can complete your profile clicking in the follow button"
-#~ msgstr "Ahora puedes completar tu perfil pulsando en el siguiente botón"
-
-#~ msgid "Fill your profile"
-#~ msgstr "Completa tu perfil"
-
-#~ msgid "Now, you can complete your profile clicking in the next button"
-#~ msgstr "Ahora puedes completar tu perfil pulsando en el siguiente botón"
-
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Master Password (PUK code)"
-#~ msgstr ""
-
-#~ msgid "Complete account profile"
-#~ msgstr "Completa tu perfil"
-
-#~ msgid "Remember to confirm email address"
-#~ msgstr "Recuerda! Debes confirmar tu correo"
-
-#~ msgid "Check your "
-#~ msgstr ""
-
-#~ msgid "Click this button to finish the signup process"
-#~ msgstr ""
-
-#~ msgid "Go to dashboard"
-#~ msgstr ""
-
-#~ msgid "Email successfully verified"
-#~ msgstr "Acabas de registrarte correctamente"
-
-#~ msgid "Do you have a verification code?"
-#~ msgstr ""
-
-#~ msgid "An email with instructions on how to proceed was sent to {email}."
-#~ msgstr ""
-
-#~ msgid "The provided code does not exist or your link is broken"
-#~ msgstr ""
-
-#~ msgid "Return to the register form"
-#~ msgstr ""
-
-#~ msgid "Go to verification code form"
-#~ msgstr ""
-
-#~ msgid "Home"
-#~ msgstr "Inicio"
-
-#~ msgid "Help"
-#~ msgstr ""
-
-#~ msgid "The requested page doesn't exists."
-#~ msgstr ""
-
-#~ msgid "Sign up with Microsoft Live Connect"
-#~ msgstr ""
-
-#~ msgid "Send a new verification link to this address"
-#~ msgstr ""
-
-#~ msgid "Resend verification link"
-#~ msgstr ""
-
-#~ msgid "Put here the verification code sent to you by e-mail"
-#~ msgstr ""
-
-#~ msgid "Paste here your code"
-#~ msgstr ""
-
-#~ msgid "The provided code does not exist"
-#~ msgstr ""
-
-#~ msgid "There was a problem with the provided code"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Go to the code verification page "
-#~ "to manually enter the code or try"
-#~ " to register again"
-#~ msgstr ""
-
-#~ msgid "Register again"
-#~ msgstr ""
-
-#~ msgid "Code verification page"
-#~ msgstr ""
-
-#~ msgid "Personal"
-#~ msgstr ""
-
-#~ msgid "Sign up with Facebook"
-#~ msgstr "Regístrate con Facebook"
-
-#~ msgid "Sign up with Google"
-#~ msgstr "Regístrate con Google"
-
-# | msgid "Sign up with Google"
-#~ msgid "Sign up with Live Connect"
-#~ msgstr "Regístrate con Google"
-
-#~ msgid ""
-#~ "\n"
-#~ "<h2>Welcome to %(site_name)s,</h2>\n"
-#~ "\n"
-#~ "<p>You recently signed up for <a "
-#~ "href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
-#~ "\n"
-#~ "<p>Please confirm the e-mail address and"
-#~ " get your password by clicking on "
-#~ "this link :</p>\n"
-#~ "\n"
-#~ "<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
-#~ "\n"
-#~ "<p>If clicking on the link above "
-#~ "does not work, please copy and "
-#~ "paste the link into a web browser"
-#~ " window.</p>\n"
-#~ "\n"
-#~ "<p>Confirmation code : %(code)s</p>\n"
-#~ "\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Welcome to %(site_name)s,\n"
-#~ "\n"
-#~ "You recently signed up for %(site_name)s.\n"
-#~ "\n"
-#~ "Please confirm the e-mail address and get your password by clicking\n"
-#~ "on this link :\n"
-#~ "\n"
-#~ "  %(verification_link)s\n"
-#~ "\n"
-#~ "If clicking on the link above does not work, please copy and paste\n"
-#~ "the link into a web browser window.\n"
-#~ "\n"
-#~ "Confirmation code : %(code)s\n"
-#~ "\n"
-#~ msgstr ""
+"\n"
+"Welcome to %(site_name)s,\n"
+"\n"
+"You recently signed up for %(site_name)s.\n"
+"\n"
+"Please confirm the e-mail address and get your password by clicking on "
+"this link:\n"
+"\n"
+"  %(verification_link)s\n"
+"\n"
 
