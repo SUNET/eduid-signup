@@ -454,9 +454,6 @@ def help(request):
     # as well as this template
 
     locale_name = get_locale_name(request)
-
-    logger.debug("help(request), locale_name: {}".format(locale_name))
-
     template = 'templates/help-%s.jinja2' % locale_name
 
     return render_to_response(template, {}, request=request)
@@ -504,23 +501,15 @@ def set_language(request):
     allowed_url = re.compile('^(http|https)://' + signup_hostname + '[:]{0,1}\d{0,5}($|/)')
     allowed_host = re.compile('^' + signup_hostname + '[:]{0,1}\d{0,5}$')
 
-    logger.debug("allowed_url: {}".format(allowed_url))
-    logger.debug("allowed_host: {}".format(allowed_host))
-
     if url is None or not allowed_url.match(url):
         url = signup_baseurl
-        logger.debug('url is None or not allowed_url.match(url)')
     elif host is None or not allowed_host.match(host):
         url = signup_baseurl
-        logger.debug('host is None or not allowed_host.match(host)')
 
     response = HTTPFound(location=url)
 
     cookie_domain = settings.get('lang_cookie_domain', None)
     cookie_name = settings.get('lang_cookie_name')
-
-    logger.debug("cookie_domain: {}".format(cookie_domain))
-    logger.debug("cookie_name: {}".format(cookie_name))
 
     extra_options = {}
     if cookie_domain is not None:
@@ -528,9 +517,6 @@ def set_language(request):
 
     extra_options['httponly'] = asbool(settings.get('session.httponly'))
     extra_options['secure'] = asbool(settings.get('session.secure'))
-
-    logger.debug("extra_options['httponly']: {}".format(extra_options['httponly']))
-    logger.debug("extra_options['secure']: {}".format(extra_options['secure']))
 
     response.set_cookie(cookie_name, value=lang, **extra_options)
 
