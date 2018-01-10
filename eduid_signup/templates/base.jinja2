@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="icon" href="{{'eduid_signup:static/css/favicon.ico'|static_url}}" type="image/x-icon" />
-    <link href="{{'eduid_signup:static/css/bootstrap-3.2.0.min.css'|static_url}}" rel="stylesheet" media="screen">
+    <link href="{{'eduid_signup:static/css/bootstrap-4.0.0-beta.3.min.css'|static_url}}" rel="stylesheet" media="screen">
     <link href="{{'eduid_signup:static/css/screen.css'|static_url}}" rel="stylesheet" media="screen">
     <link href="{{'eduid_signup:static/css/signup.css'|static_url}}" rel="stylesheet" />
     <link rel="apple-touch-icon" sizes="57x57" href="{{'eduid_signup:static/apple-touch-icon-57x57.png'|static_url}}">
@@ -32,32 +32,32 @@
   <body>
     <div class="container-fluid">
       <header id="header" class="header">
-        <div class="logo"></div>
-        <nav class="navbar navbar-default" id="eduid-navbar">
-          <div class="container-fluid">
-            <div class="navbar-header">
+        <div class="logo" id="eduid-logo-large"></div>
+        <nav class="navbar navbar-dark bg-dark navbar-expand-md" id="eduid-navbar">
               <a class="navbar-brand" href="#">
                 <div id="eduid-logo-small" class="logo"></div>
               </a>
-              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-menu" aria-expanded="false">
-              </span>
-            </div>
+              <button class="navbar-toggler" type="button"
+                  data-toggle="collapse" data-target="#eduid-menu"
+                  aria-controls="eduid-menu" aria-expanded="false">
+                  <span class="navbar-toggler-icon"></span>
+              </button>
           <div class="collapse navbar-collapse text-center" id="eduid-menu">
-            <ul  class="nav navbar-nav">
-              <li>
-                <a href="{{ request.registry.settings['student_link'] }}">{{ _("Student") }}</a>
+            <ul  class="navbar-nav mr-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ request.registry.settings['student_link'] }}">{{ _("Student") }}</a>
               </li>
-              <li>
-                <a href="{{ request.registry.settings['technicians_link'] }}">{{ _("Technician") }}</a>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ request.registry.settings['technicians_link'] }}">{{ _("Technician") }}</a>
               </li>
-              <li>
-                <a href="{{ request.registry.settings['staff_link'] }}">{{ _("Staff") }}</a>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ request.registry.settings['staff_link'] }}">{{ _("Staff") }}</a>
               </li>
-              <li>
-                <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>
               </li>
             </ul>
-            <div class="buttons nav navbar-nav navbar-right">
+            <div class="buttons nav navbar-nav float-right">
               <div class="button orange">
                       <!-- Link leads to signup page -->
                 <a href="{{ request.registry.settings['signup_baseurl'] }}">{{ _("Sign up") }}</a>
@@ -68,7 +68,6 @@
                 </div>
               </div>
             </div>
-          </div>
         </nav>
       </header>
 
@@ -91,8 +90,8 @@
      </div>
 
    </div>
-   <script src="{{'eduid_signup:static/js/libs/jquery-1.9.1.min.js'|static_url}}"></script>
-   <script src="{{'eduid_signup:static/js/libs/bootstrap-3.2.0.min.js'|static_url}}"></script>
+   <script src="{{'eduid_signup:static/js/libs/jquery-3.2.1.min.js'|static_url}}"></script>
+   <script src="{{'eduid_signup:static/js/libs/bootstrap-4.0.0-beta.3.min.js'|static_url}}"></script>
    <script src="{{'eduid_signup:static/js/signup-mobilemenu.js'|static_url}}"></script>
 
    <div class="clearfix"></div>
@@ -101,7 +100,7 @@
     <div class="container">
         <p>
             &copy; SUNET 2013-2017
-            <span class="pull-right">
+            <span class="float-right">
             {% for lang, label in request.registry.settings.get('available_languages', {}).items() %}
                 <span class="langselector">
                     {% if request.locale == lang %}
