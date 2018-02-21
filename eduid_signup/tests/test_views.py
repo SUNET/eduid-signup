@@ -468,8 +468,8 @@ class MockCapchaTests(FunctionalTests):
 
     def setUp(self):
         super(MockCapchaTests, self).setUp()
-
-        self.patcher_captcha = patch('eduid_signup.utils.verify_recaptcha')
+        self.testapp.app.registry.settings['recaptcha_public_key'] = 'key'
+        self.patcher_captcha = patch('eduid_signup.views.verify_recaptcha')
         self.captcha_mock = self.patcher_captcha.start()
         self.captcha_mock.return_value = True
 
@@ -642,6 +642,8 @@ class MockCapchaTests(FunctionalTests):
             self.assertEqual(registered.mail_addresses.primary.is_verified, True)
 
     def test_captcha_url_error(self):
+        self.patcher_captcha.stop()  # Stop verify_recaptcha mock to test requests exception
+
         mock_config = {
             'side_effect': requests.exceptions.RequestException('ho')
         }
@@ -653,6 +655,8 @@ class MockCapchaTests(FunctionalTests):
             res = self.testapp.get(res.location)
             self.assertEqual(self.signup_userdb.db_count(), 0)
             self.assertRaises(requests.exceptions.RequestException, res.form.submit)
+
+        self.patcher_captcha.start()  # Start verify_recaptcha mock so that tear_down can stop it without throwing error
 
 
 class MockInvalidCaptchaTest(FunctionalTests):

@@ -120,13 +120,17 @@ def trycaptcha(request):
         }
 
     if request.method == 'POST':
-        recaptcha_private_key = settings.get('recaptcha_private_key', '')
-        recaptcha_response = request.POST.get('g-recaptcha-response', '')
-        recaptcha_verified = verify_recaptcha(recaptcha_private_key, recaptcha_response, remote_ip)
+        if recaptcha_public_key:
+            recaptcha_private_key = settings.get('recaptcha_private_key', '')
+            recaptcha_response = request.POST.get('g-recaptcha-response', '')
+            recaptcha_verified = verify_recaptcha(recaptcha_private_key, recaptcha_response, remote_ip)
+        else:
+            # If recaptcha_public_key is not set recaptcha is disabled
+            recaptcha_verified = True
+            logger.warning('CAPTCHA disabled')
 
-        if recaptcha_verified or not recaptcha_public_key:
-            # If recaptcha_public_key is not set in development environment, just continue
-            logger.debug('Valid CAPTCHA response (or CAPTCHA disabled) from {!r}'.format(remote_ip))
+        if recaptcha_verified:
+            logger.info('Valid CAPTCHA response from {!r}'.format(remote_ip))
             email = request.session['email']
             return get_url_from_email_status(request, email)
         return {

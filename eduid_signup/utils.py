@@ -228,16 +228,16 @@ def verify_recaptcha(secret_key, captcha_response, user_ip, retries=3):
             verify_rs = requests.get(url, params=params, verify=True)
             logger.debug("CAPTCHA response: {}".format(verify_rs))
             verify_rs = verify_rs.json()
-            if verify_rs.get('success', False):
+            if verify_rs.get('success', False) is True:
                 return True
         except requests.exceptions.RequestException as e:
             if not retries:
-                logger.debug('Caught RequestException while sending CAPTCHA, giving up.')
+                logger.error('Caught RequestException while sending CAPTCHA, giving up.')
                 raise e
-            logger.debug('Caught RequestException while sending CAPTCHA, trying again.')
-            logger.debug(e)
+            logger.warning('Caught RequestException while sending CAPTCHA, trying again.')
+            logger.warning(e)
             time.sleep(0.5)
 
-    logger.debug("Invalid CAPTCHA response from {}: {}".format(user_ip,
-                                                               verify_rs.get('error-codes', 'Unspecified error')))
+    logger.info("Invalid CAPTCHA response from {}: {}".format(
+        user_ip, verify_rs.get('error-codes', 'Unspecified error')))
     return False
