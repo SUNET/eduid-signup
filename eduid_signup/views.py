@@ -1,6 +1,5 @@
 import os
 import time
-from recaptcha.client import captcha
 from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
@@ -22,7 +21,7 @@ from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.sna_callbacks import create_or_update_sna
 from eduid_signup.utils import (verify_email_code, check_email_status,
                                 generate_auth_token, AlreadyVerifiedException,
-                                CodeDoesNotExists, record_tou)
+                                CodeDoesNotExists, record_tou, verify_recaptcha)
 from eduid_signup.vccs import generate_password
 from eduid_userdb.signup import SignupUser
 from eduid_userdb.password import Password
@@ -105,56 +104,34 @@ def trycaptcha(request):
     """
     Kantara requires a check for humanness even at level AL1.
     """
-    from urllib2 import URLError
 
     if 'email' not in request.session:
-        home_url = request.route_url("home")
+        home_url = request.route_url('home')
         return HTTPFound(location=home_url)
 
     settings = request.registry.settings
 
-    remote_ip = request.environ.get("REMOTE_ADDR", '')
-    recaptcha_public_key = settings.get("recaptcha_public_key", '')
+    remote_ip = request.environ.get('REMOTE_ADDR', '')
+    recaptcha_public_key = settings.get('recaptcha_public_key', '')
     if request.method == 'GET':
-        logger.debug("Presenting CAPTCHA to {!s} (email {!s})".format(remote_ip, request.session['email']))
+        logger.debug('Presenting CAPTCHA to {!s} (email {!s})'.format(remote_ip, request.session['email']))
         return {
             'recaptcha_public_key': recaptcha_public_key
         }
 
     if request.method == 'POST':
-        challenge_field = request.POST.get('recaptcha_challenge_field', '')
-        response_field = request.POST.get('recaptcha_response_field', '')
+        recaptcha_private_key = settings.get('recaptcha_private_key', '')
+        recaptcha_response = request.POST.get('g-recaptcha-response', '')
+        recaptcha_verified = verify_recaptcha(recaptcha_private_key, recaptcha_response, remote_ip)
 
-        for i in range(0,3):
-            try:
-                response = captcha.submit(
-                    challenge_field,
-                    response_field,
-                    settings.get("recaptcha_private_key", ''),
-                    remote_ip,
-                    use_ssl=True
-                )
-                logger.debug("Sent the CAPTCHA with the user's response to google")
-                break
-            except URLError:
-                if i < 2:
-                    logger.debug("Caught URLError while sending recaptcha, trying again.")
-                    time.sleep(0.5)
-                else:
-                    logger.debug("Caught URLError while sending recaptcha, giving up.")
-                    raise
-
-        if response.is_valid or not recaptcha_public_key:
-            logger.debug("Valid CAPTCHA response (or CAPTCHA disabled) from {!r}".format(remote_ip))
-
-            # recaptcha_public_key not set in development environment, just accept
+        if recaptcha_verified or not recaptcha_public_key:
+            # If recaptcha_public_key is not set in development environment, just continue
+            logger.debug('Valid CAPTCHA response (or CAPTCHA disabled) from {!r}'.format(remote_ip))
             email = request.session['email']
             return get_url_from_email_status(request, email)
-
-        logger.debug("Invalid CAPTCHA response from {!r}: {!r}".format(remote_ip, response.error_code))
         return {
-            "error": True,
-            "recaptcha_public_key": recaptcha_public_key
+            'error': True,
+            'recaptcha_public_key': recaptcha_public_key
         }
 
     return HTTPMethodNotAllowed()

@@ -1,7 +1,7 @@
 import time
+import requests
 from mock import patch
 from pyramid_sna.compat import urlparse
-
 from eduid_signup.testing import FunctionalTests
 
 import pprint
@@ -469,14 +469,9 @@ class MockCapchaTests(FunctionalTests):
     def setUp(self):
         super(MockCapchaTests, self).setUp()
 
-        from eduid_signup.views import captcha
-        class MockCaptcha:
-            is_valid = True
-        mock_config = {
-            'return_value': MockCaptcha(),
-        }
-        self.patcher_captcha = patch.object(captcha, 'submit', **mock_config)
-        self.patcher_captcha.start()
+        self.patcher_captcha = patch('eduid_signup.utils.verify_recaptcha')
+        self.captcha_mock = self.patcher_captcha.start()
+        self.captcha_mock.return_value = True
 
         from eduid_signup.vccs import vccs_client
         class MockClient:
@@ -647,41 +642,39 @@ class MockCapchaTests(FunctionalTests):
             self.assertEqual(registered.mail_addresses.primary.is_verified, True)
 
     def test_captcha_url_error(self):
-        from eduid_signup.views import captcha
-        from urllib2 import URLError
-
-        def side_effect(*args, **kwargs):
-            raise URLError('ho')
         mock_config = {
-            'side_effect': side_effect,
+            'side_effect': requests.exceptions.RequestException('ho')
         }
-        with patch.object(captcha, 'submit', **mock_config):
+
+        with patch.object(requests, 'get', **mock_config):
             res = self.testapp.post('/', {'email': 'foo@example.com'})
             self.assertEqual(res.status, '302 Found')
             self.assertEqual(res.location, 'http://localhost/trycaptcha/')
             res = self.testapp.get(res.location)
             self.assertEqual(self.signup_userdb.db_count(), 0)
-            from urllib2 import URLError
-            self.assertRaises(URLError, res.form.submit)
+            self.assertRaises(requests.exceptions.RequestException, res.form.submit)
 
 
 class MockInvalidCaptchaTest(FunctionalTests):
 
+    def setUp(self):
+        super(MockInvalidCaptchaTest, self).setUp()
+
+        self.patcher_captcha = patch('eduid_signup.utils.verify_recaptcha')
+        self.captcha_mock = self.patcher_captcha.start()
+        self.captcha_mock.return_value = False
+
+    def tearDown(self):
+        super(MockInvalidCaptchaTest, self).tearDown()
+        self.patcher_captcha.stop()
+
     def test_captcha_invalid_error(self):
         self.testapp.app.registry.settings['recaptcha_public_key'] = 'key'
-        from eduid_signup.views import captcha
 
-        class MockCaptcha:
-            is_valid = False
-            error_code = 'invalid'
-        mock_config = {
-            'return_value': MockCaptcha(),
-        }
-        with patch.object(captcha, 'submit', **mock_config):
-            res = self.testapp.post('/', {'email': 'foo@example.com'})
-            self.assertEqual(res.status, '302 Found')
-            self.assertEqual(res.location, 'http://localhost/trycaptcha/')
-            res = self.testapp.get(res.location)
-            self.assertEqual(self.signup_userdb.db_count(), 0)
-            res = res.form.submit()
-            self.assertEqual(self.signup_userdb.db_count(), 0)
+        res = self.testapp.post('/', {'email': 'foo@example.com'})
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/trycaptcha/')
+        res = self.testapp.get(res.location)
+        self.assertEqual(self.signup_userdb.db_count(), 0)
+        res = res.form.submit()
+        self.assertEqual(self.signup_userdb.db_count(), 0)
