@@ -16,6 +16,7 @@ from wsgi_ratelimit import is_ratelimit_reached
 from eduid_am.tasks import update_attributes_keep_result
 
 from eduid_signup.i18n import TranslationString as _
+from eduid_signup.i18n import locale_negotiator
 from eduid_signup.emails import send_verification_mail, send_credentials
 from eduid_signup.validators import validate_email, ValidationError
 from eduid_signup.sna_callbacks import create_or_update_sna
@@ -116,7 +117,8 @@ def trycaptcha(request):
     if request.method == 'GET':
         logger.debug('Presenting CAPTCHA to {!s} (email {!s})'.format(remote_ip, request.session['email']))
         return {
-            'recaptcha_public_key': recaptcha_public_key
+            'recaptcha_public_key': recaptcha_public_key,
+            'lang': locale_negotiator(request)
         }
 
     if request.method == 'POST':
@@ -135,7 +137,8 @@ def trycaptcha(request):
             return get_url_from_email_status(request, email)
         return {
             'error': True,
-            'recaptcha_public_key': recaptcha_public_key
+            'recaptcha_public_key': recaptcha_public_key,
+            'lang': locale_negotiator(request)
         }
 
     return HTTPMethodNotAllowed()
