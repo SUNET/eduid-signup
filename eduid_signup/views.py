@@ -1,5 +1,6 @@
 import os
 import time
+import uuid
 from bson import ObjectId
 
 from pyramid.i18n import get_locale_name
@@ -114,11 +115,15 @@ def trycaptcha(request):
 
     remote_ip = request.environ.get('REMOTE_ADDR', '')
     recaptcha_public_key = settings.get('recaptcha_public_key', '')
+    nonce = uuid.uuid4().hex
+
     if request.method == 'GET':
         logger.debug('Presenting CAPTCHA to {!s} (email {!s})'.format(remote_ip, request.session['email']))
+
         return {
             'recaptcha_public_key': recaptcha_public_key,
-            'lang': locale_negotiator(request)
+            'lang': locale_negotiator(request),
+            'nonce': nonce
         }
 
     if request.method == 'POST':
@@ -138,7 +143,8 @@ def trycaptcha(request):
         return {
             'error': True,
             'recaptcha_public_key': recaptcha_public_key,
-            'lang': locale_negotiator(request)
+            'lang': locale_negotiator(request),
+            'nonce': nonce
         }
 
     return HTTPMethodNotAllowed()

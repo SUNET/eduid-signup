@@ -34,5 +34,5 @@
 {% endblock %}
 
 {% block extrajs %}
-    <script src="https://www.google.com/recaptcha/api.js?hl={{ lang }}" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?hl={{ lang }}" async defer nonce="{{ nonce }}"></script>
 {% endblock %}
