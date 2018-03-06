@@ -9,6 +9,8 @@ from eduid_userdb import MailAddress
 import os
 import struct
 import proquint
+import requests
+import time
 from pyramid.httpexceptions import HTTPServerError
 
 import logging
@@ -196,3 +198,46 @@ def remove_users_with_mail_address(signup_db, email):
     for user in completed_users:
         logger.warning('Removing old user {!s} with e-mail {!s} from signup_db'.format(user, email))
         signup_db.remove_user_by_id(user.user_id)
+
+
+def verify_recaptcha(secret_key, captcha_response, user_ip, retries=3):
+    """
+    :param secret_key: Recaptcha secret key
+    :param captcha_response: User recaptcha response
+    :param user_ip: User ip address
+    :param retries: Number of times to retry sending recaptcha response
+
+    :type secret_key: str
+    :type captcha_response: str
+    :type user_ip: str
+    :type retries: int
+
+    :return: True|False
+    :rtype: bool
+    """
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    params = {
+        'secret': secret_key,
+        'response': captcha_response,
+        'remoteip': user_ip
+    }
+    while retries:
+        retries -= 1
+        try:
+            logger.debug('Sending the CAPTCHA user response to google')
+            verify_rs = requests.get(url, params=params, verify=True)
+            logger.debug("CAPTCHA response: {}".format(verify_rs))
+            verify_rs = verify_rs.json()
+            if verify_rs.get('success', False) is True:
+                return True
+        except requests.exceptions.RequestException as e:
+            if not retries:
+                logger.error('Caught RequestException while sending CAPTCHA, giving up.')
+                raise e
+            logger.warning('Caught RequestException while sending CAPTCHA, trying again.')
+            logger.warning(e)
+            time.sleep(0.5)
+
+    logger.info("Invalid CAPTCHA response from {}: {}".format(
+        user_ip, verify_rs.get('error-codes', 'Unspecified error')))
+    return False

@@ -20,7 +20,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-version = '0.4.6b7'
+version = '0.4.7'
 
 requires = [
     'eduid_am >= 0.6.0, < 0.7.0',
@@ -36,7 +36,7 @@ requires = [
     'pyramid_tm == 1.1.1',
     'pyramid_sna == 0.3.2',
     'waitress == 0.8.9',
-    'recaptcha-client == 1.0.6',
+    'requests >= 2.1.18',  # Validate recaptcha with requests
     'pwgen == 0.4',
     'proquint == 0.1.0',
     'gunicorn == 19.3.0',
