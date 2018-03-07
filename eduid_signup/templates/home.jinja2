@@ -10,18 +10,19 @@
   <p class="lead">{{ _("Create an account for use with Swedish Universities.") }}</p>
 
   <div class="row text-center">
-    <div id="email-register" class="col-md-8">
+    <div id="email-register" class="col-lg-8">
       <div id="email-register-lg">
         <form class="form-inline" role="form" method="POST">
-         <div class="form-group{% if email_error is defined %} has-error{% endif %}">
+         <div class="form-group{% if email_error is defined %} has-danger{% endif %}">
           <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div>
             <input type="email" name="email" class="form-control" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
             <span class="input-group-btn">
               <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
             </span>
           </div>
           {% if email_error is defined %}
-            <p class="help-block">{{ email_error }}</p>
+            <p class="form-control-feedback">{{ email_error }}</p>
           {% endif %}
 
          </div>
@@ -29,10 +30,10 @@
       </div>
       <div id="email-register-sm">
         <form role="form" class="form-horizontal" method="POST">
-         <div class="form-group{% if email_error is defined %} has-error{% endif %}">
+         <div class="form-group{% if email_error is defined %} has-danger{% endif %}">
           <input type="email" name="email" id="input-email-register" class="form-control" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
           {% if email_error is defined %}
-            <p class="help-block">{{ email_error }}</p>
+            <p class="form-control-feedback">{{ email_error }}</p>
           {% endif %}
           <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
          </div>
@@ -41,7 +42,7 @@
     </div>
   </div>
   <div class="row text-center">
-    <div id="social-register" class="col-md-8">
+    <div id="social-register" class="col-lg-8">
 {#      {% if request.registry.settings.get('facebook_auth_enabled', False) %}#}
 {#        <a class="btn-social btn-facebook" href="{{ request.route_path('facebook_login') }}">#}
 {#          <span class="btn-icon"></span>#}
