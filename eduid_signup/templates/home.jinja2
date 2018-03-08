@@ -15,7 +15,7 @@
         <form class="form-inline" role="form" method="POST">
          <div class="form-group{% if email_error is defined %} has-danger{% endif %}">
           <div class="input-group">
-            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div>
+            <span id="email-register-lg-icon" class="input-group-text"><i class="fa fa-envelope"></i></span>
             <input type="email" name="email" class="form-control" placeholder="name@example.edu" {% if email is defined %}value="{{ email or '' }}"{% endif %} required />
             <span class="input-group-btn">
               <button class="btn btn-success" type="submit">{{ _("Sign up with your email address") }}</button>
