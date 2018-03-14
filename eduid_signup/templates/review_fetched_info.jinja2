@@ -7,8 +7,8 @@
     </div>
 
     <div class="row">
-      <div class="col-md-2"></div>
-      <div class="col-md-8">
+      <div class="col-lg-2"></div>
+      <div class="col-lg-8">
         {% if not mail_empty and not mail_registered %}
         <p>{% trans %} No account has been created in eduID yet. If the data below is
             correct, click the <strong>Accept</strong> button. Otherwise click the
@@ -35,25 +35,25 @@
             Click <strong>Cancel</strong> if it is not correct.{% endtrans %}
         </p>
       </div>
-      <div class="col-md-2"></div>
+      <div class="col-lg-2"></div>
     </div>
 
     <div class="row eduid-fetched-info-form">
-      <div class="col-md-2"></div>
-      <div class="col-md-8">
+      <div class="col-lg-2"></div>
+      <div class="col-lg-8">
         <div class='row'>
-          <div class="col-md-6">
-            <div class="form-group{% if mail_empty or mail_registered %} has-error{% endif %}">
+          <div class="col-lg-6">
+            <div class="form-group{% if mail_empty or mail_registered %} has-danger{% endif %}">
               <label class="control-label" for="email">{{_("Email")}}</label>
               <span class="form-control uneditable-input">{{ social_info.email }}</span>
               {% if mail_registered %}
-                <span class="help-block">{{ _("Email address already in use") }}</span>
+                <span class="form-control-feedback">{{ _("Email address already in use") }}</span>
               {% elif mail_empty %}
-                <span class="help-block">{{ _("Email address is required, but none was received from social network") }}</span>
+                <span class="form-control-feedback">{{ _("Email address is required, but none was received from social network") }}</span>
               {% endif %}
             </div>
           </div>
-          <div class='col-md-6'>
+          <div class='col-lg-6'>
             <div class="form-group">
               <label class="control-label" for="screenname">{{_("Display name")}}</label>
               <span class="form-control uneditable-input">{{ social_info.screen_name }}</span>
@@ -61,13 +61,13 @@
           </div>
         </div>
         <div class="row">
-          <div class='col-md-6'>
+          <div class='col-lg-6'>
             <div class="form-group">
               <label class="control-label" for="firstname">{{_("First name")}}</label>
               <span class="form-control uneditable-input">{{ social_info.first_name }}</span>
             </div>
           </div>
-          <div class='col-md-6'>
+          <div class='col-lg-6'>
             <div class="form-group">
               <label class="control-label" for="lastname">{{_("Last name")}}</label>
               <span class="form-control uneditable-input">{{ social_info.last_name }}</span>
@@ -75,17 +75,17 @@
           </div>
         </div>
       </div>
-      <div class="col-md-2"></div>
+      <div class="col-lg-2"></div>
     </div>
     <div class="row">
-      <div class="col-md-2"></div>
-      <div class="col-md-8">
+      <div class="col-lg-2"></div>
+      <div class="col-lg-8">
         <form class="accept-cancel" method="POST">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-lg-6">
                <button class="btn btn-danger" name="cancel" type="submit" value="cancel">{{ _("Cancel") }}</button>
               </div>
-              <div class="col-md-6">
+              <div class="col-lg-6">
                <button class="btn btn-success has-spinner"
                        name="action"
                        type="submit"
@@ -95,13 +95,13 @@
                        id="do-review-button"
                        value="accept"
                 {% endif %}>
-                    <span class="glyphicon glyphicon-refresh glyphicon-spin hidden"></span> {{ _("Accept") }}
+                    <i class="fas fa-refresh hidden"></i> {{ _("Accept") }}
                 </button>
               </div>
             </div>
         </form>
       </div>
-      <div class="col-md-2"></div>
+      <div class="col-lg-2"></div>
     </div>
 {% endblock %}
 
