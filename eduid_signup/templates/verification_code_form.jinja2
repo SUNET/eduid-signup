@@ -9,7 +9,7 @@
   <p class="lead">{{ _("Email address has already been verified") }}</p>
   <p class="lead">{{ _("Maybe you want to reset your password again?") }}</p>
   <div class="row">
-      <div class="col-md-12">
+      <div class="col-lg-12">
         <p class="text-center">
           <a class="btn btn-success btn-lg profile-link" href="{{ reset_password_link }}">
               {{ _("Reset password") }}</a>
@@ -23,10 +23,10 @@
   <p class="lead">{{ _("Please enter the confirmation code below") }}</p>
 
   <div class="row text-center">
-    <div id="code-verify" class="col-md-12">
+    <div id="code-verify" class="col-lg-12">
       <div id="code-verify-lg">
         <form class="form-inline" role="form" method="POST">
-          <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
+          <div class="form-group{% if code_does_not_exists is defined %} has-danger{% endif %}">
             <div class="input-group">
               <input type="text" name="code" id="verification-code-input" class="form-control" placeholder="{{ _("Confirmation code") }}" value="" required autofocus />
               <span class="input-group-btn">
@@ -37,7 +37,7 @@
                 </button>
               </span>
               {% if code_does_not_exists is defined %}
-              <p class="help-block">{{ _("The provided code could not be found") }}</p>
+              <p class="form-control-feedback">{{ _("The provided code could not be found") }}</p>
               {% endif %}
             </div>
           </div>
@@ -45,10 +45,10 @@
       </div>
       <div id="code-verify-sm">
         <form role="form" class="form-horizontal" method="POST">
-         <div class="form-group{% if code_does_not_exists is defined %} has-error{% endif %}">
+         <div class="form-group{% if code_does_not_exists is defined %} has-danger{% endif %}">
           <input type="text" name="code" id="input-code-verify" class="form-control" placeholder="{{ _("Confirmation code") }}" value="" required autofocus />
           {% if code_does_not_exists is defined %}
-            <p class="help-block">{{ _("The provided code could not be found") }}</p>
+            <p class="form-control-feedback">{{ _("The provided code could not be found") }}</p>
           {% endif %}
           <button class="btn btn-success" type="submit">{{ _("Verify account") }}</button>
          </div>

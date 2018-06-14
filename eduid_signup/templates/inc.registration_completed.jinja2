@@ -1,17 +1,22 @@
-  <div class='row text-center'>
-    <div id="#registration-completed" class="col-md-10 col-md-push-1">
+  <div id="password-gotit-div" class='row text-center'>
+    <div id="#registration-completed" class="col-lg-12 col-lg-push-1">
       <p class='lead'>{{ _("Write this password down and store it in a safe place.") }}</p>
       <pre class='text-center pre-big'>{{ password }}</pre>
       <p class="text-center">
-          <button id='gotit_btn' type="submit" class="btn btn-success btn-lg profile-link">
+          <button id="gotit_btn" class="btn btn-success btn-lg profile-link">
               {{ _("OK, got it") }}</button>
       </p>
     </div>
   </div>
 
-  <div id='instructions_div' class='hide container'>
-      <div class='row'>
-        <div class='col-md-6'>
+                <form method="post" action="{{ profile_link }}">
+                  <input type="hidden" name="eppn" value="{{ eppn }}"/>
+                  <input type="hidden" name="nonce" value="{{ nonce }}"/>
+                  <input type="hidden" name="ts" value="{{ timestamp }}"/>
+                  <input type="hidden" name="token" value="{{ auth_token }}"/>
+  <div id='instructions_div' class='container mx-auto'>
+      <div class='row text-center'>
+        <div class='col-lg-6'>
             <h4>{{  _("You can now log in") }}</h4>
             <p>
             {% trans %}
@@ -25,20 +30,13 @@
               {% endif %}
         </div>
 
-        <div class='col-md-6'>
+        <div class='col-lg-6'>
             <h4>{{ _("Access more") }}</h4>
             <p>
               {{ _("To get access to additional sites that require a confirmed identity, proceed to the dashboard.") }}
             </p>
-              <p class="text-center">
-                <form method="post" action="{{ profile_link }}">
-                  <input type="hidden" name="eppn" value="{{ eppn }}"/>
-                  <input type="hidden" name="nonce" value="{{ nonce }}"/>
-                  <input type="hidden" name="ts" value="{{ timestamp }}"/>
-                  <input type="hidden" name="token" value="{{ auth_token }}"/>
-                  <button type="submit" class="btn btn-success btn-lg profile-link">{{ _("Confirm identity") }}</button>
-                </form>
-              </p>
+              <button id="access-more-button" type="submit" class="btn btn-success btn-lg profile-link">{{ _("Confirm identity") }}</button>
         </div>
       </div>
     </div>
+                </form>

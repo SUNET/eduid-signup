@@ -14,8 +14,8 @@
     {% endif %}
     </div>
     <div class="row">
-        <div id="eduid-captcha" class="col-xs-12 col-md-6 center-block">
-            <div id="eduid-captcha-inner">
+        <div id="eduid-captcha" class="col-xs-12 col-lg-6 mx-auto">
+          <div id="eduid-captcha-inner">
                 <form action="?" method="POST">
                     <div class="g-recaptcha" data-sitekey="{{ recaptcha_public_key }}"></div>
                     <br />
@@ -24,11 +24,11 @@
                             <button type="submit" class="btn btn-primary">{{ _("Submit") }}</button>
                         </div>
                         <div class="col-sm-6">
-                            <a href="/" class="btn btn-default">{{ _("Cancel") }}</a>
+                            <a href="/" class="btn btn-light">{{ _("Cancel") }}</a>
                         </div>
                     </div>
                 </form>
-            </div>
+          </div>
         </div>
     </div>
 {% endblock %}
