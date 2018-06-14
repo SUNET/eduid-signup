@@ -25,7 +25,7 @@ from eduid_signup.utils import (verify_email_code, check_email_status,
                                 CodeDoesNotExists, record_tou, verify_recaptcha)
 from eduid_signup.vccs import generate_password
 from eduid_userdb.signup import SignupUser
-from eduid_userdb.password import Password
+from eduid_userdb.credentials import Password
 
 import logging
 logger = logging.getLogger(__name__)
