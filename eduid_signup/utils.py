@@ -1,6 +1,7 @@
 import bson
 from uuid import uuid4
 from hashlib import sha256
+from proquint import uint2quint
 import datetime
 from eduid_signup.compat import text_type
 from eduid_userdb.tou import ToUEvent
@@ -8,7 +9,6 @@ from eduid_userdb import MailAddress
 
 import os
 import struct
-import proquint
 import requests
 import time
 from pyramid.httpexceptions import HTTPServerError
@@ -131,7 +131,7 @@ def generate_eppn(request):
     """
     for _ in range(10):
         eppn_int = struct.unpack('I', os.urandom(4))[0]
-        eppn = proquint.from_int(eppn_int)
+        eppn = uint2quint(eppn_int)
         try:
             request.userdb.get_user_by_eppn(eppn)
         except request.userdb.exceptions.UserDoesNotExist:
